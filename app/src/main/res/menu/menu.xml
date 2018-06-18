@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/download_data"
+        android:title="download data"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/open_champion_list"
+        android:title="Open Champion List"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/download_pl_data"
+        android:title="download PL data"
+        app:showAsAction="never" />
+
+</menu>

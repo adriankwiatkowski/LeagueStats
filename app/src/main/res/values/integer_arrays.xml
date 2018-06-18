@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer-array name="integer_region_array">
+        <item>@integer/region_eune</item>
+        <item>@integer/region_euw</item>
+        <item>@integer/region_na</item>
+    </integer-array>
+</resources>

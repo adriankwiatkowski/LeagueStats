@@ -1,0 +1,28 @@
+<resources>
+    <string name="app_name">League Stats</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="champion_id_key">id</string>
+
+    <string name="region_eune">EUNE</string>
+    <string name="region_euw">EUW</string>
+    <string name="region_na">NA</string>
+    <string name="shared_preferences_name">sharedPreferences</string>
+    <string name="summoner_region_key">summonerRegion</string>
+    <string name="health_label">Health</string>
+    <string name="attack_damage_label">Attack Damage</string>
+    <string name="health_regen_label">Health regen</string>
+    <string name="mana_label">Mana</string>
+    <string name="range_label">Range</string>
+    <string name="armor_label">Armor</string>
+    <string name="mana_regen_label">Mana Regen</string>
+    <string name="move_speed_label">Move. Speed</string>
+    <string name="magic_resist_label">Magic Resist</string>
+    <string name="attack_speed_label">Attack Speed</string>
+    <string name="splash_art_description">Splash Art for Champion.</string>
+    <string name="playing_as">Playing As</string>
+    <string name="playing_against">Playing Against</string>
+    <string name="unknown_name">Unknown name</string>
+    <string name="unknown_description">Unknown description</string>
+    <string name="unknown_resource">Unknown resource</string>
+</resources>
