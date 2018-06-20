@@ -28,7 +28,6 @@ import com.example.android.leaguestats.database.Helper;
 import com.example.android.leaguestats.interfaces.ChampionTaskCompleted;
 import com.example.android.leaguestats.interfaces.NameTaskCompleted;
 import com.example.android.leaguestats.models.Champion;
-import com.example.android.leaguestats.models.Stats;
 import com.example.android.leaguestats.utilities.ChampionsAsyncTask;
 import com.example.android.leaguestats.utilities.NameAsyncTask;
 
@@ -261,90 +260,59 @@ public class MainActivity extends AppCompatActivity {
             String allyTipsString = stringListToString(allyTipsList);
             values.put(Contract.ChampionEntry.COLUMN_ALLY_TIPS, allyTipsString);
 
-            // Save Stats.
-            int statsSize = champion.getStats().size();
-            for (int i = 0; i < statsSize; i++) {
-                Stats stats = champion.getStats().get(i);
+            values.put(Contract.ChampionEntry.COLUMN_ATTACK_DAMAGE, champion.getAttackDamage());
+            values.put(Contract.ChampionEntry.COLUMN_ATTACK_DAMAGE_PER_LEVEL, champion.getAttackDamagePerLevel());
+            values.put(Contract.ChampionEntry.COLUMN_ATTACK_RANGE, champion.getAttackRange());
+            values.put(Contract.ChampionEntry.COLUMN_ARMOR, champion.getArmor());
+            values.put(Contract.ChampionEntry.COLUMN_ARMOR_PER_LEVEL, champion.getArmorPerLevel());
+            values.put(Contract.ChampionEntry.COLUMN_HEALTH, champion.getHealth());
+            values.put(Contract.ChampionEntry.COLUMN_HEALTH_PER_LEVEL, champion.getHealthPerLevel());
+            values.put(Contract.ChampionEntry.COLUMN_HEALTH_REGEN, champion.getHealthRegen());
+            values.put(Contract.ChampionEntry.COLUMN_HEALTH_REGEN_PER_LEVEL, champion.getHealthRegenPerLevel());
+            values.put(Contract.ChampionEntry.COLUMN_MANA, champion.getMana());
+            values.put(Contract.ChampionEntry.COLUMN_MANA_PER_LEVEL, champion.getManaPerLevel());
+            values.put(Contract.ChampionEntry.COLUMN_MANA_REGEN, champion.getManaRegen());
+            values.put(Contract.ChampionEntry.COLUMN_MANA_REGEN_PER_LEVEL, champion.getManaRegenPerLevel());
+            values.put(Contract.ChampionEntry.COLUMN_ATTACK_SPEED_OFFSET, champion.getAttackSpeedOffset());
+            values.put(Contract.ChampionEntry.COLUMN_ATTACK_SPEED_PER_LEVEL, champion.getAttackSpeedPerLevel());
+            values.put(Contract.ChampionEntry.COLUMN_MOVE_SPEED, champion.getMoveSpeed());
+            values.put(Contract.ChampionEntry.COLUMN_CRIT, champion.getCrit());
+            values.put(Contract.ChampionEntry.COLUMN_CRIT_PER_LEVEL, champion.getCritPerLevel());
+            values.put(Contract.ChampionEntry.COLUMN_MAGIC_RESIST, champion.getMagicResist());
+            values.put(Contract.ChampionEntry.COLUMN_MAGIC_RESIST_PER_LEVEL, champion.getMagicResistPerLevel());
 
-                values.put(Contract.ChampionEntry.COLUMN_ATTACK_DAMAGE, stats.getAttackDamage());
-                values.put(Contract.ChampionEntry.COLUMN_ATTACK_DAMAGE_PER_LEVEL, stats.getAttackDamagePerLevel());
-                values.put(Contract.ChampionEntry.COLUMN_ATTACK_RANGE, stats.getAttackRange());
-                values.put(Contract.ChampionEntry.COLUMN_ARMOR, stats.getArmor());
-                values.put(Contract.ChampionEntry.COLUMN_ARMOR_PER_LEVEL, stats.getArmorPerLevel());
-                values.put(Contract.ChampionEntry.COLUMN_HEALTH, stats.getHealth());
-                values.put(Contract.ChampionEntry.COLUMN_HEALTH_PER_LEVEL, stats.getHealthPerLevel());
-                values.put(Contract.ChampionEntry.COLUMN_HEALTH_REGEN, stats.getHealthRegen());
-                values.put(Contract.ChampionEntry.COLUMN_HEALTH_REGEN_PER_LEVEL, stats.getHealthRegenPerLevel());
-                values.put(Contract.ChampionEntry.COLUMN_MANA, stats.getMana());
-                values.put(Contract.ChampionEntry.COLUMN_MANA_PER_LEVEL, stats.getManaPerLevel());
-                values.put(Contract.ChampionEntry.COLUMN_MANA_REGEN, stats.getManaRegen());
-                values.put(Contract.ChampionEntry.COLUMN_MANA_REGEN_PER_LEVEL, stats.getManaRegenPerLevel());
-                values.put(Contract.ChampionEntry.COLUMN_ATTACK_SPEED_OFFSET, stats.getAttackSpeedOffset());
-                values.put(Contract.ChampionEntry.COLUMN_ATTACK_SPEED_PER_LEVEL, stats.getAttackSpeedPerLevel());
-                values.put(Contract.ChampionEntry.COLUMN_MOVE_SPEED, stats.getMoveSpeed());
-                values.put(Contract.ChampionEntry.COLUMN_CRIT, stats.getCrit());
-                values.put(Contract.ChampionEntry.COLUMN_CRIT_PER_LEVEL, stats.getCritPerLevel());
-                values.put(Contract.ChampionEntry.COLUMN_MAGIC_RESIST, stats.getMagicResist());
-                values.put(Contract.ChampionEntry.COLUMN_MAGIC_RESIST_PER_LEVEL, stats.getMagicResistPerLevel());
+            List<String> spellNameList = champion.getSpellName();
+            String spellNameString = stringListToString(spellNameList);
+            if (TextUtils.isEmpty(spellNameString)) {
+                spellNameString = getString(R.string.unknown_name);
             }
+            values.put(Contract.ChampionEntry.COLUMN_SPELL_NAME, spellNameString);
 
-            List<String> spellNameList = new ArrayList<>();
-            List<String> spellDescriptionList = new ArrayList<>();
-            List<String> spellImageList = new ArrayList<>();
-            List<String> spellResourceList = new ArrayList<>();
-            List<String> spellCooldownList = new ArrayList<>();
-            List<String> spellCostList = new ArrayList<>();
-            // Save Spells.
-            int spellSize = champion.getSpell().size();
-            for (int i = 0; i < spellSize; i++) {
-
-                String spellName = champion.getSpell().get(i).getName();
-                if (TextUtils.isEmpty(spellName)) {
-                    spellName = getString(R.string.unknown_name);
-                }
-                spellNameList.add(spellName);
-
-                String spellDescription = champion.getSpell().get(i).getDescription();
-                if (TextUtils.isEmpty(spellDescription)) {
-                    spellDescription = getString(R.string.unknown_description);
-                }
-                spellDescriptionList.add(spellDescription);
-
-                String spellImage = champion.getSpell().get(i).getImage();
-                spellImageList.add(spellImage);
-
-                String spellResource = champion.getSpell().get(i).getResource();
-                if (TextUtils.isEmpty(spellResource)) {
-                    spellResource = getString(R.string.unknown_resource);
-                }
-                spellResourceList.add(spellResource);
-
-                List<Double> spellCooldown = champion.getSpell().get(i).getCooldownList();
-                String spellCooldownString = doubleListToString(spellCooldown);
-                spellCooldownList.add(spellCooldownString);
-
-                List<Integer> spellCost = champion.getSpell().get(i).getCostList();
-                String spellCostString = integerListToString(spellCost);
-                spellCostList.add(spellCostString);
+            List<String> spellDescriptionList = champion.getSpellDescription();
+            String spellDescriptionString = stringListToString(spellDescriptionList);
+            if (TextUtils.isEmpty(spellDescriptionString)) {
+                spellDescriptionString = getString(R.string.unknown_description);
             }
+            values.put(Contract.ChampionEntry.COLUMN_SPELL_DESCRIPTION, spellDescriptionString);
 
-            String spellName = stringListToString(spellNameList);
-            values.put(Contract.ChampionEntry.COLUMN_SPELL_NAME, spellName);
+            List<String> spellImageList = champion.getSpellImage();
+            String spellImageString = stringListToString(spellImageList);
+            values.put(Contract.ChampionEntry.COLUMN_SPELL_IMAGE, spellImageString);
 
-            String spellDescription = stringListToString(spellDescriptionList);
-            values.put(Contract.ChampionEntry.COLUMN_SPELL_DESCRIPTION, spellDescription);
+            List<String> spellResourceList = champion.getSpellResource();
+            String spellResourceString = stringListToString(spellResourceList);
+            if (TextUtils.isEmpty(spellResourceString)) {
+                spellResourceString = getString(R.string.unknown_resource);
+            }
+            values.put(Contract.ChampionEntry.COLUMN_SPELL_RESOURCE, spellResourceString);
 
-            String spellImage = stringListToString(spellImageList);
-            values.put(Contract.ChampionEntry.COLUMN_SPELL_IMAGE, spellImage);
+            List<String> spellCooldown = champion.getSpellCooldownList();
+            String spellCooldownString = stringListToString(spellCooldown);
+            values.put(Contract.ChampionEntry.COLUMN_SPELL_COOLDOWN, spellCooldownString);
 
-            String spellResource = stringListToString(spellResourceList);
-            values.put(Contract.ChampionEntry.COLUMN_SPELL_RESOURCE, spellResource);
-
-            String spellCooldown = stringListToString(spellCooldownList);
-            values.put(Contract.ChampionEntry.COLUMN_SPELL_COOLDOWN, spellCooldown);
-
-            String spellCost = stringListToString(spellCostList);
-            values.put(Contract.ChampionEntry.COLUMN_SPELL_COST, spellCost);
+            List<String> spellCost = champion.getSpellCostList();
+            String spellCostString = stringListToString(spellCost);
+            values.put(Contract.ChampionEntry.COLUMN_SPELL_COST, spellCostString);
 
             Uri uri = getContentResolver().insert(Contract.ChampionEntry.CONTENT_URI, values);
             Log.d(LOG_TAG, String.valueOf(uri));
@@ -357,30 +325,6 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < list.size(); i++) {
             builder.append(list.get(i));
             if (i != list.size() - 1){
-                builder.append(STRING_DIVIDER);
-            }
-        }
-
-        return builder.toString();
-    }
-
-    private String doubleListToString(List<Double> list) {
-        StringBuilder builder = new StringBuilder();
-
-        for (int i = 0; i < list.size(); i++) {
-            builder.append(String.valueOf(list.get(i)));
-            if (i != list.size() - 1) builder.append(STRING_DIVIDER);
-        }
-
-        return builder.toString();
-    }
-
-    private String integerListToString(List<Integer> list) {
-        StringBuilder builder = new StringBuilder();
-
-        for (int i = 0; i < list.size(); i++) {
-            builder.append(String.valueOf(list.get(i)));
-            if (i != list.size() - 1)  {
                 builder.append(STRING_DIVIDER);
             }
         }

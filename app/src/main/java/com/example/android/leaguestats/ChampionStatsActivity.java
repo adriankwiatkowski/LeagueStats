@@ -18,7 +18,6 @@ import android.widget.TextView;
 import com.example.android.leaguestats.adapters.SpellAdapter;
 import com.example.android.leaguestats.adapters.SplashArtAdapter;
 import com.example.android.leaguestats.database.Contract;
-import com.example.android.leaguestats.models.Spell;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -57,7 +56,8 @@ public class ChampionStatsActivity extends AppCompatActivity implements LoaderMa
         mSpellLayoutManager = new LinearLayoutManager(this);
         mSpellRecyclerView.setLayoutManager(mSpellLayoutManager);
 
-        mSpellAdapter = new SpellAdapter(this, new ArrayList<Spell>());
+        mSpellAdapter = new SpellAdapter(this, new ArrayList<String>(), new ArrayList<String>(),
+                new ArrayList<String>(), new ArrayList<String>(), new ArrayList<String>(), new ArrayList<String>());
         mSpellRecyclerView.setAdapter(mSpellAdapter);
 
         mSplashArtRecyclerView = findViewById(R.id.splash_art_recycler_view);
@@ -203,12 +203,17 @@ public class ChampionStatsActivity extends AppCompatActivity implements LoaderMa
             mSpellCostArray = Arrays.asList(costString.split(STRING_DIVIDER));
             Log.i(LOG_TAG, String.valueOf(mSpellCostArray));
 
+            mSpellAdapter = new SpellAdapter(this, spellNameList, spellDescriptionList, spellImageList, spellResourceList, mSpellCooldownArray, mSpellCostArray);
+            mSpellRecyclerView.setAdapter(mSpellAdapter);
+
+            /*
             List<Spell> spellList = new ArrayList<>();
             for (int i = 0; i < spellNameList.size(); i++) {
                 spellList.add(new Spell(spellNameList.get(i), spellDescriptionList.get(i), spellImageList.get(i), spellResourceList.get(i), mSpellCooldownArray.get(i), mSpellCostArray.get(i)));
             }
 
             mSpellAdapter.setData(spellList);
+            */
 
             //StringBuilder.
 

@@ -8,8 +8,6 @@ import com.example.android.leaguestats.BuildConfig;
 import com.example.android.leaguestats.Data;
 import com.example.android.leaguestats.interfaces.ChampionTaskCompleted;
 import com.example.android.leaguestats.models.Champion;
-import com.example.android.leaguestats.models.Spell;
-import com.example.android.leaguestats.models.Stats;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -37,7 +35,6 @@ public class ChampionsAsyncTask extends AsyncTask<String, Void, ArrayList<Champi
     private static final String ERROR_RESPONSE_CODE = "Error response code: ";
     private static final String HTTP_ENTRY_URL = "https://eun1.api.riotgames.com/lol/static-data/v3/champions";
     private static final String API_KEY = "api_key";
-    private static final String QUERY_PARAMETER_LOCALE = "en_US";
     private static final String LOCALE = "locale";
     private static final String QUERY_PARAMETER_TAGS_LORE = "lore";
     private static final String QUERY_PARAMETER_TAGS_IMAGE = "image";
@@ -50,6 +47,7 @@ public class ChampionsAsyncTask extends AsyncTask<String, Void, ArrayList<Champi
     private static final String TAGS = "tags";
     private static final String QUERY_PARAMETER_DATA_BY_ID = "false";
     private static final String DATA_BY_ID = "dataById";
+    private final String STRING_DIVIDER = "_,_";
 
     private ChampionTaskCompleted mListener;
 
@@ -131,15 +129,18 @@ public class ChampionsAsyncTask extends AsyncTask<String, Void, ArrayList<Champi
 
         for (int i = 0; i < Data.CHAMPION_NAME_ARRAY.length; i++) {
 
-            ArrayList<Spell> spellList = new ArrayList<>();
-
             ArrayList<String> allyTipsList = new ArrayList<>();
             ArrayList<String> enemyTipsList = new ArrayList<>();
 
             ArrayList<String> splashArtList = new ArrayList<>();
             ArrayList<String> splashArtNameList = new ArrayList<>();
 
-            ArrayList<Stats> statsList = new ArrayList<>();
+            ArrayList<String> spellNameList = new ArrayList<>();
+            ArrayList<String> spellDescriptionList = new ArrayList<>();
+            ArrayList<String> spellImageList = new ArrayList<>();
+            ArrayList<String> spellResourceList = new ArrayList<>();
+            ArrayList<String> spellCooldownList = new ArrayList<>();
+            ArrayList<String> spellCostList = new ArrayList<>();
 
             JSONObject championObject = data.getJSONObject(Data.CHAMPION_NAME_ARRAY[i]);
 
@@ -158,30 +159,36 @@ public class ChampionsAsyncTask extends AsyncTask<String, Void, ArrayList<Champi
                 JSONObject spellsObject = spellsArray.getJSONObject(j);
 
                 String name = checkIfContainString(spellsObject, "name", i, j);
+                spellNameList.add(name);
 
                 String description = checkIfContainString(spellsObject, "description", i, j);
+                spellDescriptionList.add(description);
 
                 JSONObject imageObject = spellsObject.getJSONObject("image");
                 String image = checkIfContainString(imageObject, "full", i, j);
+                spellImageList.add(image);
 
                 String resource = checkIfContainString(spellsObject, "resource", i, j);
-
-                ArrayList<Double> spellCooldownList = new ArrayList<>();
-                ArrayList<Integer> spellCostList = new ArrayList<>();
+                spellResourceList.add(resource);
 
                 JSONArray cooldownArray = spellsObject.getJSONArray("cooldown");
+                StringBuilder cooldownBuilder = new StringBuilder();
                 for (int k = 0; k < cooldownArray.length(); k++) {
                     double cooldown = cooldownArray.getDouble(k);
-                    spellCooldownList.add(cooldown);
+                    cooldownBuilder.append(cooldown).append(STRING_DIVIDER);
                 }
+                String cooldownString = cooldownBuilder.toString();
+                spellCooldownList.add(cooldownString);
+
 
                 JSONArray costArray = spellsObject.getJSONArray("cost");
+                StringBuilder costBuilder = new StringBuilder();
                 for (int k = 0; k < costArray.length(); k++) {
                     int cost = costArray.getInt(k);
-                    spellCostList.add(cost);
+                    costBuilder.append(cost).append(STRING_DIVIDER);
                 }
-
-                spellList.add(new Spell(name, description, image, resource, spellCooldownList, spellCostList));
+                String costString = costBuilder.toString();
+                spellCostList.add(costString);
             }
 
             // Get Champion Thumbnail.
@@ -217,13 +224,6 @@ public class ChampionsAsyncTask extends AsyncTask<String, Void, ArrayList<Champi
             double magicResist = statsObject.getDouble("spellblock");
             double healthRegen = statsObject.getDouble("hpregen");
             double healthPerLevel = statsObject.getDouble("hpperlevel");
-
-            // Set Stats.
-            Stats stats = new Stats(attackDamage, attackDamagePerLevel, attackRange, armor, armorPerLevel,
-                    health, healthPerLevel, healthRegen, healthRegenPerLevel, mana, manaPerLevel,
-                    manaRegen, manaRegenPerLevel, attackSpeedOffset, attackSpeedPerLevel, moveSpeed,
-                    crit, critPerLevel, magicResist, magicResistPerLevel);
-            statsList.add(stats);
 
             // Get Champion allyTips.
             JSONArray allyTipsArray = championObject.getJSONArray("allytips");
@@ -262,9 +262,14 @@ public class ChampionsAsyncTask extends AsyncTask<String, Void, ArrayList<Champi
             }
 
             // Add champion to List.
-            Champion champion = new Champion(championId, championName, championKey, championTitle, championLore,
-                    championThumbnail, splashArtList, splashArtNameList, championDifficulty, championAttack,
-                    championDefense, championMagic, enemyTipsList, allyTipsList, statsList, spellList);
+            Champion champion = new Champion(championId, championName, championKey, championTitle,
+                    championLore, championThumbnail, splashArtList, splashArtNameList,
+                    championDifficulty, championAttack, championDefense, championMagic, enemyTipsList,
+                    allyTipsList, attackDamage, attackDamagePerLevel, attackRange, armor, armorPerLevel,
+                    health, healthPerLevel, healthRegen, healthRegenPerLevel, mana, manaPerLevel,
+                    manaRegen, manaRegenPerLevel, attackSpeedOffset, attackSpeedPerLevel, moveSpeed,
+                    crit, critPerLevel, magicResist, magicResistPerLevel, spellNameList,
+                    spellDescriptionList, spellImageList, spellResourceList, spellCooldownList, spellCostList);
             championList.add(champion);
         }
 

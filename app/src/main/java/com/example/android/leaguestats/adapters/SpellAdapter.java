@@ -14,7 +14,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.android.leaguestats.R;
-import com.example.android.leaguestats.models.Spell;
+import com.example.android.leaguestats.models.Champion;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -24,11 +24,23 @@ public class SpellAdapter extends RecyclerView.Adapter<SpellAdapter.ViewHolder> 
 
     private static final String HTTP_ENTRY_URL_SPELL = "http://ddragon.leagueoflegends.com/cdn/8.11.1/img/spell";
     private final Context mContext;
-    private List<Spell> mSpells;
+    private final List<String> mSpellName;
+    private final List<String> mSpellDescription;
+    private final List<String> mSpellImage;
+    private final List<String> mSpellResource;
+    private final List<String> mSpellCooldown;
+    private final List<String> mSpellCost;
 
-    public SpellAdapter(Context context, List<Spell> spells) {
+    public SpellAdapter(Context context, List<String> name, List<String> description,
+                        List<String> image, List<String> resource, List<String> cooldown,
+                        List<String> cost) {
         this.mContext = context;
-        this.mSpells = spells;
+        this.mSpellName = name;
+        mSpellDescription = description;
+        mSpellImage = image;
+        mSpellResource = resource;
+        mSpellCooldown = cooldown;
+        mSpellCost = cost;
     }
 
     @NonNull
@@ -42,43 +54,65 @@ public class SpellAdapter extends RecyclerView.Adapter<SpellAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.mSpellNameTv.setText(getItem(position).getName());
-        holder.mSpellDescriptionTv.setText(getItem(position).getDescription());
+        /*
+        holder.mSpellNameTv.setText(getItem(position).getSpellName());
+        holder.mSpellDescriptionTv.setText(getItem(position).getSpellDescription());
         holder.mSpellCostTv.setText(getItem(position).getCost());
         holder.mSpellCooldownTv.setText(getItem(position).getCooldown());
 
         Picasso.get()
-                .load(HTTP_ENTRY_URL_SPELL + "/" + getItem(position).getImage())
+                .load(HTTP_ENTRY_URL_SPELL + "/" + getItem(position).getSpellImage())
+                .resize(150, 150)
+                .error(R.drawable.ic_launcher_background)
+                .placeholder(R.drawable.ic_launcher_foreground)
+                .into(holder.mTarget);
+                */
+        holder.mSpellNameTv.setText(mSpellName.get(position));
+        holder.mSpellDescriptionTv.setText(mSpellDescription.get(position));
+        holder.mSpellCooldownTv.setText(mSpellCooldown.get(position));
+        holder.mSpellCostTv.setText(mSpellCost.get(position));
+
+        Picasso.get()
+                .load(HTTP_ENTRY_URL_SPELL + "/" + mSpellImage.get(position))
                 .resize(150, 150)
                 .error(R.drawable.ic_launcher_background)
                 .placeholder(R.drawable.ic_launcher_foreground)
                 .into(holder.mTarget);
     }
 
-    public void add(Spell spell) {
-        mSpells.add(spell);
+    public void add(String name, String description, String image, String resource, String cooldown,
+                    String cost) {
+        mSpellName.add(name);
+        mSpellDescription.add(description);
+        mSpellImage.add(image);
+        mSpellResource.add(resource);
+        mSpellCooldown.add(cooldown);
+        mSpellCost.add(cost);
         notifyDataSetChanged();
     }
 
     public void clear() {
-        mSpells.clear();
+        mSpellName.clear();
+        mSpellDescription.clear();
+        mSpellImage.clear();
+        mSpellResource.clear();
+        mSpellCooldown.clear();
+        mSpellCost.clear();
         notifyDataSetChanged();
     }
 
-    public void setData(List<Spell> spells) {
+    public void setData(List<String> name, List<String> description, List<String> image,
+                        List<String> resource, List<String> cooldown, List<String> cost) {
         clear();
-        for (Spell spell : spells) {
-            add(spell);
+        for (int i = 0; i < name.size(); i++) {
+            add(name.get(i), description.get(i), image.get(i), resource.get(i),
+                    cooldown.get(i), cost.get(i));
         }
     }
 
     @Override
     public int getItemCount() {
-        return mSpells.size();
-    }
-
-    public Spell getItem(int position) {
-        return mSpells.get(position);
+        return mSpellName.size();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
