@@ -206,17 +206,6 @@ public class ChampionStatsActivity extends AppCompatActivity implements LoaderMa
             mSpellAdapter = new SpellAdapter(this, spellNameList, spellDescriptionList, spellImageList, spellResourceList, mSpellCooldownArray, mSpellCostArray);
             mSpellRecyclerView.setAdapter(mSpellAdapter);
 
-            /*
-            List<Spell> spellList = new ArrayList<>();
-            for (int i = 0; i < spellNameList.size(); i++) {
-                spellList.add(new Spell(spellNameList.get(i), spellDescriptionList.get(i), spellImageList.get(i), spellResourceList.get(i), mSpellCooldownArray.get(i), mSpellCostArray.get(i)));
-            }
-
-            mSpellAdapter.setData(spellList);
-            */
-
-            //StringBuilder.
-
             mHealthTv.setText(String.valueOf(health));
             mHelathRegenTv.setText(String.valueOf(healthRegen));
             mManaTv.setText(String.valueOf(mana));
