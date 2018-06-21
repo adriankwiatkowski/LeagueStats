@@ -7,14 +7,14 @@ public class Data {
 
     public static final String REQUEST_METHOD_GET = "GET";
 
-    public static final String ENTRY_URL_SUMMONER_EUNE = "https://eun1.api.riotgames.com/lol/summoner/v3/summoners/by-name";
-    public static final String ENTRY_URL_SUMMONER_EUW = "https://euw1.api.riotgames.com/lol/summoner/v3/summoners/by-name";
-    public static final String ENTRY_URL_SUMMONER_NA = "https://na1.api.riotgames.com/lol/summoner/v3/summoners/by-name";
+    public static final String ENTRY_URL_SUMMONER_EUNE = "https://eun1.api.riotgames.com";
+    public static final String ENTRY_URL_SUMMONER_EUW = "https://euw1.api.riotgames.com";
+    public static final String ENTRY_URL_SUMMONER_NA = "https://na1.api.riotgames.com";
     public static final String[] ENTRY_URL_SUMMONER_ARRAY = {ENTRY_URL_SUMMONER_EUNE, ENTRY_URL_SUMMONER_EUW, ENTRY_URL_SUMMONER_NA};
 
-    public static final String ENTRY_URL_MASTERY_EUNE = "https://eun1.api.riotgames.com/lol/champion-mastery/v3/champion-masteries";
-    public static final String ENTRY_URL_MASTERY_EUW = "https://euw1.api.riotgames.com/lol/champion-mastery/v3/champion-masteries";
-    public static final String ENTRY_URL_MASTERY_NA = "https://na1.api.riotgames.com/lol/champion-mastery/v3/champion-masteries";
+    public static final String ENTRY_URL_MASTERY_EUNE = "https://eun1.api.riotgames.com";
+    public static final String ENTRY_URL_MASTERY_EUW = "https://euw1.api.riotgames.com";
+    public static final String ENTRY_URL_MASTERY_NA = "https://na1.api.riotgames.com";
     public static final String[] ENTRY_URL_MASTERY_ARRAY = {ENTRY_URL_MASTERY_EUNE, ENTRY_URL_MASTERY_EUW, ENTRY_URL_MASTERY_NA};
 
     public static final String[] CHAMPION_NAME_ARRAY = new String[]{"Jax", "Sona", "Tristana",

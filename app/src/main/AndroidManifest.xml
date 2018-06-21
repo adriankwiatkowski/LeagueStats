@@ -47,13 +47,18 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ChampionDetailActivity" />
         </activity>
+        <activity
+            android:name=".StrategyActivity"
+            android:parentActivityName=".ChampionDetailActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ChampionDetailActivity" />
+        </activity>
 
         <provider
             android:name=".database.Provider"
             android:authorities="com.example.android.leaguestats"
             android:exported="false" />
-
-        <activity android:name=".StrategyActivity"></activity>
     </application>
 
 </manifest>

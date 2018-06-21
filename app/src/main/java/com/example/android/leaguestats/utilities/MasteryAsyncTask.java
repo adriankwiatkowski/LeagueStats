@@ -34,13 +34,11 @@ public class MasteryAsyncTask extends AsyncTask<String, Void, ArrayList<Mastery>
     private static final String ERROR_RETRIEVING_DATA = "Error retrieving data";
     private static final String ERROR_CLOSING_STREAM = "Error closing stream";
     private static final String ERROR_RESPONSE_CODE = "Error response code: ";
-    private static String HTTP_ENTRY_URL;
+    private static final String SORT_BY_SUMMONER = "by-summoner";
 
-    private Context mContext;
     private MasteryTaskCompleted mListener;
 
-    public MasteryAsyncTask(Context context, MasteryTaskCompleted listener) {
-        mContext = context;
+    public MasteryAsyncTask(MasteryTaskCompleted listener) {
         mListener = listener;
     }
 
@@ -132,19 +130,18 @@ public class MasteryAsyncTask extends AsyncTask<String, Void, ArrayList<Mastery>
         return masteries;
     }
 
-    //sort_param[0] - sort by
-    //sort_param[1] - summoner id
+    // sort_param[0] - summoner region, entry region url
+    // sort_param[1] - summoner id
     private URL createUrl(String[] sort_param) {
 
-        SharedPreferences sharedPreferences = mContext.getSharedPreferences(mContext.getString(
-                R.string.shared_preferences_name), Context.MODE_PRIVATE);
-        int summonerRegionId = sharedPreferences.getInt(mContext.getString(
-                R.string.summoner_region_key), mContext.getResources().getInteger(R.integer.region_eune));
-
-        HTTP_ENTRY_URL = Data.ENTRY_URL_MASTERY_ARRAY[summonerRegionId];
+        String HTTP_ENTRY_URL = sort_param[0];
 
         Uri builtUri = Uri.parse(HTTP_ENTRY_URL).buildUpon()
-                .appendPath(sort_param[0])
+                .appendPath("lol")
+                .appendPath("champion-mastery")
+                .appendPath("v3")
+                .appendPath("champion-masteries")
+                .appendPath(SORT_BY_SUMMONER)
                 .appendPath(sort_param[1])
                 .appendQueryParameter(Data.API_KEY, Data.PERSONAL_API_KEY)
                 .build();

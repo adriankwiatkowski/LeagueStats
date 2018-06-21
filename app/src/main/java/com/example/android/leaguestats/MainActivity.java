@@ -3,7 +3,6 @@ package com.example.android.leaguestats;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -40,51 +39,9 @@ public class MainActivity extends AppCompatActivity {
     private EditText mUserNameEdit;
     private Button mSubmitButton;
     private Spinner mRegionSpinner;
-    private String mRegion;
+    private String mSummonerRegion;
     private ArrayList<Champion> mChampions;
     private final String STRING_DIVIDER = "_,_";
-
-    private final String SQL_CREATE_TABLE = "CREATE TABLE " + Contract.ChampionEntry.TABLE_NAME + " (" +
-            Contract.ChampionEntry._ID + " INTEGER PRIMARY KEY, " +
-            Contract.ChampionEntry.COLUMN_CHAMPION_NAME + " TEXT NOT NULL, " +
-            Contract.ChampionEntry.COLUMN_KEY + " TEXT NOT NULL, " +
-            Contract.ChampionEntry.COLUMN_CHAMPION_TITLE + " TEXT NOT NULL, " +
-            Contract.ChampionEntry.COLUMN_THUMBNAIL + " TEXT NOT NULL, " +
-            Contract.ChampionEntry.COLUMN_SPLASH_ART + " TEXT NOT NULL, " +
-            Contract.ChampionEntry.COLUMN_SPLASH_ART_NAME + " TEXT NOT NULL, " +
-            Contract.ChampionEntry.COLUMN_DIFFICULTY + " INTEGER NOT NULL, " +
-            Contract.ChampionEntry.COLUMN_ATTACK + " INTEGER NOT NULL, " +
-            Contract.ChampionEntry.COLUMN_DEFENSE + " INTEGER NOT NULL, " +
-            Contract.ChampionEntry.COLUMN_MAGIC + " INTEGER NOT NULL, " +
-            Contract.ChampionEntry.COLUMN_ENEMY_TIPS + " TEXT NOT NULL, " +
-            Contract.ChampionEntry.COLUMN_ALLY_TIPS + " TEXT NOT NULL, " +
-            Contract.ChampionEntry.COLUMN_ARMOR_PER_LEVEL + " REAL NOT NULL, " +
-            Contract.ChampionEntry.COLUMN_ATTACK_DAMAGE + " REAL NOT NULL, " +
-            Contract.ChampionEntry.COLUMN_MANA_PER_LEVEL + " REAL NOT NULL, " +
-            Contract.ChampionEntry.COLUMN_ATTACK_SPEED_OFFSET + " REAL NOT NULL, " +
-            Contract.ChampionEntry.COLUMN_MANA + " REAL NOT NULL, " +
-            Contract.ChampionEntry.COLUMN_ARMOR + " REAL NOT NULL, " +
-            Contract.ChampionEntry.COLUMN_HEALTH + " REAL NOT NULL, " +
-            Contract.ChampionEntry.COLUMN_HEALTH_REGEN_PER_LEVEL + " REAL NOT NULL, " +
-            Contract.ChampionEntry.COLUMN_ATTACK_SPEED_PER_LEVEL + " REAL NOT NULL, " +
-            Contract.ChampionEntry.COLUMN_ATTACK_RANGE + " REAL NOT NULL, " +
-            Contract.ChampionEntry.COLUMN_MOVE_SPEED + " REAL NOT NULL, " +
-            Contract.ChampionEntry.COLUMN_ATTACK_DAMAGE_PER_LEVEL + " REAL NOT NULL, " +
-            Contract.ChampionEntry.COLUMN_MANA_REGEN_PER_LEVEL + " REAL NOT NULL, " +
-            Contract.ChampionEntry.COLUMN_CRIT_PER_LEVEL + " REAL NOT NULL, " +
-            Contract.ChampionEntry.COLUMN_MAGIC_RESIST_PER_LEVEL + " REAL NOT NULL, " +
-            Contract.ChampionEntry.COLUMN_CRIT + " REAL NOT NULL, " +
-            Contract.ChampionEntry.COLUMN_MANA_REGEN + " REAL NOT NULL, " +
-            Contract.ChampionEntry.COLUMN_MAGIC_RESIST + " REAL NOT NULL, " +
-            Contract.ChampionEntry.COLUMN_HEALTH_REGEN + " REAL NOT NULL, " +
-            Contract.ChampionEntry.COLUMN_HEALTH_PER_LEVEL + " REAL NOT NULL, " +
-            Contract.ChampionEntry.COLUMN_SPELL_NAME + " TEXT NOT NULL, " +
-            Contract.ChampionEntry.COLUMN_SPELL_DESCRIPTION + " TEXT NOT NULL, " +
-            Contract.ChampionEntry.COLUMN_SPELL_IMAGE + " TEXT NOT NULL, " +
-            Contract.ChampionEntry.COLUMN_SPELL_RESOURCE + " TEXT NOT NULL, " +
-            Contract.ChampionEntry.COLUMN_SPELL_COOLDOWN + " TEXT NOT NULL, " +
-            Contract.ChampionEntry.COLUMN_SPELL_COST + " TEXT NOT NULL, " +
-            Contract.ChampionEntry.COLUMN_CHAMPION_LORE + " TEXT NOT NULL);";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String selection = (String) parent.getItemAtPosition(position);
                 if (!TextUtils.isEmpty(selection)) {
-                    mRegion = Data.ENTRY_URL_SUMMONER_ARRAY[position];
+                    mSummonerRegion = Data.ENTRY_URL_SUMMONER_ARRAY[position];
                 }
             }
 
@@ -135,33 +92,16 @@ public class MainActivity extends AppCompatActivity {
         if (isNetworkAvailable()) {
             NameTaskCompleted taskCompleted = new NameTaskCompleted() {
                 @Override
-                public void nameTaskCompleted(String userId) {
-                    SharedPreferences sharedPreferences = getSharedPreferences(
-                            getString(R.string.shared_preferences_name), MODE_PRIVATE);
-
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-
-                    switch (mRegion) {
-                        case Data.ENTRY_URL_SUMMONER_EUNE:
-                            editor.putInt(getString(R.string.summoner_region_key), getResources().getInteger(R.integer.region_eune));
-                            break;
-                        case Data.ENTRY_URL_SUMMONER_EUW:
-                            editor.putInt(getString(R.string.summoner_region_key), getResources().getInteger(R.integer.region_euw));
-                            break;
-                        case Data.ENTRY_URL_SUMMONER_NA:
-                            editor.putInt(getString(R.string.summoner_region_key), getResources().getInteger(R.integer.region_na));
-                            break;
-                    }
-                    editor.apply();
-
+                public void nameTaskCompleted(String summonerId) {
                     Intent intent = new Intent(MainActivity.this, MasteryActivity.class);
-                    intent.putExtra(getString(R.string.champion_id_key), userId);
+                    intent.putExtra(getString(R.string.summoner_region_key), mSummonerRegion);
+                    intent.putExtra(getString(R.string.summoner_id_key), summonerId);
                     startActivity(intent);
                 }
             };
 
-            NameAsyncTask nameAsyncTask = new NameAsyncTask(taskCompleted, mRegion);
-            nameAsyncTask.execute(summonerName);
+            NameAsyncTask nameAsyncTask = new NameAsyncTask(taskCompleted);
+            nameAsyncTask.execute(mSummonerRegion, summonerName);
         } else {
             Toast.makeText(this, "No internet connection found.", Toast.LENGTH_LONG).show();
         }
@@ -195,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
         Helper helper = new Helper(this);
         SQLiteDatabase database = helper.getWritableDatabase();
         database.execSQL("DROP TABLE IF EXISTS " + Contract.ChampionEntry.TABLE_NAME);
-        database.execSQL(SQL_CREATE_TABLE);
+        database.execSQL(Helper.SQL_CREATE_TABLE);
 
         if (isNetworkAvailable()) {
             mChampions = new ArrayList<>();
@@ -283,16 +223,10 @@ public class MainActivity extends AppCompatActivity {
 
             List<String> spellNameList = champion.getSpellName();
             String spellNameString = stringListToString(spellNameList);
-            if (TextUtils.isEmpty(spellNameString)) {
-                spellNameString = getString(R.string.unknown_name);
-            }
             values.put(Contract.ChampionEntry.COLUMN_SPELL_NAME, spellNameString);
 
             List<String> spellDescriptionList = champion.getSpellDescription();
             String spellDescriptionString = stringListToString(spellDescriptionList);
-            if (TextUtils.isEmpty(spellDescriptionString)) {
-                spellDescriptionString = getString(R.string.unknown_description);
-            }
             values.put(Contract.ChampionEntry.COLUMN_SPELL_DESCRIPTION, spellDescriptionString);
 
             List<String> spellImageList = champion.getSpellImage();
@@ -301,9 +235,6 @@ public class MainActivity extends AppCompatActivity {
 
             List<String> spellResourceList = champion.getSpellResource();
             String spellResourceString = stringListToString(spellResourceList);
-            if (TextUtils.isEmpty(spellResourceString)) {
-                spellResourceString = getString(R.string.unknown_resource);
-            }
             values.put(Contract.ChampionEntry.COLUMN_SPELL_RESOURCE, spellResourceString);
 
             List<String> spellCooldown = champion.getSpellCooldownList();

@@ -19,10 +19,8 @@ import java.util.ArrayList;
 public class MasteryActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = MasteryActivity.class.getSimpleName();
-    private static final String SORT_BY_SUMMONER = "by-summoner";
     private ListView mListView;
     private MasteryAdapter mAdapter;
-    private String userId;
     private long championId;
 
     @Override
@@ -33,9 +31,6 @@ public class MasteryActivity extends AppCompatActivity {
         mListView = findViewById(R.id.list_view);
         mAdapter = new MasteryAdapter(getApplicationContext(), new ArrayList<Mastery>());
         mListView.setAdapter(mAdapter);
-
-        Intent intent = getIntent();
-        userId = intent.getStringExtra(getString(R.string.champion_id_key));
 
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -53,10 +48,14 @@ public class MasteryActivity extends AppCompatActivity {
             }
         });
 
-        getData(SORT_BY_SUMMONER);
+        Intent intent = getIntent();
+        String summonerRegion = intent.getStringExtra(getString(R.string.summoner_region_key));
+        String summonerId = intent.getStringExtra(getString(R.string.summoner_id_key));
+
+        getData(summonerRegion, summonerId);
     }
 
-    private void getData(String sortType) {
+    private void getData(String summonerRegion, String summonerId) {
         MasteryTaskCompleted masteryTaskCompleted = new MasteryTaskCompleted() {
             @Override
             public void masteryTaskCompleted(ArrayList<Mastery> masteries) {
@@ -64,7 +63,7 @@ public class MasteryActivity extends AppCompatActivity {
             }
         };
 
-        MasteryAsyncTask masteriesAsyncTask = new MasteryAsyncTask(this, masteryTaskCompleted);
-        masteriesAsyncTask.execute(sortType, userId);
+        MasteryAsyncTask masteriesAsyncTask = new MasteryAsyncTask(masteryTaskCompleted);
+        masteriesAsyncTask.execute(summonerRegion, summonerId);
     }
 }

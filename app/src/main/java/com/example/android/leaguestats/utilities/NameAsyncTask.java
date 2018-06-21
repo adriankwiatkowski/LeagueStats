@@ -29,13 +29,11 @@ public class NameAsyncTask extends AsyncTask<String, Void, String> {
     private static final String ERROR_RETRIEVING_DATA = "Error retrieving data";
     private static final String ERROR_CLOSING_STREAM = "Error closing stream";
     private static final String ERROR_RESPONSE_CODE = "Error response code: ";
-    private static String HTTP_ENTRY_URL;
 
     private NameTaskCompleted mListener;
 
-    public NameAsyncTask(NameTaskCompleted listener, String httpEntryUrl) {
+    public NameAsyncTask(NameTaskCompleted listener) {
         mListener = listener;
-        HTTP_ENTRY_URL = httpEntryUrl;
     }
 
     @Override
@@ -113,9 +111,19 @@ public class NameAsyncTask extends AsyncTask<String, Void, String> {
         return userIdString;
     }
 
-    private URL createUrl(String[] summoner_name) {
+    // [0] entry url
+    // [1] summoner name
+    private URL createUrl(String[] strings) {
+
+        String HTTP_ENTRY_URL = strings[0];
+
         Uri builtUri = Uri.parse(HTTP_ENTRY_URL).buildUpon()
-                .appendPath(summoner_name[0])
+                .appendPath("lol")
+                .appendPath("summoner")
+                .appendPath("v3")
+                .appendPath("summoners")
+                .appendPath("by-name")
+                .appendPath(strings[1])
                 .appendQueryParameter(Data.API_KEY, Data.PERSONAL_API_KEY)
                 .build();
         try {

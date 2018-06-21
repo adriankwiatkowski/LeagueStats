@@ -36,11 +36,11 @@ public class SpellAdapter extends RecyclerView.Adapter<SpellAdapter.ViewHolder> 
                         List<String> cost) {
         this.mContext = context;
         this.mSpellName = name;
-        mSpellDescription = description;
-        mSpellImage = image;
-        mSpellResource = resource;
-        mSpellCooldown = cooldown;
-        mSpellCost = cost;
+        this.mSpellDescription = description;
+        this.mSpellImage = image;
+        this.mSpellResource = resource;
+        this.mSpellCooldown = cooldown;
+        this.mSpellCost = cost;
     }
 
     @NonNull
@@ -54,19 +54,6 @@ public class SpellAdapter extends RecyclerView.Adapter<SpellAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        /*
-        holder.mSpellNameTv.setText(getItem(position).getSpellName());
-        holder.mSpellDescriptionTv.setText(getItem(position).getSpellDescription());
-        holder.mSpellCostTv.setText(getItem(position).getCost());
-        holder.mSpellCooldownTv.setText(getItem(position).getCooldown());
-
-        Picasso.get()
-                .load(HTTP_ENTRY_URL_SPELL + "/" + getItem(position).getSpellImage())
-                .resize(150, 150)
-                .error(R.drawable.ic_launcher_background)
-                .placeholder(R.drawable.ic_launcher_foreground)
-                .into(holder.mTarget);
-                */
         holder.mSpellNameTv.setText(mSpellName.get(position));
         holder.mSpellDescriptionTv.setText(mSpellDescription.get(position));
         holder.mSpellCooldownTv.setText(mSpellCooldown.get(position));
@@ -74,7 +61,7 @@ public class SpellAdapter extends RecyclerView.Adapter<SpellAdapter.ViewHolder> 
 
         Picasso.get()
                 .load(HTTP_ENTRY_URL_SPELL + "/" + mSpellImage.get(position))
-                .resize(150, 150)
+                .resize(125, 125)
                 .error(R.drawable.ic_launcher_background)
                 .placeholder(R.drawable.ic_launcher_foreground)
                 .into(holder.mTarget);

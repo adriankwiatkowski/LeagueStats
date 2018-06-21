@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <integer name="region_eune">0</integer>
-    <integer name="region_euw">1</integer>
-    <integer name="region_na">2</integer>
-</resources>

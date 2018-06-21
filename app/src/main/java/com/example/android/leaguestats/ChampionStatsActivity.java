@@ -36,10 +36,6 @@ public class ChampionStatsActivity extends AppCompatActivity implements LoaderMa
     private RecyclerView.LayoutManager mSpellLayoutManager;
     private TextView mHealthTv, mHelathRegenTv, mManaTv, mRangeTv, mArmorTv, mManaRegenTv, mMoveSpeedTv,
             mAttackDamageTv, mMagicResistTv, mAttackSpeedTv;
-    private List<String> mSplashArtArray;
-    private List<String> mSplashArtNameArray;
-    private List<String> mSpellCooldownArray;
-    private List<String> mSpellCostArray;
     private Uri mCurrentChampionUri;
     private static final int CHAMPION_LOADER = 0;
     private final String STRING_DIVIDER = "_,_";
@@ -146,12 +142,12 @@ public class ChampionStatsActivity extends AppCompatActivity implements LoaderMa
         if (cursor.moveToFirst()) {
 
             String championSplashArtString = cursor.getString(cursor.getColumnIndex(Contract.ChampionEntry.COLUMN_SPLASH_ART));
-            mSplashArtArray = Arrays.asList(championSplashArtString.split(STRING_DIVIDER));
+            List<String> splashArtArray = Arrays.asList(championSplashArtString.split(STRING_DIVIDER));
 
             String splashArtNameString = cursor.getString(cursor.getColumnIndex(Contract.ChampionEntry.COLUMN_SPLASH_ART_NAME));
-            mSplashArtNameArray = Arrays.asList(splashArtNameString.split(STRING_DIVIDER));
+            List<String> splashArtNameArray = Arrays.asList(splashArtNameString.split(STRING_DIVIDER));
 
-            mSplashArtAdapter.setData(mSplashArtArray, mSplashArtNameArray);
+            mSplashArtAdapter.setData(splashArtArray, splashArtNameArray);
 
             double armorPerLevel = cursor.getDouble(cursor.getColumnIndex(Contract.ChampionEntry.COLUMN_ARMOR_PER_LEVEL));
             double mpPerLevel = cursor.getDouble(cursor.getColumnIndex(Contract.ChampionEntry.COLUMN_MANA_PER_LEVEL));
@@ -182,10 +178,22 @@ public class ChampionStatsActivity extends AppCompatActivity implements LoaderMa
             String spellName = cursor.getString(cursor.getColumnIndex(Contract.ChampionEntry.COLUMN_SPELL_NAME));
             List<String> spellNameList = Arrays.asList(spellName.split(STRING_DIVIDER));
             Log.i(LOG_TAG, spellName);
+            if (spellNameList.size() == 0) {
+                spellNameList = new ArrayList<>();
+                for (int i = 0; i < 4; i++) {
+                    spellNameList.add(getString(R.string.unknown_name));
+                }
+            }
 
             String spellDescription = cursor.getString(cursor.getColumnIndex(Contract.ChampionEntry.COLUMN_SPELL_DESCRIPTION));
             List<String> spellDescriptionList = Arrays.asList(spellDescription.split(STRING_DIVIDER));
             Log.i(LOG_TAG, spellDescription);
+            if (spellDescriptionList.size() == 0) {
+                spellDescriptionList = new ArrayList<>();
+                for (int i = 0; i < 4; i++) {
+                    spellDescriptionList.add(getString(R.string.unknown_description));
+                }
+            }
 
             String spellImage = cursor.getString(cursor.getColumnIndex(Contract.ChampionEntry.COLUMN_SPELL_IMAGE));
             List<String> spellImageList = Arrays.asList(spellImage.split(STRING_DIVIDER));
@@ -194,16 +202,22 @@ public class ChampionStatsActivity extends AppCompatActivity implements LoaderMa
             String spellResource = cursor.getString(cursor.getColumnIndex(Contract.ChampionEntry.COLUMN_SPELL_RESOURCE));
             List<String> spellResourceList = Arrays.asList(spellResource.split(STRING_DIVIDER));
             Log.i(LOG_TAG, spellResource);
+            if (spellResourceList.size() == 0) {
+                spellResourceList = new ArrayList<>();
+                for (int i = 0; i < 4; i++) {
+                    spellResourceList.add(getString(R.string.unknown_resource));
+                }
+            }
 
             String cooldownString = cursor.getString(cursor.getColumnIndex(Contract.ChampionEntry.COLUMN_SPELL_COOLDOWN));
-            mSpellCooldownArray = Arrays.asList(cooldownString.split(STRING_DIVIDER));
-            Log.i(LOG_TAG, String.valueOf(mSpellCooldownArray));
+            List<String> spellCooldownList = Arrays.asList(cooldownString.split(STRING_DIVIDER));
+            Log.i(LOG_TAG, String.valueOf(spellCooldownList));
 
             String costString = cursor.getString(cursor.getColumnIndex(Contract.ChampionEntry.COLUMN_SPELL_COST));
-            mSpellCostArray = Arrays.asList(costString.split(STRING_DIVIDER));
-            Log.i(LOG_TAG, String.valueOf(mSpellCostArray));
+            List<String> spellCostList = Arrays.asList(costString.split(STRING_DIVIDER));
+            Log.i(LOG_TAG, String.valueOf(spellCostList));
 
-            mSpellAdapter = new SpellAdapter(this, spellNameList, spellDescriptionList, spellImageList, spellResourceList, mSpellCooldownArray, mSpellCostArray);
+            mSpellAdapter.setData(spellNameList, spellDescriptionList, spellImageList, spellResourceList, spellCooldownList, spellCostList);
             mSpellRecyclerView.setAdapter(mSpellAdapter);
 
             mHealthTv.setText(String.valueOf(health));
