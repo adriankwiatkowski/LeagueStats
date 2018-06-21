@@ -1,128 +1,122 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+    <TextView
+        android:id="@+id/champion_name_label_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="12dp"
+        android:layout_marginStart="12dp"
+        android:text="Champion Name"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@+id/champion_thumbnail"
+        app:layout_constraintTop_toTopOf="@+id/champion_thumbnail" />
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Player ID"
-            android:textStyle="bold"/>
+    <TextView
+        android:id="@+id/champion_name_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="12dp"
+        android:layout_marginStart="12dp"
+        app:layout_constraintStart_toEndOf="@+id/champion_name_label_tv"
+        app:layout_constraintTop_toTopOf="@+id/champion_name_label_tv"
+        tools:text="Riven" />
 
-        <TextView
-            android:id="@+id/text_view_player_id"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="2"
-            tools:text="Inste"/>
+    <TextView
+        android:id="@+id/champion_level_label_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="Champion Level"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="@+id/champion_name_label_tv"
+        app:layout_constraintTop_toBottomOf="@+id/champion_name_label_tv" />
 
-    </LinearLayout>
+    <TextView
+        android:id="@+id/champion_level_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="12dp"
+        android:layout_marginStart="12dp"
+        app:layout_constraintStart_toEndOf="@+id/champion_level_label_tv"
+        app:layout_constraintTop_toTopOf="@+id/champion_level_label_tv"
+        tools:text="5" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+    <TextView
+        android:id="@+id/champion_points_label_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="Champion Points"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="@+id/champion_name_label_tv"
+        app:layout_constraintTop_toBottomOf="@+id/champion_level_label_tv" />
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Champion ID"
-            android:textStyle="bold"/>
+    <TextView
+        android:id="@+id/champion_points_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        app:layout_constraintStart_toEndOf="@+id/champion_points_label_tv"
+        app:layout_constraintTop_toTopOf="@+id/champion_points_label_tv"
+        tools:text="2325425425" />
 
-        <TextView
-            android:id="@+id/text_view_champion_id"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="2"
-            tools:text="Riven"/>
+    <TextView
+        android:id="@+id/last_played_label_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="Last Played"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="@+id/champion_points_label_tv"
+        app:layout_constraintTop_toBottomOf="@+id/champion_points_label_tv" />
 
-    </LinearLayout>
+    <TextView
+        android:id="@+id/last_played_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="@+id/champion_points_tv"
+        app:layout_constraintTop_toTopOf="@+id/last_played_label_tv"
+        tools:text="12:34" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+    <TextView
+        android:id="@+id/chest_granted_label_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="4dp"
+        android:text="Chest Granted"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/last_played_label_tv"
+        app:layout_constraintTop_toBottomOf="@+id/last_played_tv"
+        app:layout_constraintVertical_bias="1.0" />
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Champion Level"
-            android:textStyle="bold"/>
+    <TextView
+        android:id="@+id/chest_granted_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="@+id/last_played_tv"
+        app:layout_constraintTop_toTopOf="@+id/chest_granted_label_tv"
+        tools:text="Yes" />
 
-        <TextView
-            android:id="@+id/text_view_champion_level"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="2"
-            tools:text="5"/>
+    <ImageView
+        android:id="@+id/champion_thumbnail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="4dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="4dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:background="@color/statsLabelColor"
+        tools:layout_height="200dp"
+        tools:layout_width="200dp" />
 
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Champion Points"
-            android:textStyle="bold"/>
-
-        <TextView
-            android:id="@+id/text_view_champion_points"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="2"
-            tools:text="2325425425"/>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Last Played"
-            android:textStyle="bold"/>
-
-        <TextView
-            android:id="@+id/text_view_last_played"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="2"
-            tools:text="12:34"/>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Chest Granted"
-            android:textStyle="bold"/>
-
-        <TextView
-            android:id="@+id/text_view_chest_granted"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="2"
-            tools:text="Yes"/>
-
-    </LinearLayout>
-
-</LinearLayout>
+</android.support.constraint.ConstraintLayout>

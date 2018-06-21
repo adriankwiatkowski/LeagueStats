@@ -8,9 +8,8 @@ public class Mastery {
     private int mChampionPoints;
     private long mLastPlayTime;
     private boolean mChestGranted;
-
     private String mChampionName;
-    private String mChampionTitle;
+    private String mChampionImage;
 
     public Mastery(long playerId, long championId, int championLevel, int championPoints, long lastPlayTime, boolean chestGranted) {
         mPlayerId = playerId;
@@ -21,9 +20,10 @@ public class Mastery {
         mChestGranted = chestGranted;
     }
 
-    public Mastery(String name, String title, int championLevel, int championPoints, long lastPlayTime, boolean chestGranted) {
+    public Mastery(String name, String image, long championId, int championLevel, int championPoints, long lastPlayTime, boolean chestGranted) {
         mChampionName = name;
-        mChampionTitle = title;
+        mChampionImage = image;
+        mChampionId = championId;
         mChampionLevel = championLevel;
         mChampionPoints = championPoints;
         mLastPlayTime = lastPlayTime;
@@ -86,11 +86,11 @@ public class Mastery {
         this.mChampionName = championName;
     }
 
-    public String getChampionTitle() {
-        return mChampionTitle;
+    public String getChampionImage() {
+        return mChampionImage;
     }
 
-    public void setChampionTitle(String championTitle) {
-        this.mChampionTitle = championTitle;
+    public void setChampionImage(String championImage) {
+        this.mChampionImage = championImage;
     }
 }

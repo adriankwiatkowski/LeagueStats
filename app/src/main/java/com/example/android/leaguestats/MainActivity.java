@@ -170,6 +170,7 @@ public class MainActivity extends AppCompatActivity {
             values.put(Contract.ChampionEntry.COLUMN_CHAMPION_NAME, champion.getChampionName());
             values.put(Contract.ChampionEntry.COLUMN_CHAMPION_TITLE, champion.getChampionTitle());
             values.put(Contract.ChampionEntry.COLUMN_CHAMPION_LORE, champion.getChampionLore());
+            values.put(Contract.ChampionEntry.COLUMN_KEY, champion.getKey());
 
             // Save Thumbnail.
             values.put(Contract.ChampionEntry.COLUMN_THUMBNAIL, champion.getThumbnail());
