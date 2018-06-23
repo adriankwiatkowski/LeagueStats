@@ -17,7 +17,7 @@ import com.example.android.leaguestats.interfaces.MasteryTaskCompleted;
 import com.example.android.leaguestats.interfaces.QueryTaskCompleted;
 import com.example.android.leaguestats.models.Mastery;
 import com.example.android.leaguestats.utilities.MasteryAsyncTask;
-import com.example.android.leaguestats.utilities.QueryAsyncTask;
+import com.example.android.leaguestats.utilities.MasteryQueryAsyncTask;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,8 +58,10 @@ public class MasteryActivity extends AppCompatActivity
                         mAdapter.swapData(queriedMasteries);
                     }
                 };
+
                 SQLiteDatabase db = new Helper(MasteryActivity.this).getReadableDatabase();
-                QueryAsyncTask queryAsyncTask = new QueryAsyncTask(queryTaskCompleted, db);
+                MasteryQueryAsyncTask queryAsyncTask = new MasteryQueryAsyncTask(queryTaskCompleted, db);
+
                 queryAsyncTask.execute(masteries);
             }
         };

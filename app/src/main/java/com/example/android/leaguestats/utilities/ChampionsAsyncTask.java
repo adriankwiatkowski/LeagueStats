@@ -5,7 +5,6 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.example.android.leaguestats.BuildConfig;
-import com.example.android.leaguestats.Data;
 import com.example.android.leaguestats.interfaces.ChampionTaskCompleted;
 import com.example.android.leaguestats.models.Champion;
 
@@ -21,6 +20,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 public class ChampionsAsyncTask extends AsyncTask<String, Void, ArrayList<Champion>> {
 
@@ -284,6 +284,19 @@ public class ChampionsAsyncTask extends AsyncTask<String, Void, ArrayList<Champi
             Log.d(LOG_TAG, "null " + name + " " + j + Data.CHAMPION_NAME_ARRAY[i]);
             return "";
         }
+    }
+
+    private String stringListToString(List<String> list) {
+        StringBuilder builder = new StringBuilder();
+
+        for (int i = 0; i < list.size(); i++) {
+            builder.append(list.get(i));
+            if (i != list.size() - 1){
+                builder.append(STRING_DIVIDER);
+            }
+        }
+
+        return builder.toString();
     }
 
     private URL createUrl(String[] language) {

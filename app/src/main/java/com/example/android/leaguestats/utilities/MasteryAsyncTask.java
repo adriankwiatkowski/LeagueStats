@@ -1,14 +1,9 @@
 package com.example.android.leaguestats.utilities;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.example.android.leaguestats.BuildConfig;
-import com.example.android.leaguestats.Data;
-import com.example.android.leaguestats.R;
 import com.example.android.leaguestats.interfaces.MasteryTaskCompleted;
 import com.example.android.leaguestats.models.Mastery;
 

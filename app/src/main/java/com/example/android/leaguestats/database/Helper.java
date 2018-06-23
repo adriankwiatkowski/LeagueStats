@@ -8,7 +8,7 @@ import com.example.android.leaguestats.database.Contract.ChampionEntry;
 
 public class Helper extends SQLiteOpenHelper {
 
-    public static final int DATABASE_VERSION = 22;
+    public static final int DATABASE_VERSION = 27;
     public static final String DATABASE_NAME = "champions.db";
 
     public static final String SQL_CREATE_TABLE = "CREATE TABLE " + ChampionEntry.TABLE_NAME + " (" +

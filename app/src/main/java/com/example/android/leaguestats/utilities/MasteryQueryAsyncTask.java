@@ -13,24 +13,26 @@ import com.example.android.leaguestats.models.Mastery;
 import java.util.ArrayList;
 import java.util.List;
 
-public class QueryAsyncTask extends AsyncTask<List<Mastery>, Void, List<Mastery>> {
+public class MasteryQueryAsyncTask extends AsyncTask<List<Mastery>, Void, List<Mastery>> {
 
     private QueryTaskCompleted mListener;
     private SQLiteDatabase mDb;
 
-    public QueryAsyncTask(QueryTaskCompleted listener, SQLiteDatabase db) {
+    public MasteryQueryAsyncTask(QueryTaskCompleted listener, SQLiteDatabase db) {
         mListener = listener;
         mDb = db;
     }
 
-    private static final String LOG_TAG = QueryAsyncTask.class.getSimpleName();
+    private static final String LOG_TAG = MasteryQueryAsyncTask.class.getSimpleName();
 
     @Override
     protected List<Mastery> doInBackground(List<Mastery>... masteries) {
 
+        List<Mastery> mastery = masteries[0];
+
         List<Long> champions = new ArrayList<>();
-        for (int i = 0; i < masteries[0].size(); i++) {
-            long championId = masteries[0].get(i).getChampionId();
+        for (int i = 0; i < mastery.size(); i++) {
+            long championId = mastery.get(i).getChampionId();
             champions.add(championId);
         }
 
@@ -54,10 +56,11 @@ public class QueryAsyncTask extends AsyncTask<List<Mastery>, Void, List<Mastery>
             masteryList.add(new Mastery(
                     cursor.getString(cursor.getColumnIndex(Contract.ChampionEntry.COLUMN_CHAMPION_NAME)),
                     cursor.getString(cursor.getColumnIndex(Contract.ChampionEntry.COLUMN_THUMBNAIL)),
-                    masteries[0].get(i).getChampionId(), masteries[0].get(i).getChampionLevel(),
-                    masteries[0].get(i).getChampionPoints(), masteries[0].get(i).getLastPlayTime(),
-                    masteries[0].get(i).isChestGranted()));
+                    mastery.get(i).getChampionId(), mastery.get(i).getChampionLevel(),
+                    mastery.get(i).getChampionPoints(), mastery.get(i).getLastPlayTime(),
+                    mastery.get(i).isChestGranted()));
 
+            cursor.close();
         }
 
         return masteryList;

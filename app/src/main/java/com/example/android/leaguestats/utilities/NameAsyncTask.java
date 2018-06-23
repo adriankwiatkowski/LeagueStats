@@ -4,8 +4,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.example.android.leaguestats.BuildConfig;
-import com.example.android.leaguestats.Data;
 import com.example.android.leaguestats.MainActivity;
 import com.example.android.leaguestats.interfaces.NameTaskCompleted;
 
