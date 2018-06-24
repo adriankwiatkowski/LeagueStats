@@ -48,7 +48,7 @@
                 android:value=".ChampionDetailActivity" />
         </activity>
         <activity
-            android:name=".StrategyActivity"
+            android:name=".ChampionStrategyActivity"
             android:parentActivityName=".ChampionDetailActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
