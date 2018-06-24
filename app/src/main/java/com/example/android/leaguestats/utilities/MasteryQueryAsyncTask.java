@@ -5,8 +5,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 
 import com.example.android.leaguestats.database.Contract;
-import com.example.android.leaguestats.database.Helper;
-import com.example.android.leaguestats.interfaces.NameTaskCompleted;
 import com.example.android.leaguestats.interfaces.QueryTaskCompleted;
 import com.example.android.leaguestats.models.Mastery;
 

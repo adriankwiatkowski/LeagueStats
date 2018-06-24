@@ -26,9 +26,9 @@ import com.squareup.picasso.Target;
 import java.util.Arrays;
 import java.util.List;
 
-public class StrategyActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class ChampionStrategyActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    private static final String LOG_TAG = StrategyActivity.class.getSimpleName();
+    private static final String LOG_TAG = ChampionStrategyActivity.class.getSimpleName();
     private static final String HTTP_ENTRY_URL_SPLASH_ART = "http://ddragon.leagueoflegends.com/cdn/img/champion/splash";
     private static final String DB_SIGN = " = ?";
     private ScrollView mRootLayout;

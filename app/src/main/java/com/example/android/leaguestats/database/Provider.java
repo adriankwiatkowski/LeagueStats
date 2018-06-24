@@ -13,12 +13,15 @@ import com.example.android.leaguestats.database.Contract.ChampionEntry;
 
 import static com.example.android.leaguestats.database.Contract.CONTENT_AUTHORITY;
 import static com.example.android.leaguestats.database.Contract.PATH_CHAMPION;
+import static com.example.android.leaguestats.database.Contract.PATH_ICON;
 
 public class Provider extends ContentProvider {
 
     public static final String LOG_TAG = Provider.class.getSimpleName();
     private static final int CHAMPIONS = 100;
     private static final int CHAMPIONS_ID = 101;
+    private static final int ICONS = 200;
+    private static final int ICON_ID = 201;
     private static final String UNKNOWN_URI = "Query failed, unknown URI: ";
     private static final String MATCH = ". Match: ";
     private static final String INSERTION_NOT_SUPPORTED = "Insertion is not supported for ";
@@ -31,6 +34,9 @@ public class Provider extends ContentProvider {
     static {
         sUriMatcher.addURI(CONTENT_AUTHORITY, PATH_CHAMPION, CHAMPIONS);
         sUriMatcher.addURI(CONTENT_AUTHORITY, PATH_CHAMPION + "/#", CHAMPIONS_ID);
+
+        sUriMatcher.addURI(CONTENT_AUTHORITY, PATH_ICON, ICONS);
+        sUriMatcher.addURI(CONTENT_AUTHORITY, PATH_ICON + "#", ICON_ID);
     }
 
     private Helper mHelper;
@@ -62,6 +68,18 @@ public class Provider extends ContentProvider {
                         ChampionEntry.TABLE_NAME, projection, selection, selectionArgs,
                         null, null, sortOrder);
                 break;
+            case ICONS:
+                cursor = database.query(
+                        Contract.IconEntry.TABLE_NAME, projection, selection, selectionArgs,
+                        null, null, sortOrder);
+                break;
+            case ICON_ID:
+                selection = Contract.IconEntry._ID + DB_SIGN;
+                selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
+                cursor = database.query(
+                        Contract.IconEntry.TABLE_NAME, projection, selection, selectionArgs,
+                        null, null, sortOrder);
+                break;
             default:
                 Log.e(LOG_TAG, UNKNOWN_URI + uri);
         }
@@ -74,29 +92,37 @@ public class Provider extends ContentProvider {
     @Override
     public Uri insert(Uri uri, ContentValues values) {
         final int match = sUriMatcher.match(uri);
+        SQLiteDatabase database = mHelper.getWritableDatabase();
+
+        long id;
 
         switch (match) {
             case CHAMPIONS:
-                return insertItem(uri, values);
+                id = database.insert(ChampionEntry.TABLE_NAME, null, values);
+
+                if (id == -1) {
+                    Log.e(LOG_TAG, FAILED_TO_INSERT_ROW + uri);
+                    return null;
+                }
+
+                getContext().getContentResolver().notifyChange(uri, null);
+
+                return ChampionEntry.buildChampionUri(id);
+            case ICONS:
+                id = database.insert(Contract.IconEntry.TABLE_NAME, null, values);
+
+                if (id == -1) {
+                    Log.e(LOG_TAG, FAILED_TO_INSERT_ROW + uri);
+                    return null;
+                }
+
+                getContext().getContentResolver().notifyChange(uri, null);
+
+                return Contract.IconEntry.buildIconUri(id);
             default:
                 Log.e(LOG_TAG, INSERTION_NOT_SUPPORTED + uri);
                 return null;
         }
-    }
-
-    public Uri insertItem(Uri uri, ContentValues values) {
-        SQLiteDatabase database = mHelper.getWritableDatabase();
-
-        long id = database.insert(ChampionEntry.TABLE_NAME, null, values);
-
-        if (id == -1) {
-            Log.e(LOG_TAG, FAILED_TO_INSERT_ROW + uri);
-            return null;
-        }
-
-        getContext().getContentResolver().notifyChange(uri, null);
-
-        return ChampionEntry.buildChampionUri(id);
     }
 
     @Override
@@ -110,6 +136,12 @@ public class Provider extends ContentProvider {
                 selection = ChampionEntry._ID + DB_SIGN;
                 selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
                 return updateItem(uri, values, selection, selectionArgs);
+            case ICONS:
+                return updateItem(uri, values, selection, selectionArgs);
+            case ICON_ID:
+                selection = Contract.IconEntry._ID + DB_SIGN;
+                selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
+                return updateItem(uri, values, selection, selectionArgs);
             default:
                 Log.e(LOG_TAG, UPDATED_NOT_SUPPORTED + uri);
                 return -1;
@@ -117,11 +149,21 @@ public class Provider extends ContentProvider {
     }
 
     private int updateItem(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+
         SQLiteDatabase database = mHelper.getWritableDatabase();
-        int numOfRows = database.update(ChampionEntry.TABLE_NAME, values, selection, selectionArgs);
+
+        int numOfRows;
+
+        if (uri == ChampionEntry.CONTENT_URI) {
+            numOfRows = database.update(ChampionEntry.TABLE_NAME, values, selection, selectionArgs);
+        } else {
+            numOfRows = database.update(Contract.IconEntry.TABLE_NAME, values, selection, selectionArgs);
+        }
+
         if (numOfRows != 0) {
             getContext().getContentResolver().notifyChange(uri, null);
         }
+
         return numOfRows;
     }
 
@@ -130,9 +172,11 @@ public class Provider extends ContentProvider {
         final int match = sUriMatcher.match(uri);
         final SQLiteDatabase database = mHelper.getWritableDatabase();
 
+        int rowsDeleted;
+
         switch (match) {
             case CHAMPIONS:
-                int rowsDeleted = database.delete(ChampionEntry.TABLE_NAME, selection, selectionArgs);
+                rowsDeleted = database.delete(ChampionEntry.TABLE_NAME, selection, selectionArgs);
                 if (rowsDeleted != 0) {
                     getContext().getContentResolver().notifyChange(uri, null);
                 }
@@ -140,11 +184,25 @@ public class Provider extends ContentProvider {
             case CHAMPIONS_ID:
                 selection = ChampionEntry._ID + DB_SIGN;
                 selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
-                int rowDeleted = database.delete(ChampionEntry.TABLE_NAME, selection, selectionArgs);
-                if (rowDeleted != 0) {
+                rowsDeleted = database.delete(ChampionEntry.TABLE_NAME, selection, selectionArgs);
+                if (rowsDeleted != 0) {
                     getContext().getContentResolver().notifyChange(uri, null);
                 }
-                return rowDeleted;
+                return rowsDeleted;
+            case ICONS:
+                rowsDeleted = database.delete(Contract.IconEntry.TABLE_NAME, selection, selectionArgs);
+                if (rowsDeleted != 0) {
+                    getContext().getContentResolver().notifyChange(uri, null);
+                }
+                return rowsDeleted;
+            case ICON_ID:
+                selection = Contract.IconEntry._ID + DB_SIGN;
+                selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
+                rowsDeleted = database.delete(Contract.IconEntry.TABLE_NAME, selection, selectionArgs);
+                if (rowsDeleted != 0) {
+                    getContext().getContentResolver().notifyChange(uri, null);
+                }
+                return rowsDeleted;
             default:
                 Log.e(LOG_TAG, UNKNOWN_URI + uri);
                 return -1;
@@ -160,6 +218,10 @@ public class Provider extends ContentProvider {
                 return ChampionEntry.CONTENT_TYPE;
             case CHAMPIONS_ID:
                 return ChampionEntry.CONTENT_ITEM_TYPE;
+            case ICONS:
+                return Contract.IconEntry.CONTENT_TYPE;
+            case ICON_ID:
+                return Contract.IconEntry.CONTENT_ITEM_TYPE;
             default:
                 Log.e(LOG_TAG, UNKNOWN_URI + uri + MATCH + match);
                 return null;

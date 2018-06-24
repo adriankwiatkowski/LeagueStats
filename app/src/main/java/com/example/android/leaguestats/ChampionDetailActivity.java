@@ -205,7 +205,7 @@ public class ChampionDetailActivity extends AppCompatActivity implements LoaderM
     }
 
     public void onStrategyClick(View view) {
-        Intent intent = new Intent(ChampionDetailActivity.this, StrategyActivity.class);
+        Intent intent = new Intent(ChampionDetailActivity.this, ChampionStrategyActivity.class);
         intent.setData(mCurrentChampionUri);
         startActivity(intent);
     }

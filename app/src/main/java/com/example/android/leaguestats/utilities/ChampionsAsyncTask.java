@@ -3,9 +3,12 @@ package com.example.android.leaguestats.utilities;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.example.android.leaguestats.BuildConfig;
 import com.example.android.leaguestats.interfaces.ChampionTaskCompleted;
+import com.example.android.leaguestats.interfaces.ResultTask;
 import com.example.android.leaguestats.models.Champion;
 
 import org.json.JSONArray;
@@ -20,9 +23,8 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
 
-public class ChampionsAsyncTask extends AsyncTask<String, Void, ArrayList<Champion>> {
+public class ChampionsAsyncTask extends AsyncTask<String, Integer, ArrayList<Champion>> {
 
     private static final String PERSONAL_API_KEY = BuildConfig.HIDDEN_API_KEY;
     private static final String LOG_TAG = ChampionsAsyncTask.class.getSimpleName();
@@ -49,10 +51,12 @@ public class ChampionsAsyncTask extends AsyncTask<String, Void, ArrayList<Champi
     private static final String DATA_BY_ID = "dataById";
     private final String STRING_DIVIDER = "_,_";
 
-    private ChampionTaskCompleted mListener;
+    private ChampionTaskCompleted mChampionListener;
+    private ResultTask mResultTask;
 
-    public ChampionsAsyncTask(ChampionTaskCompleted listener) {
-        mListener = listener;
+    public ChampionsAsyncTask(ChampionTaskCompleted championListener, ResultTask resultTask) {
+        mChampionListener = championListener;
+        mResultTask = resultTask;
     }
 
     @Override
@@ -127,6 +131,8 @@ public class ChampionsAsyncTask extends AsyncTask<String, Void, ArrayList<Champi
 
         ArrayList<Champion> championList = new ArrayList<>();
 
+        mResultTask.maxProgress(Data.CHAMPION_NAME_ARRAY.length);
+
         for (int i = 0; i < Data.CHAMPION_NAME_ARRAY.length; i++) {
 
             ArrayList<String> allyTipsList = new ArrayList<>();
@@ -200,7 +206,12 @@ public class ChampionsAsyncTask extends AsyncTask<String, Void, ArrayList<Champi
             int championDifficulty = info.getInt("difficulty");
             int championAttack = info.getInt("attack");
             int championDefense = info.getInt("defense");
-            int championMagic = info.getInt("magic");
+            int championMagic;
+            if (info.has("magic")) {
+                championMagic = info.getInt("magic");
+            } else {
+                championMagic = 0;
+            }
 
             // Get Champion stats. data type double.
             JSONObject statsObject = championObject.getJSONObject("stats");
@@ -271,6 +282,8 @@ public class ChampionsAsyncTask extends AsyncTask<String, Void, ArrayList<Champi
                     crit, critPerLevel, magicResist, magicResistPerLevel, spellNameList,
                     spellDescriptionList, spellImageList, spellResourceList, spellCooldownList, spellCostList);
             championList.add(champion);
+
+            publishProgress(i);
         }
 
         return championList;
@@ -284,19 +297,6 @@ public class ChampionsAsyncTask extends AsyncTask<String, Void, ArrayList<Champi
             Log.d(LOG_TAG, "null " + name + " " + j + Data.CHAMPION_NAME_ARRAY[i]);
             return "";
         }
-    }
-
-    private String stringListToString(List<String> list) {
-        StringBuilder builder = new StringBuilder();
-
-        for (int i = 0; i < list.size(); i++) {
-            builder.append(list.get(i));
-            if (i != list.size() - 1){
-                builder.append(STRING_DIVIDER);
-            }
-        }
-
-        return builder.toString();
     }
 
     private URL createUrl(String[] language) {
@@ -323,9 +323,16 @@ public class ChampionsAsyncTask extends AsyncTask<String, Void, ArrayList<Champi
     }
 
     @Override
+    protected void onProgressUpdate(Integer... values) {
+        super.onProgressUpdate(values);
+
+        mResultTask.resultTask(values[0]);
+    }
+
+    @Override
     protected void onPostExecute(ArrayList<Champion> champions) {
         super.onPostExecute(champions);
 
-        mListener.championTaskCompleted(champions);
+        mChampionListener.championTaskCompleted(champions);
     }
 }

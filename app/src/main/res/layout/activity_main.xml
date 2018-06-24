@@ -49,4 +49,63 @@
         app:layout_constraintTop_toBottomOf="@+id/user_name_edit"
         android:spinnerMode="dropdown"/>
 
+    <ProgressBar
+        android:id="@+id/champion_indicator"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/region_spinner" />
+
+    <TextView
+        android:id="@+id/champion_indicator_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="@+id/champion_indicator"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/champion_indicator"
+        tools:text="0/141" />
+
+    <ProgressBar
+        android:id="@+id/icon_indicator"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="20dp"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="@+id/champion_indicator"
+        app:layout_constraintHorizontal_bias="0.487"
+        app:layout_constraintStart_toStartOf="@+id/champion_indicator"
+        app:layout_constraintTop_toBottomOf="@+id/champion_indicator_tv" />
+
+    <TextView
+        android:id="@+id/icon_indicator_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="@+id/icon_indicator"
+        app:layout_constraintStart_toStartOf="@+id/icon_indicator"
+        app:layout_constraintTop_toBottomOf="@+id/icon_indicator"
+        tools:text="0/13375" />
+
 </android.support.constraint.ConstraintLayout>

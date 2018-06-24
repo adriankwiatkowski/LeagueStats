@@ -9,6 +9,7 @@ public class Contract {
     public static final String CONTENT_AUTHORITY = "com.example.android.leaguestats";
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
     public static final String PATH_CHAMPION = "champions";
+    public static final String PATH_ICON = "icon";
 
     public Contract() {}
 
@@ -69,6 +70,24 @@ public class Contract {
         public static final String COLUMN_SPELL_COST = "spellCost";
 
         public static Uri buildChampionUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+    }
+
+    public static final class IconEntry implements BaseColumns {
+        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_ICON).build();
+
+        public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_ICON;
+        public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_ICON;
+
+        public static final String TABLE_NAME = "icons";
+
+        public static final String _ID = BaseColumns._ID;
+
+        public static final String COLUMN_ICON = "icon";
+        public static final String COLUMN_ICON_ID = "iconId";
+
+        public static Uri buildIconUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
     }

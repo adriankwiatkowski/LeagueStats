@@ -8,10 +8,10 @@ import com.example.android.leaguestats.database.Contract.ChampionEntry;
 
 public class Helper extends SQLiteOpenHelper {
 
-    public static final int DATABASE_VERSION = 27;
+    public static final int DATABASE_VERSION = 42;
     public static final String DATABASE_NAME = "champions.db";
 
-    public static final String SQL_CREATE_TABLE = "CREATE TABLE " + ChampionEntry.TABLE_NAME + " (" +
+    public static final String SQL_CREATE_CHAMPION_TABLE = "CREATE TABLE " + ChampionEntry.TABLE_NAME + " (" +
             ChampionEntry._ID + " INTEGER PRIMARY KEY, " +
             ChampionEntry.COLUMN_CHAMPION_NAME + " TEXT NOT NULL, " +
             ChampionEntry.COLUMN_KEY + " TEXT NOT NULL, " +
@@ -53,18 +53,25 @@ public class Helper extends SQLiteOpenHelper {
             ChampionEntry.COLUMN_SPELL_COST + " TEXT NOT NULL, " +
             ChampionEntry.COLUMN_CHAMPION_LORE + " TEXT NOT NULL);";
 
+    public static final String SQL_CREATE_ICON_TABLE = "CREATE TABLE " + Contract.IconEntry.TABLE_NAME + " (" +
+            Contract.IconEntry._ID + " INTEGER PRIMARY KEY, " +
+            Contract.IconEntry.COLUMN_ICON + " TEXT NOT NULL, " +
+            Contract.IconEntry.COLUMN_ICON_ID + " INTEGER NOT NULL);";
+
     public Helper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(SQL_CREATE_TABLE);
+        db.execSQL(SQL_CREATE_CHAMPION_TABLE);
+        db.execSQL(SQL_CREATE_ICON_TABLE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + ChampionEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + Contract.IconEntry.TABLE_NAME);
         onCreate(db);
     }
 }

@@ -4,8 +4,10 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.example.android.leaguestats.MainActivity;
-import com.example.android.leaguestats.interfaces.NameTaskCompleted;
+import com.example.android.leaguestats.BuildConfig;
+import com.example.android.leaguestats.interfaces.IconTaskCompleted;
+import com.example.android.leaguestats.interfaces.ResultTask;
+import com.example.android.leaguestats.models.Icon;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -17,37 +19,46 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
-public class NameAsyncTask extends AsyncTask<String, Void, String> {
+public class IconAsyncTask extends AsyncTask<Void, Integer, List<Icon>> {
 
-    private static final String LOG_TAG = MainActivity.class.getSimpleName();
+    private static final String PERSONAL_API_KEY = BuildConfig.HIDDEN_API_KEY;
+    private static final String LOG_TAG = IconAsyncTask.class.getSimpleName();
     private static final int TIMEOUT = 10000;
     private static final int CONNECT_TIMEOUT = 15000;
     private static final int RESPONSE_CODE = 200;
+    private static final String REQUEST_METHOD = "GET";
     private static final String ERROR_RETRIEVING_DATA = "Error retrieving data";
     private static final String ERROR_CLOSING_STREAM = "Error closing stream";
     private static final String ERROR_RESPONSE_CODE = "Error response code: ";
+    private static final String HTTP_ENTRY_URL = "https://eun1.api.riotgames.com/lol/static-data/v3/profile-icons";
+    private static final String API_KEY = "api_key";
+    private static final String LOCALE = "locale";
 
-    private NameTaskCompleted mListener;
+    private IconTaskCompleted mIconListener;
+    private ResultTask mResultListener;
 
-    public NameAsyncTask(NameTaskCompleted listener) {
-        mListener = listener;
+    public IconAsyncTask(IconTaskCompleted iconListener, ResultTask resultListener) {
+        mIconListener = iconListener;
+        mResultListener = resultListener;
     }
 
     @Override
-    protected String doInBackground(String... strings) {
-        BufferedReader reader = null;
+    protected List<Icon> doInBackground(Void... voids) {BufferedReader reader = null;
         String jsonResponse = "";
         HttpURLConnection urlConnection = null;
         InputStream inputStream = null;
 
         try {
-            URL url = createUrl(strings);
+            URL url = createUrl();
 
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setReadTimeout(TIMEOUT);
             urlConnection.setConnectTimeout(CONNECT_TIMEOUT);
-            urlConnection.setRequestMethod(Data.REQUEST_METHOD_GET);
+            urlConnection.setRequestMethod(REQUEST_METHOD);
             urlConnection.connect();
 
             if (urlConnection.getResponseCode() == RESPONSE_CODE) {
@@ -100,29 +111,41 @@ public class NameAsyncTask extends AsyncTask<String, Void, String> {
         return null;
     }
 
-    private String getJsonData(String json) throws JSONException {
+    private List<Icon> getJsonData(String json) throws JSONException {
         JSONObject root = new JSONObject(json);
 
-        long userId = root.getLong("id");
-        String userIdString = String.valueOf(userId);
+        List<Icon> iconList = new ArrayList<>();
 
-        return userIdString;
+        JSONObject data = root.getJSONObject("data");
+        Iterator<String> iterator = data.keys();
+
+        mResultListener.maxProgress(data.length());
+
+        int progressUpdate = 0;
+        publishProgress(progressUpdate);
+
+        while (iterator.hasNext()) {
+            JSONObject iconObject = data.getJSONObject(iterator.next());
+
+            JSONObject iconImage = iconObject.getJSONObject("image");
+            String groupString = iconImage.getString("group");
+            String fullString = iconImage.getString("full");
+
+            int iconId = iconObject.getInt("id");
+
+            iconList.add(new Icon(groupString + "/" + fullString, iconId));
+            Log.d(LOG_TAG, groupString + " " + fullString + " " + iconId);
+
+            publishProgress(progressUpdate++);
+        }
+
+        return iconList;
     }
 
-    // [0] entry url
-    // [1] summoner name
-    private URL createUrl(String[] strings) {
-
-        String HTTP_ENTRY_URL = strings[0];
-
+    private URL createUrl() {
         Uri builtUri = Uri.parse(HTTP_ENTRY_URL).buildUpon()
-                .appendPath("lol")
-                .appendPath("summoner")
-                .appendPath("v3")
-                .appendPath("summoners")
-                .appendPath("by-name")
-                .appendPath(strings[1])
-                .appendQueryParameter(Data.API_KEY, Data.PERSONAL_API_KEY)
+                .appendQueryParameter(LOCALE, "en_US")
+                .appendQueryParameter(API_KEY, PERSONAL_API_KEY)
                 .build();
         try {
             URL url = new URL(builtUri.toString());
@@ -134,8 +157,16 @@ public class NameAsyncTask extends AsyncTask<String, Void, String> {
     }
 
     @Override
-    protected void onPostExecute(String result) {
-        super.onPostExecute(result);
-        mListener.nameTaskCompleted(result);
+    protected void onProgressUpdate(Integer... values) {
+        super.onProgressUpdate(values);
+
+        mResultListener.resultTask(values[0]);
+    }
+
+    @Override
+    protected void onPostExecute(List<Icon> icons) {
+        super.onPostExecute(icons);
+
+        mIconListener.iconTaskCompleted(icons);
     }
 }

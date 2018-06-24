@@ -6,6 +6,7 @@ import android.content.Context;
 import com.example.android.leaguestats.BuildConfig;
 import com.example.android.leaguestats.database.Contract;
 import com.example.android.leaguestats.models.Champion;
+import com.example.android.leaguestats.models.Icon;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +44,27 @@ public class Data {
             "Morgana", "Nocturne", "Diana", "AurelionSol", "Zyra", "Viktor", "Cassiopeia", "Nasus",
             "Twitch", "DrMundo", "Orianna", "Evelynn", "RekSai", "Lux", "Sion", "Camille", "MasterYi",
             "Ryze", "Malphite", "Anivia", "Shen", "JarvanIV", "Malzahar", "Zac", "Gragas"};
+
+    public static void saveIconData(Context context, List<Icon> icons) {
+        ContentValues[] contentValues = new ContentValues[icons.size()];
+
+        for (int i = 0; i < icons.size(); i++) {
+            ContentValues values = new ContentValues();
+
+            values.put(Contract.IconEntry.COLUMN_ICON, icons.get(i).getIconPath());
+            values.put(Contract.IconEntry.COLUMN_ICON_ID, icons.get(i).getIconId());
+
+            contentValues[i] = values;
+        }
+
+        /*
+        QueryHandler queryHandler = new QueryHandler(context.getContentResolver());
+        for (int i = 0; i < contentValues.length; i++) {
+            queryHandler.startInsert(i, null, Contract.IconEntry.CONTENT_URI, contentValues[i]);
+        }
+        */
+        context.getContentResolver().bulkInsert(Contract.IconEntry.CONTENT_URI, contentValues);
+    }
 
     public static void saveChampionData(Context context, ArrayList<Champion> champions) {
         ContentValues[] championContentValues = new ContentValues[champions.size()];

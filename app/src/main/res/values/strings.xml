@@ -30,4 +30,6 @@
     <string name="unknown_name">Unknown name</string>
     <string name="unknown_description">Unknown description</string>
     <string name="unknown_resource">Unknown resource</string>
+    <string name="summoner_name_key">summonerNameKey</string>
+    <string name="level">Level</string>
 </resources>
