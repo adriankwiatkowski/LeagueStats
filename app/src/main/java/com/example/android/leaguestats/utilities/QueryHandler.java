@@ -18,10 +18,12 @@ public class QueryHandler extends AsyncQueryHandler {
         super.onInsertComplete(token, cookie, uri);
 
         if (uri == null) {
-            Log.d(LOG_TAG, "Failed insertion for token " + token + " Uri:" + uri);
+            Log.d(LOG_TAG, "Failed insertion for token " + token + " Uri: " + uri);
         } else {
-            Log.d(LOG_TAG, "Insertion successful for token " + token + " Uri:" + uri);
+            Log.d(LOG_TAG, "Insertion successful for token " + token + " Uri: " + uri);
         }
     }
+
+
 }
 

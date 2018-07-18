@@ -1,15 +1,57 @@
 package com.example.android.leaguestats.models;
 
-public class Mastery {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class Mastery implements Parcelable {
+
+    public static final Creator<Mastery> CREATOR = new Creator<Mastery>() {
+        @Override
+        public Mastery createFromParcel(Parcel in) {
+            return new Mastery(in);
+        }
+
+        @Override
+        public Mastery[] newArray(int size) {
+            return new Mastery[size];
+        }
+    };
 
     private long mPlayerId;
     private long mChampionId;
     private int mChampionLevel;
     private int mChampionPoints;
     private long mLastPlayTime;
-    private boolean mChestGranted;
+    private boolean mIsChestGranted;
     private String mChampionName;
     private String mChampionImage;
+
+    protected Mastery(Parcel in) {
+        mPlayerId = in.readLong();
+        mChampionId = in.readLong();
+        mChampionLevel = in.readInt();
+        mChampionPoints = in.readInt();
+        mLastPlayTime = in.readLong();
+        mIsChestGranted = in.readByte() != 0;
+        mChampionName = in.readString();
+        mChampionImage = in.readString();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(mChampionName);
+        dest.writeString(mChampionImage);
+        dest.writeLong(mChampionId);
+        dest.writeInt(mChampionLevel);
+        dest.writeInt(mChampionPoints);
+        dest.writeLong(mLastPlayTime);
+        dest.writeByte((byte) (mIsChestGranted ? 1 : 0));
+    }
 
     public Mastery(long playerId, long championId, int championLevel, int championPoints, long lastPlayTime, boolean chestGranted) {
         mPlayerId = playerId;
@@ -17,7 +59,7 @@ public class Mastery {
         mChampionLevel = championLevel;
         mChampionPoints = championPoints;
         mLastPlayTime = lastPlayTime;
-        mChestGranted = chestGranted;
+        mIsChestGranted = chestGranted;
     }
 
     public Mastery(String name, String image, long championId, int championLevel, int championPoints, long lastPlayTime, boolean chestGranted) {
@@ -27,7 +69,7 @@ public class Mastery {
         mChampionLevel = championLevel;
         mChampionPoints = championPoints;
         mLastPlayTime = lastPlayTime;
-        mChestGranted = chestGranted;
+        mIsChestGranted = chestGranted;
     }
 
     public long getPlayerId() {
@@ -63,11 +105,11 @@ public class Mastery {
     }
 
     public boolean isChestGranted() {
-        return mChestGranted;
+        return mIsChestGranted;
     }
 
     public void setChestGranted(boolean chestGranted) {
-        this.mChestGranted = chestGranted;
+        this.mIsChestGranted = chestGranted;
     }
 
     public long getLastPlayTime() {

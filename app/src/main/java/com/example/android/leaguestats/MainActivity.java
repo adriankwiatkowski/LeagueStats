@@ -2,24 +2,17 @@ package com.example.android.leaguestats;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.KeyEvent;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ProgressBar;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,12 +20,22 @@ import com.example.android.leaguestats.database.Contract;
 import com.example.android.leaguestats.database.Helper;
 import com.example.android.leaguestats.interfaces.ChampionTaskCompleted;
 import com.example.android.leaguestats.interfaces.IconTaskCompleted;
+import com.example.android.leaguestats.interfaces.ItemTaskCompleted;
+import com.example.android.leaguestats.interfaces.PatchTaskCompleted;
 import com.example.android.leaguestats.interfaces.ResultTask;
+import com.example.android.leaguestats.interfaces.SummonerSpellTaskCompleted;
 import com.example.android.leaguestats.models.Champion;
 import com.example.android.leaguestats.models.Icon;
-import com.example.android.leaguestats.utilities.ChampionsAsyncTask;
-import com.example.android.leaguestats.utilities.Data;
-import com.example.android.leaguestats.utilities.IconAsyncTask;
+import com.example.android.leaguestats.models.Item;
+import com.example.android.leaguestats.models.SummonerSpell;
+import com.example.android.leaguestats.utilities.AsyncTasks.ChampionsAsyncTask;
+import com.example.android.leaguestats.utilities.AsyncTasks.SummonerSpellAsyncTask;
+import com.example.android.leaguestats.utilities.DataUtils;
+import com.example.android.leaguestats.utilities.AsyncTasks.IconAsyncTask;
+import com.example.android.leaguestats.utilities.AsyncTasks.ItemAsyncTask;
+import com.example.android.leaguestats.utilities.LocaleUtils;
+import com.example.android.leaguestats.utilities.AsyncTasks.PatchAsyncTask;
+import com.example.android.leaguestats.utilities.PreferencesUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,110 +43,73 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
-    private EditText mUserNameEdit;
-    private Button mSubmitButton;
-    private Spinner mRegionSpinner;
-    private String mSummonerRegion;
-    private ArrayList<Champion> mChampionsList;
+    private Button buttonPl, buttonEn;
+    private TextView mSelectLanguageTv;
+    private List<Champion> mChampionList;
     private List<Icon> mIconList;
+    private List<Item> mItemList;
+    private List<SummonerSpell> mSummonerSpells;
     private ProgressBar mChampionIndicator;
     private ProgressBar mIconIndicator;
+    private ProgressBar mPatchIndicator;
+    private ProgressBar mItemIndicator;
+    private ProgressBar mSummonerSpellIndicator;
     private TextView mChampionIndicatorTv;
     private TextView mIconIndicatorTv;
+    private TextView mPatchIndicatorTv;
+    private TextView mItemIndicatorTv;
+    private TextView mSummonerSpellIndicatorTv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mUserNameEdit = findViewById(R.id.user_name_edit);
-        mSubmitButton = findViewById(R.id.button_submit);
-        mRegionSpinner = findViewById(R.id.region_spinner);
+        mSelectLanguageTv = findViewById(R.id.select_language_tv);
         mChampionIndicator = findViewById(R.id.champion_indicator);
         mChampionIndicatorTv = findViewById(R.id.champion_indicator_tv);
         mIconIndicator = findViewById(R.id.icon_indicator);
         mIconIndicatorTv = findViewById(R.id.icon_indicator_tv);
+        mPatchIndicator = findViewById(R.id.patch_version_indicator);
+        mPatchIndicatorTv = findViewById(R.id.patch_version_indicator_tv);
+        mItemIndicator = findViewById(R.id.item_indicator);
+        mItemIndicatorTv = findViewById(R.id.item_indicator_tv);
+        mSummonerSpellIndicator = findViewById(R.id.summoner_spell_indicator);
+        mSummonerSpellIndicatorTv = findViewById(R.id.summoner_spell_indicator_tv);
 
-        mSubmitButton.setOnClickListener(new View.OnClickListener() {
+        checkIfLanguageIsSaved();
+
+        buttonPl = findViewById(R.id.buttonPl);
+        buttonEn = findViewById(R.id.buttonEn);
+
+        buttonPl.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openMastery();
+                LocaleUtils.setLocale(getBaseContext(), "pl");
+                PreferencesUtils.saveUserLanguage(getBaseContext(), "pl");
+                downloadStaticData("pl_PL");
             }
         });
 
-        setupSpinner();
-
-        mUserNameEdit.setOnKeyListener(new View.OnKeyListener() {
+        buttonEn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
-                    openMastery();
-                    return true;
-                }
-                return false;
+            public void onClick(View v) {
+                LocaleUtils.setLocale(getBaseContext(), "en");
+                PreferencesUtils.saveUserLanguage(getBaseContext(), "en");
+                downloadStaticData("en_US");
             }
         });
     }
 
-    private void setupSpinner() {
-        ArrayAdapter regionSpinnerAdapter = ArrayAdapter.createFromResource(this,
-                R.array.string_region_array, android.R.layout.simple_spinner_item);
-
-        regionSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
-
-        mRegionSpinner.setAdapter(regionSpinnerAdapter);
-
-        mRegionSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String selection = (String) parent.getItemAtPosition(position);
-                if (!TextUtils.isEmpty(selection)) {
-                    mSummonerRegion = Data.ENTRY_URL_SUMMONER_ARRAY[position];
-                }
+    private void checkIfLanguageIsSaved() {
+        Intent intent = getIntent();
+        if (!intent.hasExtra(getString(R.string.change_language_key))) {
+            boolean isSaved = LocaleUtils.didUserSelectedLanguage(getBaseContext());
+            if (isSaved) {
+                startActivity(new Intent(MainActivity.this, NavigationActivity.class));
+                // Prevent to go back to the previous activity
+                finish();
             }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                Toast.makeText(MainActivity.this, "Please select region to continue...", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    private void openMastery() {
-
-        final String summonerName = mUserNameEdit.getText().toString().trim();
-
-        Intent intent = new Intent(MainActivity.this, MasteryActivity.class);
-
-        intent.putExtra(getString(R.string.summoner_region_key), mSummonerRegion);
-        intent.putExtra(getString(R.string.summoner_name_key), summonerName);
-
-        startActivity(intent);
-    }
-
-    private void showIndicator() {
-        mUserNameEdit.setVisibility(View.INVISIBLE);
-        mSubmitButton.setVisibility(View.INVISIBLE);
-        mRegionSpinner.setVisibility(View.INVISIBLE);
-        mChampionIndicator.setVisibility(View.VISIBLE);
-        mChampionIndicatorTv.setVisibility(View.VISIBLE);
-        mIconIndicator.setVisibility(View.VISIBLE);
-        mIconIndicatorTv.setVisibility(View.VISIBLE);
-    }
-
-    private void hideIndicator(View... views) {
-
-        for (View view : views) {
-            view.setVisibility(View.INVISIBLE);
-        }
-
-        int invisible = View.INVISIBLE;
-
-        if (mChampionIndicator.getVisibility() == invisible && mChampionIndicatorTv.getVisibility() == invisible
-                && mIconIndicator.getVisibility() == invisible && mIconIndicatorTv.getVisibility() == invisible) {
-            mUserNameEdit.setVisibility(View.VISIBLE);
-            mSubmitButton.setVisibility(View.VISIBLE);
-            mRegionSpinner.setVisibility(View.VISIBLE);
         }
     }
 
@@ -153,8 +119,13 @@ public class MainActivity extends AppCompatActivity {
 
             dropTable();
 
+            String patchVersion = PreferencesUtils.getPatchVersion(this);
+
             downloadChampionData(language);
             downloadIconData();
+            downloadPatchVersion();
+            downloadItemData(language);
+            downloadSummonerSpellData(language, patchVersion);
 
             showIndicator();
         } else {
@@ -162,22 +133,57 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void downloadItemData(String language) {
+
+        mItemList = new ArrayList<>();
+
+        ItemTaskCompleted itemTaskCompleted = new ItemTaskCompleted() {
+            @Override
+            public void itemTaskCompleted(List<Item> items) {
+                if (!(items == null || items.isEmpty())) {
+                    mItemList = items;
+
+                    DataUtils.saveItemData(MainActivity.this, mItemList);
+                }
+
+                hideIndicator(mItemIndicator, mItemIndicatorTv);
+            }
+        };
+
+        ResultTask resultTask = new ResultTask() {
+            @Override
+            public void resultTask(int progress) {
+                mItemIndicator.setProgress(progress);
+                mItemIndicatorTv.setText(String.valueOf(progress) + "/" + mItemIndicator.getMax());
+            }
+
+            @Override
+            public void maxProgress(int max) {
+                mItemIndicator.setMax(max);
+            }
+        };
+
+        ItemAsyncTask itemAsyncTask = new ItemAsyncTask(itemTaskCompleted, resultTask);
+        itemAsyncTask.execute(language);
+    }
+
     private void downloadChampionData(String language) {
 
-        mChampionsList = new ArrayList<>();
+        mChampionList = new ArrayList<>();
 
         ChampionTaskCompleted championTaskCompleted = new ChampionTaskCompleted() {
             @Override
-            public void championTaskCompleted(ArrayList<Champion> champion) {
+            public void championTaskCompleted(List<Champion> champion) {
 
-                mChampionsList = champion;
+                if (!(champion == null || champion.isEmpty())) {
+                    mChampionList = champion;
 
-                Data.saveChampionData(MainActivity.this, mChampionsList);
+                    DataUtils.saveChampionData(MainActivity.this, mChampionList);
 
-                Toast.makeText(MainActivity.this, "Data has been downloaded.", Toast.LENGTH_SHORT).show();
-                Log.d(LOG_TAG, String.valueOf(mChampionsList.size()));
+                    Log.d(LOG_TAG, String.valueOf(mChampionList.size()));
 
-                hideIndicator(mChampionIndicator, mChampionIndicatorTv);
+                    hideIndicator(mChampionIndicator, mChampionIndicatorTv);
+                }
             }
         };
 
@@ -205,13 +211,16 @@ public class MainActivity extends AppCompatActivity {
         IconTaskCompleted iconTaskCompleted = new IconTaskCompleted() {
             @Override
             public void iconTaskCompleted(List<Icon> icons) {
+                if (!(icons == null || icons.isEmpty())) {
 
-                mIconList = icons;
+                    mIconList = icons;
 
-                Data.saveIconData(MainActivity.this, mIconList);
+                    DataUtils.saveIconData(MainActivity.this, mIconList);
 
-                hideIndicator(mIconIndicator, mIconIndicatorTv);
+                    hideIndicator(mIconIndicator, mIconIndicatorTv);
+                }
             }
+
         };
 
         ResultTask resultTask = new ResultTask() {
@@ -231,9 +240,72 @@ public class MainActivity extends AppCompatActivity {
         iconAsyncTask.execute();
     }
 
-    private void openChampionList() {
-        Intent intent = new Intent(MainActivity.this, ChampionListActivity.class);
-        startActivity(intent);
+    private void downloadPatchVersion() {
+        PatchTaskCompleted patchTaskCompleted = new PatchTaskCompleted() {
+            @Override
+            public void patchTaskCompleted(String patchVersion) {
+                if (!TextUtils.isEmpty(patchVersion)) {
+                    SharedPreferences preferences = getSharedPreferences(
+                            getString(R.string.preferences_file_name), Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = preferences.edit();
+                    editor.putString(getString(R.string.patch_version_key), patchVersion);
+                    editor.apply();
+
+                    hideIndicator(mPatchIndicator, mPatchIndicatorTv);
+                }
+            }
+        };
+
+        ResultTask resultTask = new ResultTask() {
+            @Override
+            public void resultTask(int progress) {
+                mPatchIndicator.setProgress(progress);
+                mPatchIndicatorTv.setText(String.valueOf(progress) + "/" + mPatchIndicator.getMax());
+            }
+
+            @Override
+            public void maxProgress(int max) {
+                mPatchIndicator.setMax(max);
+            }
+        };
+
+        PatchAsyncTask patchAsyncTask = new PatchAsyncTask(patchTaskCompleted, resultTask);
+        patchAsyncTask.execute();
+    }
+
+    private void downloadSummonerSpellData(String language, String patchVersion) {
+
+        mSummonerSpells = new ArrayList<>();
+
+        SummonerSpellTaskCompleted summonerSpellTaskCompleted = new SummonerSpellTaskCompleted() {
+            @Override
+            public void summonerSpellTaskCompleted(List<SummonerSpell> summonerSpells) {
+                if (!(summonerSpells == null || summonerSpells.isEmpty())) {
+
+                    mSummonerSpells = summonerSpells;
+
+                    DataUtils.saveSummonerSpellData(MainActivity.this, mSummonerSpells);
+
+                    hideIndicator(mSummonerSpellIndicator, mSummonerSpellIndicatorTv);
+                }
+            }
+        };
+
+        ResultTask resultTask = new ResultTask() {
+            @Override
+            public void resultTask(int progress) {
+                mSummonerSpellIndicator.setProgress(progress);
+                mSummonerSpellIndicatorTv.setText(String.valueOf(progress) + "/" + mSummonerSpellIndicator.getMax());
+            }
+
+            @Override
+            public void maxProgress(int max) {
+                mSummonerSpellIndicator.setMax(max);
+            }
+        };
+
+        SummonerSpellAsyncTask summonerSpellAsyncTask = new SummonerSpellAsyncTask(summonerSpellTaskCompleted, resultTask);
+        summonerSpellAsyncTask.execute(language, patchVersion);
     }
 
     private void dropTable() {
@@ -241,8 +313,52 @@ public class MainActivity extends AppCompatActivity {
         SQLiteDatabase database = helper.getWritableDatabase();
         database.execSQL("DROP TABLE IF EXISTS " + Contract.ChampionEntry.TABLE_NAME);
         database.execSQL("DROP TABLE IF EXISTS " + Contract.IconEntry.TABLE_NAME);
+        database.execSQL("DROP TABLE IF EXISTS " + Contract.ItemEntry.TABLE_NAME);
+        database.execSQL("DROP TABLE IF EXISTS " + Contract.SummonerSpellEntry.TABLE_NAME);
         database.execSQL(Helper.SQL_CREATE_CHAMPION_TABLE);
         database.execSQL(Helper.SQL_CREATE_ICON_TABLE);
+        database.execSQL(Helper.SQL_CREATE_ITEM_TABLE);
+        database.execSQL(Helper.SQL_CREATE_SUMMONER_SPELL_TABLE);
+    }
+
+    private void showIndicator() {
+        buttonPl.setVisibility(View.INVISIBLE);
+        buttonEn.setVisibility(View.INVISIBLE);
+        mSelectLanguageTv.setVisibility(View.INVISIBLE);
+        mChampionIndicator.setVisibility(View.VISIBLE);
+        mChampionIndicatorTv.setVisibility(View.VISIBLE);
+        mIconIndicator.setVisibility(View.VISIBLE);
+        mIconIndicatorTv.setVisibility(View.VISIBLE);
+        mPatchIndicator.setVisibility(View.VISIBLE);
+        mPatchIndicatorTv.setVisibility(View.VISIBLE);
+        mItemIndicator.setVisibility(View.VISIBLE);
+        mItemIndicatorTv.setVisibility(View.VISIBLE);
+        mSummonerSpellIndicator.setVisibility(View.VISIBLE);
+        mSummonerSpellIndicatorTv.setVisibility(View.VISIBLE);
+    }
+
+    private void hideIndicator(View... views) {
+
+        for (View view : views) {
+            view.setVisibility(View.INVISIBLE);
+        }
+
+        if (isInvisible(mChampionIndicator) && isInvisible(mChampionIndicatorTv)
+                && isInvisible(mIconIndicator) && isInvisible(mIconIndicatorTv)
+                && isInvisible(mPatchIndicator) && isInvisible(mPatchIndicatorTv)
+                && isInvisible(mItemIndicator) && isInvisible(mItemIndicatorTv)
+                && isInvisible(mSummonerSpellIndicator) && isInvisible(mSummonerSpellIndicatorTv)) {
+
+            // Start NavigationActivity.
+            startActivity(new Intent(MainActivity.this, NavigationActivity.class));
+            // Prevent to go back to the previous activity
+            finish();
+        }
+    }
+
+    private boolean isInvisible(View view) {
+        int invisible = View.INVISIBLE;
+        return view.getVisibility() == invisible;
     }
 
     private boolean isNetworkAvailable() {
@@ -251,29 +367,5 @@ public class MainActivity extends AppCompatActivity {
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
 
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.download_data:
-                downloadStaticData("en_US");
-                return true;
-            case R.id.open_champion_list:
-                openChampionList();
-                return true;
-            case R.id.download_pl_data:
-                downloadStaticData("pl_PL");
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
     }
 }

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/splash_art_recycler_view"
+            style="@style/ChampionRecyclerView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/champion_name_tv"
+            style="@style/StatsLabel"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/splash_art_recycler_view"
+            tools:text="Riven" />
+
+        <TextView
+            android:id="@+id/champion_title_tv"
+            style="@style/StatsLabel"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/champion_name_tv"
+            tools:text="The Exile" />
+
+        <TextView
+            android:id="@+id/champion_lore_tv"
+            style="@style/StatsLabel"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/champion_title_tv"
+            tools:text="Riven was the... " />
+
+        <ProgressBar
+            android:id="@+id/attack_progress_bar"
+            style="@style/StatsProgressBar"
+            app:layout_constraintEnd_toEndOf="@+id/splash_art_recycler_view"
+            app:layout_constraintStart_toEndOf="@+id/champion_difficulty_tv"
+            app:layout_constraintTop_toTopOf="@+id/champion_attack_tv" />
+
+        <ProgressBar
+            android:id="@+id/defense_progress_bar"
+            style="@style/StatsProgressBar"
+            app:layout_constraintEnd_toEndOf="@+id/splash_art_recycler_view"
+            app:layout_constraintStart_toEndOf="@+id/champion_difficulty_tv"
+            app:layout_constraintTop_toTopOf="@+id/champion_defense_tv" />
+
+        <ProgressBar
+            android:id="@+id/magic_progress_bar"
+            style="@style/StatsProgressBar"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/splash_art_recycler_view"
+            app:layout_constraintStart_toEndOf="@+id/champion_difficulty_tv"
+            app:layout_constraintTop_toTopOf="@+id/champion_magic_tv" />
+
+        <ProgressBar
+            android:id="@+id/difficulty_progress_bar"
+            style="@style/StatsProgressBar"
+            app:layout_constraintEnd_toEndOf="@+id/splash_art_recycler_view"
+            app:layout_constraintStart_toEndOf="@+id/champion_difficulty_tv"
+            app:layout_constraintTop_toTopOf="@+id/champion_difficulty_tv" />
+
+        <TextView
+            android:id="@+id/champion_difficulty_tv"
+            style="@style/StatsLabel"
+            android:text="@string/difficulty"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/champion_lore_tv" />
+
+        <TextView
+            android:id="@+id/champion_attack_tv"
+            style="@style/StatsLabel"
+            android:text="@string/attack"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/champion_difficulty_tv" />
+
+        <TextView
+            android:id="@+id/champion_defense_tv"
+            style="@style/StatsLabel"
+            android:text="@string/defense"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/champion_attack_tv" />
+
+        <TextView
+            android:id="@+id/champion_magic_tv"
+            style="@style/StatsLabel"
+            android:text="@string/magic"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/champion_defense_tv" />
+
+    </android.support.constraint.ConstraintLayout>
+
+</android.support.v4.widget.NestedScrollView>

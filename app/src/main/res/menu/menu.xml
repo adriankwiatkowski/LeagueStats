@@ -3,18 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/download_data"
-        android:title="download data"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/open_champion_list"
-        android:title="Open Champion List"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/download_pl_data"
-        android:title="download PL data"
+        android:id="@+id/change_language"
+        android:title="@string/change_language"
         app:showAsAction="never" />
 
 </menu>

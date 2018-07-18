@@ -23,26 +23,34 @@ import java.util.List;
 
 public class MasteryAdapter extends RecyclerView.Adapter<MasteryAdapter.ViewHolder> {
 
-    private static final String HTTP_ENTRY_URL_THUMBNAIL = "https://ddragon.leagueoflegends.com/cdn/8.11.1/img/champion";
-    static private ListItemClickListener mOnClickListener = null;
+    static private ListItemClickListener mOnClickListener;
 
     private static List<Mastery> mMastery;
     private final Context mContext;
+    private final String mVersion;
 
     public interface ListItemClickListener {
-        void onListItemClick(int position, long view);
+        void onListItemClick(long championId);
     }
 
-    public MasteryAdapter(Context context, List<Mastery> mastery, ListItemClickListener listener) {
+    public MasteryAdapter(Context context, List<Mastery> mastery, ListItemClickListener listener,
+                          String patchVersion) {
         mContext = context;
         mMastery = mastery;
         mOnClickListener = listener;
+        mVersion = patchVersion;
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(mContext).inflate(R.layout.mastery_item, parent, false);
+
+        final String HTTP_ENTRY_THUMBNAIL_URL =
+                "https://ddragon.leagueoflegends.com/cdn/" + mVersion + "/img/champion";
+
+        view.setTag(R.id.mastery_thumbnail_tag, HTTP_ENTRY_THUMBNAIL_URL);
+
         return new ViewHolder(view);
     }
 
@@ -52,11 +60,12 @@ public class MasteryAdapter extends RecyclerView.Adapter<MasteryAdapter.ViewHold
         int level = mMastery.get(position).getChampionLevel();
         int points = mMastery.get(position).getChampionPoints();
         long timeStamp = mMastery.get(position).getLastPlayTime();
-        boolean chestGranted = mMastery.get(position).isChestGranted();
+
+        String httpEntryUrl = (String) holder.itemView.getTag(R.id.mastery_thumbnail_tag);
 
         String imagePath = mMastery.get(position).getChampionImage();
         Picasso.get()
-                .load(HTTP_ENTRY_URL_THUMBNAIL + "/" + imagePath)
+                .load(httpEntryUrl + "/" + imagePath)
                 .resize(200, 200)
                 .centerCrop()
                 .error(R.drawable.ic_launcher_background)
@@ -67,7 +76,7 @@ public class MasteryAdapter extends RecyclerView.Adapter<MasteryAdapter.ViewHold
         holder.mChampionLevelTv.setText(String.valueOf(level));
         holder.mChampionPointsTv.setText(String.valueOf(points));
 
-        Date dateObject = new Date(mMastery.get(position).getLastPlayTime());
+        Date dateObject = new Date(timeStamp);
         SimpleDateFormat dateFormat = new SimpleDateFormat("LLL dd, yyyy");
         String formattedDate = dateFormat.format(dateObject);
         SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a");
@@ -75,15 +84,14 @@ public class MasteryAdapter extends RecyclerView.Adapter<MasteryAdapter.ViewHold
         String date = formattedDate + "    " + formattedTime;
         holder.mLastPlayTimeTv.setText(date);
 
-        boolean isGranted = mMastery.get(position).isChestGranted();
+        boolean chestGranted = mMastery.get(position).isChestGranted();
         String isGrantedString;
-        if (isGranted) {
+        if (chestGranted) {
             isGrantedString = mContext.getString(R.string.yes);
         } else {
             isGrantedString = mContext.getString(R.string.no);
         }
         holder.mIsChestGrantedTv.setText(isGrantedString);
-
     }
 
     @Override
@@ -157,7 +165,7 @@ public class MasteryAdapter extends RecyclerView.Adapter<MasteryAdapter.ViewHold
         @Override
         public void onClick(View v) {
             long championId = mMastery.get(getAdapterPosition()).getChampionId();
-            mOnClickListener.onListItemClick(getAdapterPosition(), championId);
+            mOnClickListener.onListItemClick(championId);
         }
     }
 }

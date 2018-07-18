@@ -2,8 +2,8 @@ package com.example.android.leaguestats.interfaces;
 
 import com.example.android.leaguestats.models.Champion;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public interface ChampionTaskCompleted {
-    void championTaskCompleted(ArrayList<Champion> champion);
+    void championTaskCompleted(List<Champion> champion);
 }

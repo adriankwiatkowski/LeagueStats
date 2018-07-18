@@ -1,15 +1,15 @@
-package com.example.android.leaguestats.utilities;
+package com.example.android.leaguestats.utilities.AsyncTasks;
 
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.example.android.leaguestats.MainActivity;
-import com.example.android.leaguestats.interfaces.SummonerTaskCompleted;
-import com.example.android.leaguestats.models.Summoner;
+import com.example.android.leaguestats.BuildConfig;
+import com.example.android.leaguestats.interfaces.PatchTaskCompleted;
+import com.example.android.leaguestats.interfaces.ResultTask;
 
+import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -18,38 +18,42 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.List;
 
-public class SummonerAsyncTask extends AsyncTask<String, Void, Summoner> {
+public class PatchAsyncTask extends AsyncTask<Void, Integer, String> {
 
-    private static final String LOG_TAG = MainActivity.class.getSimpleName();
+    private static final String PERSONAL_API_KEY = BuildConfig.HIDDEN_API_KEY;
+    private static final String LOG_TAG = PatchAsyncTask.class.getSimpleName();
     private static final int TIMEOUT = 10000;
     private static final int CONNECT_TIMEOUT = 15000;
     private static final int RESPONSE_CODE = 200;
+    private static final String REQUEST_METHOD = "GET";
     private static final String ERROR_RETRIEVING_DATA = "Error retrieving data";
     private static final String ERROR_CLOSING_STREAM = "Error closing stream";
     private static final String ERROR_RESPONSE_CODE = "Error response code: ";
+    private static final String HTTP_ENTRY_URL = "https://eun1.api.riotgames.com/lol/static-data/v3/versions";
+    private static final String API_KEY = "api_key";
 
-    private SummonerTaskCompleted mListener;
+    private PatchTaskCompleted mIconListener;
+    private ResultTask mResultListener;
 
-    public SummonerAsyncTask(SummonerTaskCompleted listener) {
-        mListener = listener;
+    public PatchAsyncTask(PatchTaskCompleted patchListener, ResultTask resultListener) {
+        mIconListener = patchListener;
+        mResultListener = resultListener;
     }
 
     @Override
-    protected Summoner doInBackground(String... strings) {
-        BufferedReader reader = null;
+    protected String doInBackground(Void... voids) {BufferedReader reader = null;
         String jsonResponse = "";
         HttpURLConnection urlConnection = null;
         InputStream inputStream = null;
 
         try {
-            URL url = createUrl(strings);
+            URL url = createUrl();
 
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setReadTimeout(TIMEOUT);
             urlConnection.setConnectTimeout(CONNECT_TIMEOUT);
-            urlConnection.setRequestMethod(Data.REQUEST_METHOD_GET);
+            urlConnection.setRequestMethod(REQUEST_METHOD);
             urlConnection.connect();
 
             if (urlConnection.getResponseCode() == RESPONSE_CODE) {
@@ -102,36 +106,22 @@ public class SummonerAsyncTask extends AsyncTask<String, Void, Summoner> {
         return null;
     }
 
-    private Summoner getJsonData(String json) throws JSONException {
-        JSONObject root = new JSONObject(json);
+    private String getJsonData(String json) throws JSONException {
+        JSONArray array = new JSONArray(json);
+        String lastVersion = array.getString(0);
 
-        //long userId = root.getLong("id");
-        //String userIdString = String.valueOf(userId);
+        publishProgress(0);
 
-        int profileIconId = root.getInt("profileIconId");
-        String summonerName = root.getString("name");
-        long summonerLevel = root.getLong("summonerLevel");
-        long accountId = root.getLong("accountId");
-        long summonerId = root.getLong("id");
-        long revisionDate = root.getLong("revisionDate");
+        mResultListener.maxProgress(1);
 
-        return new Summoner(profileIconId, summonerName, summonerLevel, accountId, summonerId, revisionDate);
+        publishProgress(1);
+
+        return lastVersion;
     }
 
-    // [0] entry url
-    // [1] summoner name
-    private URL createUrl(String[] strings) {
-
-        String HTTP_ENTRY_URL = strings[0];
-
+    private URL createUrl() {
         Uri builtUri = Uri.parse(HTTP_ENTRY_URL).buildUpon()
-                .appendPath("lol")
-                .appendPath("summoner")
-                .appendPath("v3")
-                .appendPath("summoners")
-                .appendPath("by-name")
-                .appendPath(strings[1])
-                .appendQueryParameter(Data.API_KEY, Data.PERSONAL_API_KEY)
+                .appendQueryParameter(API_KEY, PERSONAL_API_KEY)
                 .build();
         try {
             URL url = new URL(builtUri.toString());
@@ -143,8 +133,16 @@ public class SummonerAsyncTask extends AsyncTask<String, Void, Summoner> {
     }
 
     @Override
-    protected void onPostExecute(Summoner summoner) {
-        super.onPostExecute(summoner);
-        mListener.summonerTaskCompleted(summoner);
+    protected void onProgressUpdate(Integer... values) {
+        super.onProgressUpdate(values);
+
+        mResultListener.resultTask(values[0]);
+    }
+
+    @Override
+    protected void onPostExecute(String patchVersion) {
+        super.onPostExecute(patchVersion);
+        mIconListener.patchTaskCompleted(patchVersion);
     }
 }
+

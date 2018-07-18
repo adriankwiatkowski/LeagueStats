@@ -1,34 +1,44 @@
 package com.example.android.leaguestats;
 
 import android.content.ContentUris;
+import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.graphics.Palette;
 import android.util.Log;
+import android.view.Display;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.example.android.leaguestats.database.Contract;
+import com.example.android.leaguestats.utilities.DataUtils;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
 import java.util.Arrays;
 import java.util.List;
 
-public class ChampionStrategyActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class ChampionTipsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    private static final String LOG_TAG = ChampionStrategyActivity.class.getSimpleName();
+    private static final String LOG_TAG = ChampionTipsFragment.class.getSimpleName();
     private static final String HTTP_ENTRY_URL_SPLASH_ART = "http://ddragon.leagueoflegends.com/cdn/img/champion/splash";
     private static final String DB_SIGN = " = ?";
     private ScrollView mRootLayout;
@@ -42,31 +52,61 @@ public class ChampionStrategyActivity extends AppCompatActivity implements Loade
     private List<String> mAgainstTipsArray;
     private Target mTarget;
     private Uri mCurrentChampionUri;
-    private final int CHAMPION_LOADER = 0;
-    private final String STRING_DIVIDER = "_,_";
+    private static final int CHAMPION_LOADER = 2;
+    private static final String CHAMPION_URI_KEY = "CHAMPION_URI_KEY";
+
+    public ChampionTipsFragment() {
+    }
+
+    public static ChampionTipsFragment newInstance(Uri championUri) {
+
+        ChampionTipsFragment championTipsFragment = new ChampionTipsFragment();
+
+        Bundle args = new Bundle();
+        args.putParcelable(CHAMPION_URI_KEY, championUri);
+        championTipsFragment.setArguments(args);
+
+        return championTipsFragment;
+    }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_strategy);
+        Log.d(LOG_TAG, "onCreate");
 
-        mRootLayout = findViewById(R.id.strategy_root_layout);
-        mTipsLabelTv = findViewById(R.id.tips_label_tv);
-        mPlayingAsTv = findViewById(R.id.playing_as_tv);
-        mPlayingAgainstTv = findViewById(R.id.playing_against_tv);
-        mPlayingAsLabelTv = findViewById(R.id.playing_as_label_tv);
-        mPlayingAgainstLabelTv = findViewById(R.id.playing_against_label_tv);
-        mSplashArtImage = findViewById(R.id.splash_art_image);
+        Bundle bundle = getArguments();
+        if (bundle != null && bundle.containsKey(CHAMPION_URI_KEY)) {
+            mCurrentChampionUri = bundle.getParcelable(CHAMPION_URI_KEY);
+        }
+    }
 
-        Intent intent = getIntent();
-        mCurrentChampionUri = intent.getData();
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.fragment_champion_tips, container, false);
+        Log.d(LOG_TAG, "onCreateView");
+
+        mRootLayout = rootView.findViewById(R.id.strategy_root_layout);
+        mTipsLabelTv = rootView.findViewById(R.id.tips_label_tv);
+        mPlayingAsTv = rootView.findViewById(R.id.playing_as_tv);
+        mPlayingAgainstTv = rootView.findViewById(R.id.playing_against_tv);
+        mPlayingAsLabelTv = rootView.findViewById(R.id.playing_as_label_tv);
+        mPlayingAgainstLabelTv = rootView.findViewById(R.id.playing_against_label_tv);
+        mSplashArtImage = rootView.findViewById(R.id.splash_art_image);
+
+        return rootView;
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        Log.d(LOG_TAG, "onActivityCreated");
 
         setUpTarget();
-
         if (mCurrentChampionUri == null) {
             Log.d(LOG_TAG, "ChampionUri is null");
         } else {
-            getSupportLoaderManager().initLoader(CHAMPION_LOADER, null, this);
+            getActivity().getSupportLoaderManager().initLoader(CHAMPION_LOADER, null, this);
         }
     }
 
@@ -83,7 +123,7 @@ public class ChampionStrategyActivity extends AppCompatActivity implements Loade
                 Contract.ChampionEntry.COLUMN_ENEMY_TIPS,
                 Contract.ChampionEntry.COLUMN_ALLY_TIPS};
 
-        return new CursorLoader(this,
+        return new CursorLoader(getActivity(),
                 mCurrentChampionUri,
                 PROJECTION,
                 Contract.ChampionEntry._ID + DB_SIGN,
@@ -100,23 +140,39 @@ public class ChampionStrategyActivity extends AppCompatActivity implements Loade
         if (cursor.moveToFirst()) {
 
             String championSplashArtString = cursor.getString(cursor.getColumnIndex(Contract.ChampionEntry.COLUMN_SPLASH_ART));
-            List<String> splashArtArray = Arrays.asList(championSplashArtString.split(STRING_DIVIDER));
+            List<String> splashArtArray = Arrays.asList(championSplashArtString.split(DataUtils.STRING_DIVIDER));
 
             // Default Splash Art.
             String splashArtString = splashArtArray.get(0);
 
+            // Get screen size.
+            Display display = ((WindowManager) getActivity().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+            Point size = new Point();
+            display.getSize(size);
+            int maxWidth = size.x;
+            int maxHeight = size.y;
+
+            int imageHeight;
+            if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+                imageHeight = maxHeight / 3;
+            } else {
+                imageHeight = maxHeight;
+            }
+
             // Load Default Splash Art.
             Picasso.get()
                     .load(HTTP_ENTRY_URL_SPLASH_ART + "/" + splashArtString)
-                    .error(ContextCompat.getDrawable(this, R.drawable.ic_launcher_background))
-                    .placeholder(R.color.colorPrimary)
+                    .resize(maxWidth, imageHeight)
+                    .centerCrop()
+                    .error(R.drawable.ic_launcher_background)
+                    .placeholder(R.drawable.ic_launcher_foreground)
                     .into(mTarget);
 
             String championName = cursor.getString(cursor.getColumnIndex(Contract.ChampionEntry.COLUMN_CHAMPION_NAME));
             mPlayingAsLabelTv.setText(getString(R.string.playing_as) + " " + championName);
 
             String allyTipsString = cursor.getString(cursor.getColumnIndex(Contract.ChampionEntry.COLUMN_ALLY_TIPS));
-            mAsTipsArray = Arrays.asList(allyTipsString.split(STRING_DIVIDER));
+            mAsTipsArray = Arrays.asList(allyTipsString.split(DataUtils.STRING_DIVIDER));
 
             for (int i = 0; i < mAsTipsArray.size(); i++) {
 
@@ -130,7 +186,7 @@ public class ChampionStrategyActivity extends AppCompatActivity implements Loade
             mPlayingAgainstLabelTv.setText(getString(R.string.playing_against) + " " + championName);
 
             String enemyTipsString = cursor.getString(cursor.getColumnIndex(Contract.ChampionEntry.COLUMN_ENEMY_TIPS));
-            mAgainstTipsArray = Arrays.asList(enemyTipsString.split(STRING_DIVIDER));
+            mAgainstTipsArray = Arrays.asList(enemyTipsString.split(DataUtils.STRING_DIVIDER));
 
             for (int i = 0; i < mAgainstTipsArray.size(); i++) {
 

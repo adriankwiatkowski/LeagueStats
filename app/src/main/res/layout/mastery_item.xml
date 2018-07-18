@@ -6,117 +6,85 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
+    <ImageView
+        android:id="@+id/champion_thumbnail"
+        style="@style/ItemImageThumbnail"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:background="@color/statsLabelColor"
+        tools:layout_height="100dp"
+        tools:layout_width="100dp" />
+
     <TextView
         android:id="@+id/champion_name_label_tv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="12dp"
-        android:layout_marginStart="12dp"
-        android:text="Champion Name"
-        android:textStyle="bold"
+        style="@style/MasteryLabelText"
+        android:text="@string/champion_name"
         app:layout_constraintStart_toEndOf="@+id/champion_thumbnail"
         app:layout_constraintTop_toTopOf="@+id/champion_thumbnail" />
 
     <TextView
         android:id="@+id/champion_name_tv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="12dp"
-        android:layout_marginStart="12dp"
+        style="@style/MasteryText"
         app:layout_constraintStart_toEndOf="@+id/champion_name_label_tv"
         app:layout_constraintTop_toTopOf="@+id/champion_name_label_tv"
         tools:text="Riven" />
 
     <TextView
         android:id="@+id/champion_level_label_tv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:text="Champion Level"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="@+id/champion_name_label_tv"
+        style="@style/MasteryLabelText"
+        android:text="@string/champion_level"
+        app:layout_constraintStart_toEndOf="@+id/champion_thumbnail"
         app:layout_constraintTop_toBottomOf="@+id/champion_name_label_tv" />
 
     <TextView
         android:id="@+id/champion_level_tv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="12dp"
-        android:layout_marginStart="12dp"
+        style="@style/MasteryText"
         app:layout_constraintStart_toEndOf="@+id/champion_level_label_tv"
         app:layout_constraintTop_toTopOf="@+id/champion_level_label_tv"
         tools:text="5" />
 
     <TextView
         android:id="@+id/champion_points_label_tv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:text="Champion Points"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="@+id/champion_name_label_tv"
+        style="@style/MasteryLabelText"
+        android:text="@string/champion_points"
+        app:layout_constraintStart_toEndOf="@+id/champion_thumbnail"
         app:layout_constraintTop_toBottomOf="@+id/champion_level_label_tv" />
 
     <TextView
         android:id="@+id/champion_points_tv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
-        android:layout_marginStart="8dp"
+        style="@style/MasteryText"
         app:layout_constraintStart_toEndOf="@+id/champion_points_label_tv"
         app:layout_constraintTop_toTopOf="@+id/champion_points_label_tv"
         tools:text="2325425425" />
 
     <TextView
         android:id="@+id/last_played_label_tv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:text="Last Played"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="@+id/champion_points_label_tv"
+        style="@style/MasteryLabelText"
+        android:text="@string/last_played"
+        app:layout_constraintStart_toEndOf="@+id/champion_thumbnail"
         app:layout_constraintTop_toBottomOf="@+id/champion_points_label_tv" />
 
     <TextView
         android:id="@+id/last_played_tv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="@+id/champion_points_tv"
+        style="@style/MasteryText"
+        app:layout_constraintStart_toEndOf="@+id/last_played_label_tv"
         app:layout_constraintTop_toTopOf="@+id/last_played_label_tv"
         tools:text="12:34" />
 
     <TextView
         android:id="@+id/chest_granted_label_tv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:layout_marginBottom="4dp"
-        android:text="Chest Granted"
-        android:textStyle="bold"
+        style="@style/MasteryLabelText"
+        android:text="@string/chest_granted"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/last_played_label_tv"
+        app:layout_constraintStart_toEndOf="@+id/champion_thumbnail"
         app:layout_constraintTop_toBottomOf="@+id/last_played_tv"
         app:layout_constraintVertical_bias="1.0" />
 
     <TextView
         android:id="@+id/chest_granted_tv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="@+id/last_played_tv"
+        style="@style/MasteryText"
+        app:layout_constraintStart_toEndOf="@+id/chest_granted_label_tv"
         app:layout_constraintTop_toTopOf="@+id/chest_granted_label_tv"
         tools:text="Yes" />
-
-    <ImageView
-        android:id="@+id/champion_thumbnail"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="4dp"
-        android:layout_marginStart="4dp"
-        android:layout_marginTop="4dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:background="@color/statsLabelColor"
-        tools:layout_height="100dp"
-        tools:layout_width="100dp" />
 
 </android.support.constraint.ConstraintLayout>

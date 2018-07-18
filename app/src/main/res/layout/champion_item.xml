@@ -1,38 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="horizontal">
+    android:layout_height="wrap_content">
 
     <ImageView
         android:id="@+id/champion_image"
-        android:layout_width="48dp"
-        android:layout_height="54dp"
-        android:scaleType="centerCrop"
+        style="@style/ChampionImageThumbnail"
         tools:src="@color/colorAccent" />
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingLeft="4dp"
-        android:paddingStart="4dp">
+    <TextView
+        android:id="@+id/champion_name_tv"
+        style="@style/ChampionText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/champion_image"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Riven" />
 
-        <TextView
-            android:id="@+id/champion_name_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textStyle="bold"
-            tools:text="Riven" />
+    <TextView
+        android:id="@+id/champion_title_tv"
+        style="@style/ChampionText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/champion_image"
+        app:layout_constraintTop_toBottomOf="@+id/champion_name_tv"
+        tools:text="The Exile" />
 
-        <TextView
-            android:id="@+id/champion_title_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textStyle="italic"
-            tools:text="The Exile" />
-
-    </LinearLayout>
-
-</LinearLayout>
+</android.support.constraint.ConstraintLayout>

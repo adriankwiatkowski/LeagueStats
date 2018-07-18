@@ -1,4 +1,4 @@
-package com.example.android.leaguestats.utilities;
+package com.example.android.leaguestats.utilities.AsyncTasks;
 
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -130,11 +130,9 @@ public class IconAsyncTask extends AsyncTask<Void, Integer, List<Icon>> {
             JSONObject iconImage = iconObject.getJSONObject("image");
             String groupString = iconImage.getString("group");
             String fullString = iconImage.getString("full");
-
             int iconId = iconObject.getInt("id");
 
             iconList.add(new Icon(groupString + "/" + fullString, iconId));
-            Log.d(LOG_TAG, groupString + " " + fullString + " " + iconId);
 
             publishProgress(progressUpdate++);
         }

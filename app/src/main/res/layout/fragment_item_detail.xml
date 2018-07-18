@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/statsLabelColor">
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/item_detail_image"
+            style="@style/ItemDetailImageThumbnail"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:background="#ffc72d"
+            tools:layout_height="100dp"
+            tools:layout_width="100dp" />
+
+        <TextView
+            android:id="@+id/base_gold_label"
+            style="@style/ItemDetailGoldLabel"
+            android:text="@string/recipe_cost"
+            app:layout_constraintEnd_toStartOf="@+id/base_gold_tv"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/total_gold_label"
+            style="@style/ItemDetailGoldLabel"
+            android:text="@string/total_cost"
+            app:layout_constraintEnd_toStartOf="@+id/total_gold_tv"
+            app:layout_constraintTop_toBottomOf="@+id/base_gold_label" />
+
+        <TextView
+            android:id="@+id/sell_gold_label"
+            style="@style/ItemDetailGoldLabel"
+            android:text="@string/gold_for_sale"
+            app:layout_constraintEnd_toStartOf="@+id/sell_gold_tv"
+            app:layout_constraintTop_toBottomOf="@+id/total_gold_label" />
+
+        <TextView
+            android:id="@+id/base_gold_tv"
+            style="@style/ItemDetailGoldText"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/base_gold_label"
+            tools:text="400" />
+
+        <TextView
+            android:id="@+id/total_gold_tv"
+            style="@style/ItemDetailGoldText"
+            app:layout_constraintStart_toEndOf="@+id/base_gold_label"
+            app:layout_constraintTop_toTopOf="@+id/total_gold_label"
+            tools:text="1000" />
+
+        <TextView
+            android:id="@+id/sell_gold_tv"
+            style="@style/ItemDetailGoldText"
+            app:layout_constraintStart_toEndOf="@+id/base_gold_label"
+            app:layout_constraintTop_toTopOf="@+id/sell_gold_label"
+            tools:text="667" />
+
+        <TextView
+            android:id="@+id/item_description_label"
+            style="@style/ItemDetailLabel"
+            android:text="@string/description"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/item_detail_image" />
+
+        <TextView
+            android:id="@+id/plain_text_label"
+            style="@style/ItemDetailLabel"
+            android:text="@string/plain_text"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/item_description_tv" />
+
+        <TextView
+            android:id="@+id/item_detail_name"
+            style="@style/ItemDetailText"
+            app:layout_constraintEnd_toStartOf="@+id/base_gold_label"
+            app:layout_constraintStart_toEndOf="@+id/item_detail_image"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Guardian Angel ;)" />
+
+        <TextView
+            android:id="@+id/plain_text_tv"
+            style="@style/ItemDetailText"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/plain_text_label"
+            app:layout_constraintTop_toBottomOf="@+id/item_description_tv"
+            tools:text="cool" />
+
+        <TextView
+            android:id="@+id/item_description_tv"
+            style="@style/ItemDetailText"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/item_description_label"
+            app:layout_constraintTop_toBottomOf="@+id/item_detail_image"
+            tools:text="pretty cool" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/item_from_recycler"
+            style="@style/ChampionRecyclerView"
+            app:layout_constraintEnd_toStartOf="@+id/guideline5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/item_from_label" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/item_into_recycler"
+            style="@style/ChampionRecyclerView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/guideline5"
+            app:layout_constraintTop_toBottomOf="@+id/item_into_label" />
+
+        <android.support.constraint.Guideline
+            android:id="@+id/guideline5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.5" />
+
+        <TextView
+            android:id="@+id/item_from_label"
+            style="@style/ItemDetailRecyclerLabel"
+            android:text="@string/recipe"
+            app:layout_constraintEnd_toEndOf="@+id/item_from_recycler"
+            app:layout_constraintStart_toStartOf="@+id/item_from_recycler"
+            app:layout_constraintTop_toBottomOf="@+id/plain_text_tv" />
+
+        <TextView
+            android:id="@+id/item_into_label"
+            style="@style/ItemDetailRecyclerLabel"
+            android:text="@string/builds_into"
+            app:layout_constraintEnd_toEndOf="@+id/item_into_recycler"
+            app:layout_constraintStart_toStartOf="@+id/guideline5"
+            app:layout_constraintTop_toBottomOf="@+id/plain_text_tv" />
+
+    </android.support.constraint.ConstraintLayout>
+
+</android.support.v4.widget.NestedScrollView>

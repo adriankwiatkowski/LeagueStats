@@ -4,7 +4,6 @@
     android:id="@+id/splash_art_name"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingTop="16dp"
     android:textAllCaps="true"
     android:textStyle="bold"
     tools:background="@color/statsLabelColor"

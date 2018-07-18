@@ -13,16 +13,16 @@ public class Champion {
     private String mLore;
 
     private String mThumbnail;
-    private ArrayList<String> mSplashArt;
-    private ArrayList<String> mSplashArtName;
+    private String mSplashArt;
+    private String mSplashArtName;
 
     private int mDifficulty;
     private int mAttack;
     private int mDefense;
     private int mMagic;
 
-    private ArrayList<String> mEnemyTips;
-    private ArrayList<String> mAllyTips;
+    private String mEnemyTips;
+    private String mAllyTips;
 
     private double mAttackDamage;
     private double mAttackDamagePerLevel;
@@ -45,24 +45,24 @@ public class Champion {
     private double mMagicResist;
     private double mMagicResistPerLevel;
 
-    private List<String> mSpellName;
-    private List<String> mSpellDescription;
-    private List<String> mSpellImage;
-    private List<String> mSpellResource;
-    private List<String> mSpellCooldownArray;
-    private List<String> mSpellCostArray;
+    private String mSpellName;
+    private String mSpellDescription;
+    private String mSpellImage;
+    private String mSpellResource;
+    private String mSpellCooldownArray;
+    private String mSpellCostArray;
 
     public Champion(long id, String name, String key, String title, String lore, String thumbnail,
-                    ArrayList<String> splashArt, ArrayList<String> splashArtName, int difficulty,
-                    int attack, int defense, int magic, ArrayList<String> enemyTips,
-                    ArrayList<String> allyTips, double attackDamage, double attackDamagePerLevel,
-                    double attackRange, double armor, double armorPerLevel, double health,
-                    double healthPerLevel, double healthRegen, double healthRegenPerLevel,
-                    double mana, double manaPerLevel, double manaRegen, double manaRegenPerLevel,
-                    double attackSpeedOffset, double attackSpeedPerLevel, double moveSpeed,
-                    double crit, double critPerLevel, double magicResist, double magicResistPerLevel,
-                    List<String> spellName, List<String> spellDescription, List<String> spellImage,
-                    List<String> spellResource, ArrayList<String> spellCooldown, ArrayList<String> spellCost) {
+                    String splashArt, String splashArtName, int difficulty, int attack,
+                    int defense, int magic, String enemyTips, String allyTips, double attackDamage,
+                    double attackDamagePerLevel, double attackRange, double armor,
+                    double armorPerLevel, double health, double healthPerLevel, double healthRegen,
+                    double healthRegenPerLevel, double mana, double manaPerLevel, double manaRegen,
+                    double manaRegenPerLevel, double attackSpeedOffset, double attackSpeedPerLevel,
+                    double moveSpeed, double crit, double critPerLevel, double magicResist,
+                    double magicResistPerLevel, String spellName, String spellDescription,
+                    String spellImage, String spellResource, String spellCooldown,
+                    String spellCost) {
 
         mId = id;
         mName = name;
@@ -144,19 +144,19 @@ public class Champion {
         this.mThumbnail = thumbnail;
     }
 
-    public ArrayList<String> getSplashArt() {
+    public String getSplashArt() {
         return mSplashArt;
     }
 
-    public void setSplashArt(ArrayList<String> splashArt) {
+    public void setSplashArt(String splashArt) {
         this.mSplashArt = splashArt;
     }
 
-    public ArrayList<String> getSplashArtName() {
+    public String getSplashArtName() {
         return mSplashArtName;
     }
 
-    public void setSplashArtName(ArrayList<String> splashArtName) {
+    public void setSplashArtName(String splashArtName) {
         this.mSplashArtName = splashArtName;
     }
 
@@ -192,19 +192,19 @@ public class Champion {
         this.mMagic = magic;
     }
 
-    public ArrayList<String> getEnemyTips() {
+    public String getEnemyTips() {
         return mEnemyTips;
     }
 
-    public void setEnemyTips(ArrayList<String> enemyTips) {
+    public void setEnemyTips(String enemyTips) {
         this.mEnemyTips = enemyTips;
     }
 
-    public ArrayList<String> getAllyTips() {
+    public String getAllyTips() {
         return mAllyTips;
     }
 
-    public void setAllyTips(ArrayList<String> allyTips) {
+    public void setAllyTips(String allyTips) {
         this.mAllyTips = allyTips;
     }
 
@@ -376,51 +376,51 @@ public class Champion {
         this.mMagicResist = magicResist;
     }
 
-    public List<String> getSpellName() {
+    public String getSpellName() {
         return mSpellName;
     }
 
-    public void setSpellName(List<String> name) {
+    public void setSpellName(String name) {
         this.mSpellName = name;
     }
 
-    public List<String> getSpellDescription() {
+    public String getSpellDescription() {
         return mSpellDescription;
     }
 
-    public void setSpellDescription(List<String> description) {
+    public void setSpellDescription(String description) {
         this.mSpellDescription = description;
     }
 
-    public List<String> getSpellImage() {
+    public String getSpellImage() {
         return mSpellImage;
     }
 
-    public void setSpellImage(List<String> image) {
+    public void setSpellImage(String image) {
         this.mSpellImage = image;
     }
 
-    public List<String> getSpellCooldownList() {
+    public String getSpellCooldownList() {
         return mSpellCooldownArray;
     }
 
-    public void setSpellCooldownList(List<String> cooldown) {
+    public void setSpellCooldownList(String cooldown) {
         this.mSpellCooldownArray = cooldown;
     }
 
-    public List<String> getSpellCostList() {
+    public String getSpellCostList() {
         return mSpellCostArray;
     }
 
-    public void setSpellCostList(List<String> cost) {
+    public void setSpellCostList(String cost) {
         this.mSpellCostArray = cost;
     }
 
-    public List<String> getSpellResource() {
+    public String getSpellResource() {
         return mSpellResource;
     }
 
-    public void setSpellResource(List<String> resource) {
+    public void setSpellResource(String resource) {
         this.mSpellResource = resource;
     }
 }

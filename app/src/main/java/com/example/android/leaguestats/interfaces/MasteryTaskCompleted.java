@@ -2,8 +2,8 @@ package com.example.android.leaguestats.interfaces;
 
 import com.example.android.leaguestats.models.Mastery;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public interface MasteryTaskCompleted {
-    void masteryTaskCompleted(ArrayList<Mastery> masteries);
+    void masteryTaskCompleted(List<Mastery> masteries);
 }

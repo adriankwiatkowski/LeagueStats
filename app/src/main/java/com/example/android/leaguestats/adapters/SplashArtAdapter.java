@@ -1,19 +1,26 @@
 package com.example.android.leaguestats.adapters;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -26,6 +33,7 @@ import java.util.List;
 
 public class SplashArtAdapter extends RecyclerView.Adapter<SplashArtAdapter.ViewHolder> {
 
+    private static final String LOG_TAG = SplashArtAdapter.class.getSimpleName();
     private static final String HTTP_ENTRY_URL_SPLASH_ART = "http://ddragon.leagueoflegends.com/cdn/img/champion/splash";
     private final Context mContext;
     private final List<String> mSplashArt;
@@ -39,19 +47,31 @@ public class SplashArtAdapter extends RecyclerView.Adapter<SplashArtAdapter.View
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(mContext)
-                .inflate(R.layout.splash_art_item, parent, false);
+        View view = LayoutInflater.from(mContext).inflate(R.layout.splash_art_item, parent, false);
 
-        ViewHolder viewHolder = new ViewHolder(view);
-        return viewHolder;
+        return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
+
+        Display display = ((WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        int maxWidth = size.x;
+        int maxHeight = size.y;
+
+        int imageHeight;
+        if (mContext.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            imageHeight = maxHeight/3;
+        } else {
+            imageHeight = maxHeight;
+        }
+
         // Set Splash Art on Text.
         Picasso.get()
                 .load(HTTP_ENTRY_URL_SPLASH_ART + "/" + mSplashArt.get(position))
-                .resize(1000, 500)
+                .resize(maxWidth, imageHeight)
                 .centerCrop()
                 .error(R.drawable.ic_launcher_background)
                 .placeholder(R.drawable.ic_launcher_foreground)
@@ -73,16 +93,11 @@ public class SplashArtAdapter extends RecyclerView.Adapter<SplashArtAdapter.View
         notifyDataSetChanged();
     }
 
-    public void setData(List<String> data, List<String> name) {
+    public void setData(List<String> image, List<String> name) {
         clear();
-        for (int i = 0; i < data.size(); i++) {
-            add(data.get(i), name.get(i));
+        for (int i = 0; i < image.size(); i++) {
+            add(image.get(i), name.get(i));
         }
-    }
-
-    @Override
-    public long getItemId(int position) {
-        return position;
     }
 
     @Override
@@ -90,11 +105,11 @@ public class SplashArtAdapter extends RecyclerView.Adapter<SplashArtAdapter.View
         return mSplashArt.size();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    static class ViewHolder extends RecyclerView.ViewHolder {
         TextView mSplashArtNameTv;
         Target mTarget;
 
-        public ViewHolder(View itemView) {
+        public ViewHolder(final View itemView) {
             super(itemView);
             mSplashArtNameTv = itemView.findViewById(R.id.splash_art_name);
 
@@ -114,6 +129,11 @@ public class SplashArtAdapter extends RecyclerView.Adapter<SplashArtAdapter.View
                                     }
                                     mSplashArtNameTv.setBackgroundColor(textSwatch.getRgb());
                                     mSplashArtNameTv.setTextColor(textSwatch.getTitleTextColor());
+
+                                    // Prevent from changing background on every swap. It'd be weird experience.
+                                    if (getAdapterPosition() == 0) {
+                                        itemView.getRootView().setBackgroundColor(textSwatch.getRgb());
+                                    }
                                 }
                             });
                 }

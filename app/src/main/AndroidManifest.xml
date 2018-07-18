@@ -12,47 +12,50 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name=".MainActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".NavigationActivity" />
         <activity
-            android:name=".MasteryActivity"
-            android:parentActivityName=".MainActivity">
+            android:name=".SummonerActivity"
+            android:parentActivityName=".NavigationActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
-        </activity>
-        <activity
-            android:name=".ChampionDetailActivity"
-            android:parentActivityName=".MasteryActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MasteryActivity" />
+                android:value=".NavigationActivity" />
         </activity>
         <activity
             android:name=".ChampionListActivity"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".NavigationActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
+                android:value=".NavigationActivity" />
         </activity>
         <activity
-            android:name=".ChampionStatsActivity"
-            android:parentActivityName=".ChampionDetailActivity">
+            android:name=".ChampionDetailActivity"
+            android:parentActivityName=".NavigationActivity"
+            android:theme="@style/ChampionTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ChampionDetailActivity" />
+                android:value=".NavigationActivity" />
         </activity>
         <activity
-            android:name=".ChampionStrategyActivity"
-            android:parentActivityName=".ChampionDetailActivity">
+            android:name=".ItemActivity"
+            android:parentActivityName=".NavigationActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ChampionDetailActivity" />
+                android:value=".NavigationActivity" />
+        </activity>
+        <activity
+            android:name=".SummonerSpellActivity"
+            android:parentActivityName=".NavigationActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".NavigationActivity" />
         </activity>
 
         <provider
