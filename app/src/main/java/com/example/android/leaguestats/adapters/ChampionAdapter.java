@@ -10,25 +10,27 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.android.leaguestats.R;
-import com.example.android.leaguestats.database.Contract;
+import com.example.android.leaguestats.room.ChampionEntry;
 import com.squareup.picasso.Picasso;
+
+import java.util.List;
 
 public class ChampionAdapter extends RecyclerView.Adapter<ChampionAdapter.ChampionViewHolder> {
 
     private static ChampionClickListener mListener;
 
     public interface ChampionClickListener {
-        void onChampionClick(int championId);
+        void onChampionClick(long id);
     }
 
     private static final String LOG_TAG = ChampionAdapter.class.getSimpleName();
     private Context mContext;
-    private static Cursor mCursor;
+    private static List<ChampionEntry> mList;
     private final String PATCH_VERSION;
 
-    public ChampionAdapter(Context context, Cursor cursor, ChampionClickListener listener, String patchVersion) {
+    public ChampionAdapter(Context context, List<ChampionEntry> championEntries, ChampionClickListener listener, String patchVersion) {
         mContext = context;
-        mCursor = cursor;
+        mList = championEntries;
         mListener = listener;
         PATCH_VERSION = patchVersion;
     }
@@ -46,35 +48,38 @@ public class ChampionAdapter extends RecyclerView.Adapter<ChampionAdapter.Champi
 
     @Override
     public void onBindViewHolder(ChampionAdapter.ChampionViewHolder holder, int position) {
-        if (!mCursor.moveToPosition(position))
-            return;
-
-        String championName = mCursor.getString(mCursor.getColumnIndex(Contract.ChampionEntry.COLUMN_CHAMPION_NAME));
-        String championTitle = mCursor.getString(mCursor.getColumnIndex(Contract.ChampionEntry.COLUMN_CHAMPION_TITLE));
-        String championThumbnail = mCursor.getString(mCursor.getColumnIndex(Contract.ChampionEntry.COLUMN_CHAMPION_THUMBNAIL));
-
-        holder.mNameTv.setText(championName);
-        holder.mTitleTv.setText(championTitle);
+        holder.mNameTv.setText(mList.get(position).getName());
+        holder.mTitleTv.setText(mList.get(position).getTitle());
 
         String httpEntryUrl = (String) holder.itemView.getTag();
+        String image = mList.get(position).getThumbnail();
 
         Picasso.get()
-                .load(httpEntryUrl + "/" + championThumbnail)
+                .load(httpEntryUrl + "/" + image)
                 .error(R.drawable.ic_launcher_background)
                 .placeholder(R.drawable.ic_launcher_foreground)
                 .into(holder.mImage);
     }
 
-    @Override
-    public int getItemCount() {
-        if (null == mCursor) return 0;
-        return mCursor.getCount();
+    public void add(ChampionEntry championEntry) {
+        mList.add(championEntry);
+        notifyDataSetChanged();
     }
 
-    public void swapCursor(Cursor newCursor) {
-        if (newCursor == mCursor) return;
-        mCursor = newCursor;
+    public void clear() {
+        mList.clear();
         notifyDataSetChanged();
+    }
+
+    public void setData(List<ChampionEntry> list) {
+        clear();
+        mList.addAll(list);
+        notifyDataSetChanged();
+    }
+
+    @Override
+    public int getItemCount() {
+        return mList.size();
     }
 
     public static class ChampionViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -94,9 +99,7 @@ public class ChampionAdapter extends RecyclerView.Adapter<ChampionAdapter.Champi
 
         @Override
         public void onClick(View v) {
-            mCursor.moveToPosition(getAdapterPosition());
-            int id = mCursor.getInt(mCursor.getColumnIndex(Contract.ChampionEntry._ID));
-            mListener.onChampionClick(id);
+            mListener.onChampionClick(mList.get(getAdapterPosition()).getId());
         }
     }
 }

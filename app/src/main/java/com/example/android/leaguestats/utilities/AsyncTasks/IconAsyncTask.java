@@ -7,7 +7,7 @@ import android.util.Log;
 import com.example.android.leaguestats.BuildConfig;
 import com.example.android.leaguestats.interfaces.IconTaskCompleted;
 import com.example.android.leaguestats.interfaces.ResultTask;
-import com.example.android.leaguestats.models.Icon;
+import com.example.android.leaguestats.room.IconEntry;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class IconAsyncTask extends AsyncTask<Void, Integer, List<Icon>> {
+public class IconAsyncTask extends AsyncTask<Void, Integer, List<IconEntry>> {
 
     private static final String PERSONAL_API_KEY = BuildConfig.HIDDEN_API_KEY;
     private static final String LOG_TAG = IconAsyncTask.class.getSimpleName();
@@ -47,7 +47,7 @@ public class IconAsyncTask extends AsyncTask<Void, Integer, List<Icon>> {
     }
 
     @Override
-    protected List<Icon> doInBackground(Void... voids) {BufferedReader reader = null;
+    protected List<IconEntry> doInBackground(Void... voids) {BufferedReader reader = null;
         String jsonResponse = "";
         HttpURLConnection urlConnection = null;
         InputStream inputStream = null;
@@ -111,10 +111,10 @@ public class IconAsyncTask extends AsyncTask<Void, Integer, List<Icon>> {
         return null;
     }
 
-    private List<Icon> getJsonData(String json) throws JSONException {
+    private List<IconEntry> getJsonData(String json) throws JSONException {
         JSONObject root = new JSONObject(json);
 
-        List<Icon> iconList = new ArrayList<>();
+        List<IconEntry> iconList = new ArrayList<>();
 
         JSONObject data = root.getJSONObject("data");
         Iterator<String> iterator = data.keys();
@@ -132,7 +132,7 @@ public class IconAsyncTask extends AsyncTask<Void, Integer, List<Icon>> {
             String fullString = iconImage.getString("full");
             int iconId = iconObject.getInt("id");
 
-            iconList.add(new Icon(groupString + "/" + fullString, iconId));
+            iconList.add(new IconEntry(iconId, groupString + "/" + fullString));
 
             publishProgress(progressUpdate++);
         }
@@ -162,7 +162,7 @@ public class IconAsyncTask extends AsyncTask<Void, Integer, List<Icon>> {
     }
 
     @Override
-    protected void onPostExecute(List<Icon> icons) {
+    protected void onPostExecute(List<IconEntry> icons) {
         super.onPostExecute(icons);
 
         mIconListener.iconTaskCompleted(icons);

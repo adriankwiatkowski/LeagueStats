@@ -19,8 +19,6 @@ import java.util.Map;
 public class SummonerPagerAdapter extends FragmentPagerAdapter {
 
     private Context mContext;
-    private Map<Integer, String> mFragmentsTag;
-    private FragmentManager mFragmentManager;
     private String mSummonerName;
     private String mEntryRegionString;
 
@@ -28,8 +26,6 @@ public class SummonerPagerAdapter extends FragmentPagerAdapter {
                                 String summonerName, String entryRegionString) {
         super(fm);
         mContext = context;
-        mFragmentManager = fm;
-        mFragmentsTag = new HashMap<>();
         mSummonerName = summonerName;
         mEntryRegionString = entryRegionString;
     }
@@ -62,26 +58,5 @@ public class SummonerPagerAdapter extends FragmentPagerAdapter {
             default:
                 return super.getPageTitle(position);
         }
-    }
-
-    @NonNull
-    @Override
-    public Object instantiateItem(ViewGroup container, int position) {
-        Object object = super.instantiateItem(container, position);
-        if (object instanceof Fragment) {
-            Fragment fragment = (Fragment) object;
-            String tag = fragment.getTag();
-            mFragmentsTag.put(position, tag);
-        }
-        return object;
-    }
-
-    public Fragment getFragment(int position) {
-        Fragment fragment = null;
-        String tag = mFragmentsTag.get(position);
-        if (tag != null) {
-            fragment = mFragmentManager.findFragmentByTag(tag);
-        }
-        return fragment;
     }
 }

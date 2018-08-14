@@ -37,11 +37,6 @@ public class SummonerSearchFragment extends Fragment {
 
     public SummonerSearchFragment() {}
 
-    public static SummonerSearchFragment newInstance() {
-        SummonerSearchFragment summonerSearchFragment = new SummonerSearchFragment();
-        return summonerSearchFragment;
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

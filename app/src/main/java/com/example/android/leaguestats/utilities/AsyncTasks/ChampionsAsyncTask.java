@@ -7,7 +7,7 @@ import android.util.Log;
 import com.example.android.leaguestats.BuildConfig;
 import com.example.android.leaguestats.interfaces.ChampionTaskCompleted;
 import com.example.android.leaguestats.interfaces.ResultTask;
-import com.example.android.leaguestats.models.Champion;
+import com.example.android.leaguestats.room.ChampionEntry;
 import com.example.android.leaguestats.utilities.DataUtils;
 import com.example.android.leaguestats.utilities.JSONUtils;
 
@@ -25,7 +25,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ChampionsAsyncTask extends AsyncTask<String, Integer, List<Champion>> {
+public class ChampionsAsyncTask extends AsyncTask<String, Integer, List<ChampionEntry>> {
 
     private static final String PERSONAL_API_KEY = BuildConfig.HIDDEN_API_KEY;
     private static final String LOG_TAG = ChampionsAsyncTask.class.getSimpleName();
@@ -60,7 +60,7 @@ public class ChampionsAsyncTask extends AsyncTask<String, Integer, List<Champion
     }
 
     @Override
-    protected List<Champion> doInBackground(String... strings) {
+    protected List<ChampionEntry> doInBackground(String... strings) {
         BufferedReader reader = null;
         String jsonResponse = "";
         HttpURLConnection urlConnection = null;
@@ -125,11 +125,11 @@ public class ChampionsAsyncTask extends AsyncTask<String, Integer, List<Champion
         return null;
     }
 
-    private List<Champion> getJsonData(String json) throws JSONException {
+    private List<ChampionEntry> getJsonData(String json) throws JSONException {
         JSONObject root = new JSONObject(json);
         JSONObject data = root.getJSONObject("data");
 
-        List<Champion> championList = new ArrayList<>();
+        List<ChampionEntry> championList = new ArrayList<>();
 
         mResultListener.maxProgress(data.length());
 
@@ -149,12 +149,13 @@ public class ChampionsAsyncTask extends AsyncTask<String, Integer, List<Champion
 
             // Get Champion Spells.
             JSONArray spellsArray = championObject.getJSONArray("spells");
-            String spellName = JSONUtils.getStringFromJSONObjectFromJSONArray(spellsArray, "name");
-            String spellDescription = JSONUtils.getStringFromJSONObjectFromJSONArray(spellsArray, "description");
-            String spellImage = JSONUtils.getStringSpellImage(spellsArray, "image", "full");
-            String spellResource = JSONUtils.getStringFromJSONObjectFromJSONArray(spellsArray, "resource");
-            String spellCooldown = JSONUtils.getStringFromJSONArrayFromJSONObjectFromJSONArray(spellsArray, "cooldown");
-            String spellCost = JSONUtils.getStringFromJSONArrayFromJSONObjectFromJSONArray(spellsArray, "cost");
+            List<String> spellName = JSONUtils.getListStringFromJSONObjectFromJSONArray(spellsArray, "name");
+            List<String> spellDescription = JSONUtils.getListStringFromJSONObjectFromJSONArray(spellsArray, "sanitizedDescription");
+            List<String> spellImage = JSONUtils.getSpellImage(spellsArray, "image", "full");
+            List<String> spellResource = JSONUtils.getListStringFromJSONObjectFromJSONArray(spellsArray, "resource");
+            List<Double> spellCooldown = JSONUtils.getListFromJSONArrayFromJSONObjectFromJSONArray(spellsArray, "cooldown");
+            List<Double> spellCost = JSONUtils.getListFromJSONArrayFromJSONObjectFromJSONArray(spellsArray, "cost");
+            List<Integer> spellMaxRank = JSONUtils.getListIntegerFromJSONObjectFromJSONArray(spellsArray, "maxrank");
 
             // Get Champion Thumbnail.
             JSONObject image = championObject.getJSONObject("image");
@@ -162,17 +163,18 @@ public class ChampionsAsyncTask extends AsyncTask<String, Integer, List<Champion
 
             // Get Champion allyTips.
             JSONArray allyTipsArray = championObject.getJSONArray("allytips");
-            String championAllyTip = JSONUtils.getStringFromJSONArray(allyTipsArray);
+            List<String> asTips = JSONUtils.getStringListFromJSONArray(allyTipsArray);
 
             // Get Champion enemyTips.
             JSONArray enemyTipsArray = championObject.getJSONArray("enemytips");
-            String championEnemyTip = JSONUtils.getStringFromJSONArray(enemyTipsArray);
+            List<String> vsTips = JSONUtils.getStringListFromJSONArray(enemyTipsArray);
 
             // Get Champion SplashArt.
             // Example http://ddragon.leagueoflegends.com/cdn/img/champion/splash/Aatrox_0.jpg
             JSONArray skins = championObject.getJSONArray("skins");
-            String splashArtName = JSONUtils.getStringFromJSONObjectFromJSONArray(skins, "name");
-            String splashArtPath = JSONUtils.getSplashArtPathFromJSONObjectFromJSONArray(skins, "num", championName);
+
+            List<String> splashArtList = JSONUtils.getSplashArtPathFromJSONObjectFromJSONArray(skins, "num", championName);
+            List<String> splashArtName = JSONUtils.getListStringFromJSONObjectFromJSONArray(skins, "name");
 
             // Get Champion info.
             JSONObject info = championObject.getJSONObject("info");
@@ -205,14 +207,14 @@ public class ChampionsAsyncTask extends AsyncTask<String, Integer, List<Champion
             double healthPerLevel = statsObject.getDouble("hpperlevel");
 
             // Add champion to List.
-            Champion champion = new Champion(championId, championName, championKey, championTitle,
-                    championLore, championThumbnail, splashArtPath, splashArtName,
-                    championDifficulty, championAttack, championDefense, championMagic, championEnemyTip,
-                    championAllyTip, attackDamage, attackDamagePerLevel, attackRange, armor, armorPerLevel,
+            ChampionEntry champion = new ChampionEntry(championId, championName, championKey, championTitle,
+                    championLore, championThumbnail, splashArtList, splashArtName,
+                    championDifficulty, championAttack, championDefense, championMagic, vsTips,
+                    asTips, attackDamage, attackDamagePerLevel, attackRange, armor, armorPerLevel,
                     health, healthPerLevel, healthRegen, healthRegenPerLevel, mana, manaPerLevel,
                     manaRegen, manaRegenPerLevel, attackSpeedOffset, attackSpeedPerLevel, moveSpeed,
                     crit, critPerLevel, magicResist, magicResistPerLevel, spellName,
-                    spellDescription, spellImage, spellResource, spellCooldown, spellCost);
+                    spellDescription, spellImage, spellResource, spellCooldown, spellCost, spellMaxRank);
             championList.add(champion);
 
             publishProgress(i);
@@ -252,7 +254,7 @@ public class ChampionsAsyncTask extends AsyncTask<String, Integer, List<Champion
     }
 
     @Override
-    protected void onPostExecute(List<Champion> champions) {
+    protected void onPostExecute(List<ChampionEntry> champions) {
         super.onPostExecute(champions);
 
         mChampionListener.championTaskCompleted(champions);

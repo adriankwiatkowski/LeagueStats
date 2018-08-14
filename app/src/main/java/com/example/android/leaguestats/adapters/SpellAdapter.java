@@ -14,7 +14,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.android.leaguestats.R;
-import com.example.android.leaguestats.models.Champion;
 import com.example.android.leaguestats.models.Spell;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;

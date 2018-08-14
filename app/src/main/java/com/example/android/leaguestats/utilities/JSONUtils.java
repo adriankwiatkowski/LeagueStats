@@ -4,75 +4,69 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class JSONUtils {
 
     private static final String LOG_TAG = JSONUtils.class.getSimpleName();
 
-    public static String getStringFromJSONArray(JSONArray jsonArray) throws JSONException {
-        StringBuilder builder = new StringBuilder();
+    public static List<String> getStringListFromJSONArray(JSONArray jsonArray) throws JSONException {
+        List<String> stringList = new ArrayList<>();
         for (int i = 0; i < jsonArray.length(); i++) {
-            builder.append(jsonArray.getString(i));
-            if (i != jsonArray.length() - 1) {
-                builder.append(DataUtils.STRING_DIVIDER);
-            }
+            stringList.add(i, jsonArray.getString(i));
         }
-        return builder.toString();
+        return stringList;
     }
 
-    public static String getStringSpellImage(
-            JSONArray jsonArray, String JSONObjectKey, String key) throws JSONException {
-        StringBuilder builder = new StringBuilder();
+    public static List<String> getSpellImage(JSONArray jsonArray, String JSONObjectKey, String key) throws JSONException {
+        List<String> stringList = new ArrayList<>();
         for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject object = jsonArray.getJSONObject(i);
             JSONObject spellImage = object.getJSONObject(JSONObjectKey);
-            builder.append(spellImage.optString(key));
-            if (i != jsonArray.length() - 1) {
-                builder.append(DataUtils.STRING_DIVIDER);
-            }
+            stringList.add(spellImage.optString(key));
         }
-        return builder.toString();
+        return stringList;
     }
 
-    public static String getStringFromJSONObjectFromJSONArray(JSONArray jsonArray, String key) throws JSONException {
-        StringBuilder builder = new StringBuilder();
+    public static List<String> getListStringFromJSONObjectFromJSONArray(JSONArray jsonArray, String key) throws JSONException {
+        List<String> stringList = new ArrayList<>();
         for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject object = jsonArray.getJSONObject(i);
-            builder.append(object.optString(key));
-            if (i != jsonArray.length() - 1) {
-                builder.append(DataUtils.STRING_DIVIDER);
-            }
+            stringList.add(object.optString(key));
         }
-        return builder.toString();
+        return stringList;
     }
 
-    public static String getSplashArtPathFromJSONObjectFromJSONArray(
-            JSONArray jsonArray, String key, String championName) throws JSONException {
-        StringBuilder builder = new StringBuilder();
+    public static List<Integer> getListIntegerFromJSONObjectFromJSONArray(JSONArray jsonArray, String key) throws JSONException  {
+        List<Integer> integerList = new ArrayList<>();
+        for (int i = 0; i < jsonArray.length(); i++) {
+            JSONObject object = jsonArray.getJSONObject(i);
+            integerList.add(object.optInt(key));
+        }
+        return integerList;
+    }
+
+    public static List<String> getSplashArtPathFromJSONObjectFromJSONArray(JSONArray jsonArray, String key, String championName) throws JSONException {
+        List<String> stringList = new ArrayList<>();
         for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject object = jsonArray.getJSONObject(i);
             int splashArtId = object.optInt(key);
             String splashArtPath = championName + "_" + String.valueOf(splashArtId) + ".jpg";
-            builder.append(splashArtPath);
-            if (i != jsonArray.length() - 1) {
-                builder.append(DataUtils.STRING_DIVIDER);
-            }
+            stringList.add(i, splashArtPath);
         }
-        return builder.toString();
+        return stringList;
     }
 
-    public static String getStringFromJSONArrayFromJSONObjectFromJSONArray(
-            JSONArray jsonArray, String JSONArrayKey) throws JSONException {
-        StringBuilder builder = new StringBuilder();
+    public static List<Double> getListFromJSONArrayFromJSONObjectFromJSONArray(JSONArray jsonArray, String JSONArrayKey) throws JSONException {
+        List<Double> doubleList = new ArrayList<>();
         for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject object = jsonArray.getJSONObject(i);
             JSONArray array = object.getJSONArray(JSONArrayKey);
             for (int j = 0; j < array.length(); j++) {
-                builder.append(array.getDouble(j)).append(DataUtils.STRING_DIVIDER);
+                doubleList.add(array.getDouble(j));
             }
         }
-        for (int i = 0; i < DataUtils.STRING_DIVIDER.length(); i++) {
-            builder.deleteCharAt(builder.length() - 1);
-        };
-        return builder.toString();
+        return doubleList;
     }
 }

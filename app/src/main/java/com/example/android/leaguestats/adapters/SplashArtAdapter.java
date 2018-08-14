@@ -26,6 +26,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.android.leaguestats.R;
+import com.example.android.leaguestats.utilities.SplashArtUtils;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -55,23 +56,13 @@ public class SplashArtAdapter extends RecyclerView.Adapter<SplashArtAdapter.View
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
 
-        Display display = ((WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-        Point size = new Point();
-        display.getSize(size);
-        int maxWidth = size.x;
-        int maxHeight = size.y;
-
-        int imageHeight;
-        if (mContext.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            imageHeight = maxHeight/3;
-        } else {
-            imageHeight = maxHeight;
-        }
+        int width = SplashArtUtils.getWidth(mContext);
+        int height = SplashArtUtils.getHeight(mContext);
 
         // Set Splash Art on Text.
         Picasso.get()
                 .load(HTTP_ENTRY_URL_SPLASH_ART + "/" + mSplashArt.get(position))
-                .resize(maxWidth, imageHeight)
+                .resize(width, height)
                 .centerCrop()
                 .error(R.drawable.ic_launcher_background)
                 .placeholder(R.drawable.ic_launcher_foreground)

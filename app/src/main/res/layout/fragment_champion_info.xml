@@ -8,14 +8,17 @@
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:focusableInTouchMode="true"
         tools:context=".ChampionStatsActivity">
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/splash_art_recycler_view"
-            style="@style/ChampionRecyclerView"
+        <ImageView
+            android:id="@+id/splash_art_info_image"
+            style="@style/TipsSplashArt"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:background="@color/statsLabelColor"
+            tools:src="@drawable/ic_launcher_foreground" />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/spell_recycler_view"
@@ -30,14 +33,14 @@
             style="@style/StatsLabel"
             android:text="@string/health_label"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/splash_art_recycler_view" />
+            app:layout_constraintTop_toBottomOf="@+id/splash_art_info_image" />
 
         <TextView
             android:id="@+id/attack_damage_label_tv"
             style="@style/StatsLabel"
             android:text="@string/attack_damage_label"
             app:layout_constraintStart_toStartOf="@+id/guideline3"
-            app:layout_constraintTop_toBottomOf="@+id/splash_art_recycler_view" />
+            app:layout_constraintTop_toBottomOf="@+id/splash_art_info_image" />
 
         <TextView
             android:id="@+id/health_regen_label_tv"

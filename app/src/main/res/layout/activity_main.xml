@@ -64,26 +64,11 @@
         tools:text="0/13375" />
 
     <ProgressBar
-        android:id="@+id/patch_version_indicator"
-        style="@style/MainProgressBar"
-        app:layout_constraintEnd_toEndOf="@+id/icon_indicator"
-        app:layout_constraintStart_toStartOf="@+id/icon_indicator"
-        app:layout_constraintTop_toBottomOf="@+id/icon_indicator_tv" />
-
-    <TextView
-        android:id="@+id/patch_version_indicator_tv"
-        style="@style/MainProgressBarTv"
-        app:layout_constraintEnd_toEndOf="@+id/patch_version_indicator"
-        app:layout_constraintStart_toStartOf="@+id/patch_version_indicator"
-        app:layout_constraintTop_toBottomOf="@+id/patch_version_indicator"
-        tools:text="1/1" />
-
-    <ProgressBar
         android:id="@+id/item_indicator"
         style="@style/MainProgressBar"
         app:layout_constraintEnd_toEndOf="@+id/champion_indicator"
         app:layout_constraintStart_toStartOf="@+id/champion_indicator"
-        app:layout_constraintTop_toBottomOf="@+id/patch_version_indicator_tv" />
+        app:layout_constraintTop_toBottomOf="@+id/icon_indicator_tv" />
 
     <TextView
         android:id="@+id/item_indicator_tv"

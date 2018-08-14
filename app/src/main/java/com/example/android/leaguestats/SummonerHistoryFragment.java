@@ -1,7 +1,8 @@
 package com.example.android.leaguestats;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
-import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -9,9 +10,6 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -24,28 +22,34 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.android.leaguestats.adapters.MatchAdapter;
-import com.example.android.leaguestats.database.Contract;
+import com.example.android.leaguestats.ViewModels.ChampionViewModelShared;
+import com.example.android.leaguestats.ViewModels.ChampionViewModelSharedFactory;
+import com.example.android.leaguestats.ViewModels.SummonerSpellSharedViewModel;
+import com.example.android.leaguestats.ViewModels.SummonerSpellSharedViewModelFactory;
+import com.example.android.leaguestats.adapters.MatchHistoryAdapter;
 import com.example.android.leaguestats.interfaces.MatchListTaskCompleted;
 import com.example.android.leaguestats.interfaces.MatchTaskCompleted;
 import com.example.android.leaguestats.interfaces.SummonerTaskCompleted;
 import com.example.android.leaguestats.models.Match;
 import com.example.android.leaguestats.models.MatchList;
 import com.example.android.leaguestats.models.Summoner;
+import com.example.android.leaguestats.room.AppDatabase;
+import com.example.android.leaguestats.room.ChampionEntry;
+import com.example.android.leaguestats.room.SummonerSpellEntry;
 import com.example.android.leaguestats.utilities.AsyncTasks.MatchAsyncTask;
 import com.example.android.leaguestats.utilities.AsyncTasks.MatchListAsyncTask;
 import com.example.android.leaguestats.utilities.AsyncTasks.SummonerAsyncTask;
-import com.example.android.leaguestats.utilities.DataUtils;
 import com.example.android.leaguestats.utilities.PreferencesUtils;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public class SummonerHistoryFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class SummonerHistoryFragment extends Fragment {
 
     private static final String LOG_TAG = SummonerHistoryFragment.class.getSimpleName();
     private RecyclerView mRecyclerView;
-    private MatchAdapter mAdapter;
+    private MatchHistoryAdapter mAdapter;
     private TextView mEmptyViewTv;
     private ProgressBar mRecyclerIndicator;
     private TextView mSummonerNameTv;
@@ -57,20 +61,16 @@ public class SummonerHistoryFragment extends Fragment implements LoaderManager.L
     private long mAccountId;
     private String mPatchVersion;
     private String mEntryRegionString;
-    private String[] mSummonerSpellId1Array;
-    private String[] mSummonerSpellId2Array;
-    private String[] mChampionIdArray;
     private ArrayList<Match> mMatches;
+    private SummonerSpellSharedViewModel mSummonerSpellViewModel;
+    private ChampionViewModelShared mChampionViewModel;
+    private AppDatabase mDb;
     private String LAYOUT_MANAGER_STATE_KEY = "layoutManagerStateKey";
     private Parcelable mLayoutManagerViewState;
     public static final String ENTRY_REGION_STRING = "ENTRY_REGION_STRING";
-    public static final String ACCOUNT_ID_KEY = "ACCOUNT_ID_KEY";
     private static final String SUMMONER_LEVEL_KEY = "SUMMONER_LEVEL_KEY";
     private static final String PROFILE_ICON_KEY = "PROFILE_ICON_KEY";
     public static final String SUMMONER_NAME_KEY = "SUMMONER_NAME_KEY";
-    private static final int SUMMONER_SPELL_1_LOADER = 0;
-    private static final int SUMMONER_SPELL_2_LOADER = 1;
-    private static final int CHAMPION_LOADER = 2;
 
     public SummonerHistoryFragment() {
     }
@@ -87,7 +87,7 @@ public class SummonerHistoryFragment extends Fragment implements LoaderManager.L
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.i(LOG_TAG, "onCreate");
+        Log.d(LOG_TAG, "onCreate");
 
         Bundle args = getArguments();
         if (args != null && args.containsKey(ENTRY_REGION_STRING) && args.containsKey(SUMMONER_NAME_KEY)) {
@@ -100,7 +100,7 @@ public class SummonerHistoryFragment extends Fragment implements LoaderManager.L
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_summoner, container, false);
-        Log.i(LOG_TAG, "onCreateView");
+        Log.d(LOG_TAG, "onCreateView");
 
         mRecyclerView = rootView.findViewById(R.id.summoner_recycler_view);
 
@@ -116,23 +116,33 @@ public class SummonerHistoryFragment extends Fragment implements LoaderManager.L
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Log.i(LOG_TAG, "onActivityCreated");
+        Log.d(LOG_TAG, "onActivityCreated");
 
         mPatchVersion = PreferencesUtils.getPatchVersion(getContext());
 
-        mAdapter = new MatchAdapter(getContext(), new ArrayList<Match>(), null, null, null, mPatchVersion);
+        mAdapter = new MatchHistoryAdapter(getContext(), new ArrayList<Match>(),
+                new ArrayList<ChampionEntry>(), new ArrayList<SummonerSpellEntry>(),
+                new ArrayList<SummonerSpellEntry>(), mPatchVersion);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+
+        mDb = AppDatabase.getInstance(getActivity().getApplicationContext());
 
         if (savedInstanceState != null) {
             if (savedInstanceState.containsKey(LAYOUT_MANAGER_STATE_KEY)) {
                 mLayoutManagerViewState = savedInstanceState.getParcelable(LAYOUT_MANAGER_STATE_KEY);
                 mRecyclerView.getLayoutManager().onRestoreInstanceState(mLayoutManagerViewState);
+
+                mSummonerName = savedInstanceState.getString(SUMMONER_NAME_KEY);
+                mSummonerLevel = savedInstanceState.getLong(SUMMONER_LEVEL_KEY);
+                mProfileIconId = savedInstanceState.getInt(PROFILE_ICON_KEY);
+                bindDataToViews();
             }
         } else {
-            Log.i(LOG_TAG, "savedInstance null");
+            Log.d(LOG_TAG, "savedInstance null");
         }
+
         getSummonerData(mEntryRegionString, mSummonerName);
     }
 
@@ -146,10 +156,7 @@ public class SummonerHistoryFragment extends Fragment implements LoaderManager.L
                         mProfileIconId = summoner.getProfileIconId();
                         mSummonerLevel = summoner.getSummonerLevel();
                         mSummonerName = summoner.getSummonerName();
-
-                        mSummonerNameTv.setText(mSummonerName);
-                        mSummonerLevelTv.setText(String.valueOf(mSummonerLevel) + " " + getString(R.string.level));
-                        loadImage(mProfileIcon, mProfileIconId);
+                        bindDataToViews();
 
                         getMatchList(entryRegionString, String.valueOf(mAccountId));
                     } else {
@@ -190,96 +197,73 @@ public class SummonerHistoryFragment extends Fragment implements LoaderManager.L
             @Override
             public void matchTaskCompleted(ArrayList<Match> matches) {
                 mMatches = matches;
-                mAdapter.swapMatchesData(mMatches);
-                mRecyclerIndicator.setVisibility(View.INVISIBLE);
-
-                mSummonerSpellId1Array = new String[matches.size()];
-                for (int i = 0; i < matches.size(); i++) {
-                    mSummonerSpellId1Array[i] = String.valueOf(matches.get(i).getSpell1Id());
-                }
-                mSummonerSpellId2Array = new String[matches.size()];
-                for (int i = 0; i < matches.size(); i++) {
-                    mSummonerSpellId2Array[i] = String.valueOf(matches.get(i).getSpell2Id());
-                }
-                mChampionIdArray = new String[matches.size()];
-                for (int i = 0; i < matches.size(); i++) {
-                    mChampionIdArray[i] = String.valueOf(matches.get(i).getChampionId());
-                }
-
-                getActivity().getSupportLoaderManager().initLoader(SUMMONER_SPELL_1_LOADER, null, SummonerHistoryFragment.this);
-                getActivity().getSupportLoaderManager().initLoader(SUMMONER_SPELL_2_LOADER, null, SummonerHistoryFragment.this);
-                getActivity().getSupportLoaderManager().initLoader(CHAMPION_LOADER, null, SummonerHistoryFragment.this);
+                updateUi(matches);
             }
         };
         MatchAsyncTask matchAsyncTask = new MatchAsyncTask(matchTaskCompleted);
         matchAsyncTask.execute(entryRegionString, String.valueOf(matchLists.get(0).getGameId()));
     }
 
-    @NonNull
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args) {
-        final String[] PROJECTION;
-        String inClause;
-        switch (id) {
-            case SUMMONER_SPELL_1_LOADER:
-                PROJECTION = new String[]{Contract.SummonerSpellEntry._ID,
-                        Contract.SummonerSpellEntry.COLUMN_IMAGE};
-                inClause = DataUtils.buildInClause(mSummonerSpellId1Array);
-                return new CursorLoader(getContext(),
-                        Contract.SummonerSpellEntry.CONTENT_URI,
-                        PROJECTION,
-                        Contract.SummonerSpellEntry._ID + inClause,
-                        mSummonerSpellId1Array,
-                        null);
-            case SUMMONER_SPELL_2_LOADER:
-                PROJECTION = new String[]{Contract.SummonerSpellEntry._ID,
-                        Contract.SummonerSpellEntry.COLUMN_IMAGE};
-                inClause = DataUtils.buildInClause(mSummonerSpellId2Array);
-                return new CursorLoader(getContext(),
-                        Contract.SummonerSpellEntry.CONTENT_URI,
-                        PROJECTION,
-                        Contract.SummonerSpellEntry._ID + inClause,
-                        mSummonerSpellId2Array,
-                        null);
-            case CHAMPION_LOADER:
-                 PROJECTION = new String[]{Contract.ChampionEntry._ID,
-                         Contract.ChampionEntry.COLUMN_CHAMPION_THUMBNAIL};
-                 inClause = DataUtils.buildInClause(mChampionIdArray);
-                 return new CursorLoader(getContext(),
-                         Contract.ChampionEntry.CONTENT_URI,
-                         PROJECTION,
-                         Contract.ChampionEntry._ID + inClause,
-                         mChampionIdArray,
-                         null);
-            default:
-                return null;
-        }
+    private void updateUi(ArrayList<Match> matches) {
+        mAdapter.setMatches(mMatches);
+        mRecyclerIndicator.setVisibility(View.INVISIBLE);
+
+        setupViewModels(matches);
     }
 
-    @Override
-    public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor cursor) {
-        switch (loader.getId()) {
-            case SUMMONER_SPELL_1_LOADER:
-                mAdapter.swapSummonerSpell1Data(cursor);
-                break;
-            case SUMMONER_SPELL_2_LOADER:
-                mAdapter.swapSummonerSpell2Data(cursor);
-                break;
-            case CHAMPION_LOADER:
-                mAdapter.swapChampionCursor(cursor);
-                break;
-        }
+    private void setupViewModels(List<Match> matches) {
+        int[] summonerSpell1Array = listToIntArray(matches.get(0).getSpell1Id());
+        int[] summonerSpell2Array = listToIntArray(matches.get(0).getSpell2Id());
+        int[] championIdArray = listToIntArray(matches.get(0).getChampionId());
+
+        Log.d(LOG_TAG, "Getting summonerSpell");
+        SummonerSpellSharedViewModelFactory summonerSpellFactory = new SummonerSpellSharedViewModelFactory(mDb);
+        mSummonerSpellViewModel = ViewModelProviders.of(getActivity(), summonerSpellFactory).get(SummonerSpellSharedViewModel.class);
+        mSummonerSpellViewModel.setSummonerSpell1(summonerSpell1Array);
+        mSummonerSpellViewModel.setSummonerSpell2(summonerSpell2Array);
+        mSummonerSpellViewModel.getSummonerSpell1().observe(this, new Observer<List<SummonerSpellEntry>>() {
+            @Override
+            public void onChanged(@Nullable List<SummonerSpellEntry> summonerSpellEntries) {
+                Log.d(LOG_TAG, "Receiving database update from LiveData for summonerSpell1");
+                mSummonerSpellViewModel.getSummonerSpell1().removeObserver(this);
+                mAdapter.setSummonerSpell1(summonerSpellEntries);
+            }
+        });
+        mSummonerSpellViewModel.getSummonerSpell2().observe(this, new Observer<List<SummonerSpellEntry>>() {
+            @Override
+            public void onChanged(@Nullable List<SummonerSpellEntry> summonerSpellEntries) {
+                Log.d(LOG_TAG, "Receiving database update from LiveData for summonerSpell2");
+                mSummonerSpellViewModel.getSummonerSpell2().removeObserver(this);
+                mAdapter.setSummonerSpell2(summonerSpellEntries);
+            }
+        });
+
+        Log.d(LOG_TAG, "Getting champion");
+        ChampionViewModelSharedFactory championFactory = new ChampionViewModelSharedFactory(mDb);
+        mChampionViewModel = ViewModelProviders.of(getActivity(), championFactory).get(ChampionViewModelShared.class);
+        mChampionViewModel.setHistoryChampions(championIdArray);
+        mChampionViewModel.getHistoryChampions().observe(this, new Observer<List<ChampionEntry>>() {
+            @Override
+            public void onChanged(@Nullable List<ChampionEntry> championEntries) {
+                Log.d(LOG_TAG, "Receiving database update from LiveData for champions");
+                mChampionViewModel.getHistoryChampions().removeObserver(this);
+                mAdapter.setChampions(championEntries);
+            }
+        });
     }
 
-    @Override
-    public void onLoaderReset(@NonNull Loader<Cursor> loader) {
-
+    private int[] listToIntArray(List<Integer> list) {
+        int[] intArray = new int[list.size()];
+        for (int i = 0; i < intArray.length; i++) {
+            intArray[i] = list.get(i);
+        }
+        return intArray;
     }
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        Log.i(LOG_TAG, "onSaveInstanceState");
+        Log.d(LOG_TAG, "onSaveInstanceState");
 
         mLayoutManagerViewState = mRecyclerView.getLayoutManager().onSaveInstanceState();
         outState.putParcelable(LAYOUT_MANAGER_STATE_KEY, mLayoutManagerViewState);
@@ -288,25 +272,15 @@ public class SummonerHistoryFragment extends Fragment implements LoaderManager.L
         outState.putInt(PROFILE_ICON_KEY, mProfileIconId);
     }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        Log.d(LOG_TAG, "onDetach");
-        mRecyclerView.setAdapter(null);
-    }
-
-    private void loadImage(ImageView imageView, int profileIconId) {
+    private void bindDataToViews() {
+        mSummonerNameTv.setText(mSummonerName);
+        mSummonerLevelTv.setText(getString(R.string.level) + " " + String.valueOf(mSummonerLevel));
         Picasso.get()
-                .load("http://ddragon.leagueoflegends.com/cdn/" + mPatchVersion + "/img/profileicon/" + String.valueOf(profileIconId) + ".png")
+                .load("http://ddragon.leagueoflegends.com/cdn/" + mPatchVersion + "/img/profileicon/" + String.valueOf(mProfileIconId) + ".png")
                 .resize(200, 200)
                 .error(R.drawable.ic_launcher_background)
                 .placeholder(R.drawable.ic_launcher_foreground)
-                .into(imageView);
+                .into(mProfileIcon);
     }
 
     private boolean isNetworkAvailable() {

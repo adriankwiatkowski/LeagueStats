@@ -1,19 +1,26 @@
 package com.example.android.leaguestats.models;
 
+import java.util.List;
+
 public class Match {
 
-    private int mParticipantId;
-    private String mSummonerName;
-    private int mTeamId;
-    private int mChampionId;
-    private int mSpell1Id;
-    private int mSpell2Id;
+    private List<Integer> mParticipantId;
+    private List<Long> mAccountId;
+    private List<Long> mSummonerId;
+    private List<String> mSummonerName;
+    private List<Integer> mTeamId;
+    private List<Integer> mChampionId;
+    private List<Integer> mSpell1Id;
+    private List<Integer> mSpell2Id;
     private long mGameDuration;
     private long mGameCreation;
 
-    public Match(int participantId, String summonerName, int teamId, int championId,
-                 int spell1, int spell2, long gameDuration, long gameCreation) {
+    public Match(List<Integer> participantId, List<Long> accountId, List<Long> summonerId,
+                 List<String> summonerName, List<Integer> teamId, List<Integer> championId,
+                 List<Integer> spell1, List<Integer> spell2, long gameDuration, long gameCreation) {
         this.mParticipantId = participantId;
+        this.mAccountId = accountId;
+        this.mSummonerId = summonerId;
         this.mSummonerName = summonerName;
         this.mTeamId = teamId;
         this.mChampionId = championId;
@@ -23,35 +30,35 @@ public class Match {
         this.mGameCreation = gameCreation;
     }
 
-    public int getParticipantId() {
+    public List<Integer> getParticipantId() {
         return mParticipantId;
     }
 
-    public void setParticipantId(int participantId) {
+    public void setParticipantId(List<Integer> participantId) {
         this.mParticipantId = participantId;
     }
 
-    public String getSummonerName() {
+    public List<String> getSummonerName() {
         return mSummonerName;
     }
 
-    public void setSummonerName(String summonerName) {
+    public void setSummonerName(List<String> summonerName) {
         this.mSummonerName = summonerName;
     }
 
-    public int getTeamId() {
+    public List<Integer> getTeamId() {
         return mTeamId;
     }
 
-    public void setTeamId(int teamId) {
+    public void setTeamId(List<Integer> teamId) {
         this.mTeamId = teamId;
     }
 
-    public int getChampionId() {
+    public List<Integer> getChampionId() {
         return mChampionId;
     }
 
-    public void setChampionId(int championId) {
+    public void setChampionId(List<Integer> championId) {
         this.mChampionId = championId;
     }
 
@@ -71,19 +78,35 @@ public class Match {
         this.mGameCreation = gameCreation;
     }
 
-    public int getSpell2Id() {
+    public List<Integer> getSpell2Id() {
         return mSpell2Id;
     }
 
-    public void setSpell2Id(int spell2Id) {
+    public void setSpell2Id(List<Integer> spell2Id) {
         this.mSpell2Id = spell2Id;
     }
 
-    public int getSpell1Id() {
+    public List<Integer> getSpell1Id() {
         return mSpell1Id;
     }
 
-    public void setSpell1Id(int spell1Id) {
+    public void setSpell1Id(List<Integer> spell1Id) {
         this.mSpell1Id = spell1Id;
+    }
+
+    public List<Long> getAccountId() {
+        return mAccountId;
+    }
+
+    public void setAccountId(List<Long> accountId) {
+        this.mAccountId = accountId;
+    }
+
+    public List<Long> getSummonerId() {
+        return mSummonerId;
+    }
+
+    public void setSummonerId(List<Long> summonerId) {
+        this.mSummonerId = summonerId;
     }
 }

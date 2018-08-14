@@ -2,6 +2,7 @@ package com.example.android.leaguestats.adapters;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -12,28 +13,30 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.android.leaguestats.R;
-import com.example.android.leaguestats.database.Contract;
+import com.example.android.leaguestats.room.ItemEntry;
 import com.example.android.leaguestats.utilities.DataUtils;
 import com.squareup.picasso.Picasso;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder> {
 
     private static ItemClickListener mListener;
 
     public interface ItemClickListener {
-        void onItemClick(int itemId);
+        void onItemClick(ItemEntry itemEntry);
     }
 
     private static final String LOG_TAG = ItemAdapter.class.getSimpleName();
     private Context mContext;
-    private Cursor mCursor;
+    private List<ItemEntry> mList;
     private final String PATCH_VERSION;
+    private long mLastClickTime = 0;
 
-    public ItemAdapter(Context context, Cursor cursor, ItemClickListener listener, String patchVersion) {
+    public ItemAdapter(Context context, List<ItemEntry> list, ItemClickListener listener, String patchVersion) {
         mContext = context;
-        mCursor = cursor;
+        mList = list;
         mListener = listener;
         PATCH_VERSION = patchVersion;
     }
@@ -52,15 +55,10 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull ItemViewHolder holder, int position) {
-        if (!mCursor.moveToPosition(position))
-            return;
+        holder.mNameTv.setText(mList.get(position).getName());
+        holder.mCostTv.setText(String.valueOf(mList.get(position).getTotalGold()));
 
-        String name = mCursor.getString(mCursor.getColumnIndex(Contract.ItemEntry.COLUMN_NAME));
-        int cost = mCursor.getInt(mCursor.getColumnIndex(Contract.ItemEntry.COLUMN_TOTAL_GOLD));
-        String image = mCursor.getString(mCursor.getColumnIndex(Contract.ItemEntry.COLUMN_IMAGE));
-
-        holder.mNameTv.setText(name);
-        holder.mCostTv.setText(String.valueOf(cost));
+        String image = mList.get(position).getImage();
 
         String httpEntryUrl = (String) holder.itemView.getTag();
 
@@ -72,16 +70,25 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
                 .into(holder.mImage);
     }
 
-    @Override
-    public int getItemCount() {
-        if (null == mCursor) return 0;
-        return mCursor.getCount();
+    public void add(ItemEntry itemEntry) {
+        mList.add(itemEntry);
+        notifyDataSetChanged();
     }
 
-    public void swapCursor(Cursor newCursor) {
-        if (newCursor == mCursor) return;
-        mCursor = newCursor;
+    public void clear() {
+        mList.clear();
         notifyDataSetChanged();
+    }
+
+    public void setData(List<ItemEntry> list) {
+        clear();
+        mList.addAll(list);
+        notifyDataSetChanged();
+    }
+
+    @Override
+    public int getItemCount() {
+        return mList.size();
     }
 
     public class ItemViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -101,9 +108,11 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
 
         @Override
         public void onClick(View v) {
-            if (!mCursor.moveToPosition(getAdapterPosition())) return;
-            int id = mCursor.getInt(mCursor.getColumnIndex(Contract.ItemEntry._ID));
-            mListener.onItemClick(id);
+            if (SystemClock.elapsedRealtime() - mLastClickTime < 1000) {
+                return;
+            }
+            mLastClickTime = SystemClock.elapsedRealtime();
+            mListener.onItemClick(mList.get(getAdapterPosition()));
         }
     }
 }

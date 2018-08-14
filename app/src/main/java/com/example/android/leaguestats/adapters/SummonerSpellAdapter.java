@@ -11,20 +11,30 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.android.leaguestats.R;
-import com.example.android.leaguestats.database.Contract;
+import com.example.android.leaguestats.room.SummonerSpellEntry;
 import com.squareup.picasso.Picasso;
+
+import java.util.List;
 
 public class SummonerSpellAdapter extends RecyclerView.Adapter<SummonerSpellAdapter.SummonerSpellViewHolder> {
 
+    private static SummonerSpellClickListener mListener;
+
+    public interface SummonerSpellClickListener {
+        void onSummonerSpellClick(SummonerSpellEntry summonerSpellEntry);
+    }
+
     private static final String LOG_TAG = SummonerSpellAdapter.class.getSimpleName();
     private Context mContext;
-    private static Cursor mCursor;
+    private static List<SummonerSpellEntry> mList;
     private final String PATCH_VERSION;
 
-    public SummonerSpellAdapter(Context context, Cursor cursor, String patchVersion) {
+    public SummonerSpellAdapter(Context context, List<SummonerSpellEntry> list,
+                                SummonerSpellClickListener listener, String patchVersion) {
         mContext = context;
-        mCursor = cursor;
+        mList = list;
         PATCH_VERSION = patchVersion;
+        mListener = listener;
     }
 
     @NonNull
@@ -41,39 +51,41 @@ public class SummonerSpellAdapter extends RecyclerView.Adapter<SummonerSpellAdap
 
     @Override
     public void onBindViewHolder(@NonNull SummonerSpellViewHolder holder, int position) {
-        if (!mCursor.moveToPosition(position))
-            return;
-
-        String name = mCursor.getString(mCursor.getColumnIndex(Contract.SummonerSpellEntry.COLUMN_NAME));
-        int cooldown = mCursor.getInt(mCursor.getColumnIndex(Contract.SummonerSpellEntry.COLUMN_COOLDOWN));
-        String image = mCursor.getString(mCursor.getColumnIndex(Contract.SummonerSpellEntry.COLUMN_IMAGE));
-
-        holder.mNameTv.setText(name);
-        holder.mCooldownTv.setText(String.valueOf(cooldown));
+        holder.mNameTv.setText(mList.get(position).getName());
+        holder.mCooldownTv.setText(String.valueOf(mList.get(position).getCooldown()));
 
         String httpEntryUrl = (String) holder.itemView.getTag();
 
         Picasso.get()
-                .load(httpEntryUrl + "/" + image)
+                .load(httpEntryUrl + "/" + mList.get(position).getImage())
                 .resize(200, 200)
                 .error(R.drawable.ic_launcher_background)
                 .placeholder(R.drawable.ic_launcher_foreground)
                 .into(holder.mImage);
     }
 
-    @Override
-    public int getItemCount() {
-        if (null == mCursor) return 0;
-        return mCursor.getCount();
-    }
-
-    public void swapCursor(Cursor newCursor) {
-        if (newCursor == mCursor) return;
-        mCursor = newCursor;
+    public void add(SummonerSpellEntry summonerSpellEntry) {
+        mList.add(summonerSpellEntry);
         notifyDataSetChanged();
     }
 
-    public static class SummonerSpellViewHolder extends RecyclerView.ViewHolder {
+    public void clear() {
+        mList.clear();
+        notifyDataSetChanged();
+    }
+
+    public void setData(List<SummonerSpellEntry> list) {
+        clear();
+        mList.addAll(list);
+        notifyDataSetChanged();
+    }
+
+    @Override
+    public int getItemCount() {
+        return mList.size();
+    }
+
+    public static class SummonerSpellViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView mNameTv;
         TextView mCooldownTv;
         ImageView mImage;
@@ -81,9 +93,16 @@ public class SummonerSpellAdapter extends RecyclerView.Adapter<SummonerSpellAdap
         public SummonerSpellViewHolder(View itemView) {
             super(itemView);
 
+            itemView.setOnClickListener(this);
+
             mNameTv = itemView.findViewById(R.id.summoner_spell_name_item);
             mCooldownTv = itemView.findViewById(R.id.summoner_spell_cooldown_item);
             mImage = itemView.findViewById(R.id.summoner_spell_image_item);
+        }
+
+        @Override
+        public void onClick(View v) {
+            mListener.onSummonerSpellClick(mList.get(getAdapterPosition()));
         }
     }
 }

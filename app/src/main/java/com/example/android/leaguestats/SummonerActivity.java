@@ -9,7 +9,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
-import com.example.android.leaguestats.database.Contract;
 import com.example.android.leaguestats.utilities.LocaleUtils;
 
 public class SummonerActivity extends AppCompatActivity
@@ -31,14 +30,10 @@ public class SummonerActivity extends AppCompatActivity
 
     @Override
     public void onMasteryListener(String summonerName, String entryRegionString) {
-        SummonerMasteryFragment masteryListFragment = new SummonerMasteryFragment();
-        Bundle args = new Bundle();
-        args.putString(SummonerMasteryFragment.SUMMONER_NAME_KEY, summonerName);
-        args.putString(SummonerMasteryFragment.ENTRY_REGION_STRING, entryRegionString);
-        masteryListFragment.setArguments(args);
-
+        SummonerMasteryFragment summonerMasteryFragment =
+                SummonerMasteryFragment.newInstance(summonerName, entryRegionString);
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.summoner_container, masteryListFragment);
+        transaction.replace(R.id.summoner_container, summonerMasteryFragment);
         transaction.addToBackStack(null);
 
         transaction.commit();
@@ -48,7 +43,6 @@ public class SummonerActivity extends AppCompatActivity
     public void onHistoryListener(String summonerName, String entryString) {
         SummonerHistoryFragment summonerHistoryFragment =
                 SummonerHistoryFragment.newInstance(entryString, summonerName);
-
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.summoner_container, summonerHistoryFragment);
         transaction.addToBackStack(null);
@@ -59,8 +53,7 @@ public class SummonerActivity extends AppCompatActivity
     @Override
     public void onChampionClick(long championId) {
         Intent intent = new Intent(SummonerActivity.this, ChampionDetailActivity.class);
-        Uri contentChampionUri = Contract.ChampionEntry.buildChampionUri(championId);
-        intent.setData(contentChampionUri);
+        intent.putExtra(ChampionDetailActivity.CHAMPION_ID_KEY, championId);
         startActivity(intent);
     }
 

@@ -1,6 +1,5 @@
 package com.example.android.leaguestats.utilities.AsyncTasks;
 
-import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -8,8 +7,7 @@ import android.util.Log;
 import com.example.android.leaguestats.BuildConfig;
 import com.example.android.leaguestats.interfaces.ItemTaskCompleted;
 import com.example.android.leaguestats.interfaces.ResultTask;
-import com.example.android.leaguestats.models.Item;
-import com.example.android.leaguestats.utilities.DataUtils;
+import com.example.android.leaguestats.room.ItemEntry;
 import com.example.android.leaguestats.utilities.JSONUtils;
 
 import org.json.JSONArray;
@@ -27,7 +25,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class ItemAsyncTask extends AsyncTask<String, Integer, List<Item>> {
+public class ItemAsyncTask extends AsyncTask<String, Integer, List<ItemEntry>> {
     private static final String PERSONAL_API_KEY = BuildConfig.HIDDEN_API_KEY;
     private static final String LOG_TAG = ItemAsyncTask.class.getSimpleName();
     private static final int TIMEOUT = 10000;
@@ -43,7 +41,6 @@ public class ItemAsyncTask extends AsyncTask<String, Integer, List<Item>> {
     private static final String LOCALE = "locale";
     private static final String QUERY_PARAMETER_TAGS_ALL = "all";
     private static final String TAGS = "tags";
-    private final String STRING_DIVIDER = "_,_";
 
     private ItemTaskCompleted mItemListener;
     private ResultTask mResultListener;
@@ -54,7 +51,7 @@ public class ItemAsyncTask extends AsyncTask<String, Integer, List<Item>> {
     }
 
     @Override
-    protected List<Item> doInBackground(String... strings) {
+    protected List<ItemEntry> doInBackground(String... strings) {
         BufferedReader reader = null;
         String jsonResponse = "";
         HttpURLConnection urlConnection = null;
@@ -119,11 +116,11 @@ public class ItemAsyncTask extends AsyncTask<String, Integer, List<Item>> {
         return null;
     }
 
-    private List<Item> getJsonData(String json) throws JSONException {
+    private List<ItemEntry> getJsonData(String json) throws JSONException {
         JSONObject root = new JSONObject(json);
         JSONObject data = root.getJSONObject("data");
 
-        List<Item> itemList = new ArrayList<>();
+        List<ItemEntry> itemList = new ArrayList<>();
 
         mResultListener.maxProgress(data.length());
 
@@ -143,15 +140,15 @@ public class ItemAsyncTask extends AsyncTask<String, Integer, List<Item>> {
             int depth = itemJson.optInt("depth");
 
             JSONArray fromArray = itemJson.optJSONArray("from");
-            String fromString = "";
+            List<String> fromList = new ArrayList<>();
             if (fromArray != null) {
-                fromString = JSONUtils.getStringFromJSONArray(fromArray);
+                    fromList = JSONUtils.getStringListFromJSONArray(fromArray);
             }
 
             JSONArray intoArray = itemJson.optJSONArray("into");
-            String intoString = "";
+            List<String> intoList = new ArrayList<>();
             if (intoArray != null) {
-                intoString = JSONUtils.getStringFromJSONArray(intoArray);
+                intoList = JSONUtils.getStringListFromJSONArray(intoArray);
             }
 
             double flatArmor = 0;
@@ -232,8 +229,8 @@ public class ItemAsyncTask extends AsyncTask<String, Integer, List<Item>> {
                 purchasable = goldJson.optString("purchasable");
             }
 
-            Item item = new Item(id, name, plainText, description, depth, image, intoString,
-                    fromString, baseGold, totalGold, sellGold, purchasable, flatArmor, flatSpellBlock,
+            ItemEntry item = new ItemEntry(id, name, plainText, description, depth, image, intoList,
+                    fromList, baseGold, totalGold, sellGold, purchasable, flatArmor, flatSpellBlock,
                     flatHPPool, flatMPPool, flatHPRegen, flatCritChance, flatMagicDamage, flatPhysicalDamage,
                     flatMovementSpeed, percentMovementSpeed, percentAttackSpeed, percentLifeSteal);
             itemList.add(item);
@@ -268,7 +265,7 @@ public class ItemAsyncTask extends AsyncTask<String, Integer, List<Item>> {
     }
 
     @Override
-    protected void onPostExecute(List<Item> items) {
+    protected void onPostExecute(List<ItemEntry> items) {
         super.onPostExecute(items);
 
         mItemListener.itemTaskCompleted(items);

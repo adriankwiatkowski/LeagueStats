@@ -12,7 +12,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity"
+        <activity
+            android:name=".MainActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -20,48 +21,26 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".NavigationActivity" />
+        <activity
+            android:name=".NavigationActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".SummonerActivity"
-            android:parentActivityName=".NavigationActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".NavigationActivity" />
-        </activity>
+            android:parentActivityName=".NavigationActivity" />
         <activity
             android:name=".ChampionListActivity"
-            android:parentActivityName=".NavigationActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".NavigationActivity" />
-        </activity>
+            android:parentActivityName=".NavigationActivity" />
         <activity
             android:name=".ChampionDetailActivity"
             android:parentActivityName=".NavigationActivity"
-            android:theme="@style/ChampionTheme">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".NavigationActivity" />
-        </activity>
+            android:theme="@style/ChampionTheme" />
         <activity
             android:name=".ItemActivity"
-            android:parentActivityName=".NavigationActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".NavigationActivity" />
-        </activity>
+            android:parentActivityName=".NavigationActivity" />
         <activity
             android:name=".SummonerSpellActivity"
-            android:parentActivityName=".NavigationActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".NavigationActivity" />
-        </activity>
+            android:parentActivityName=".NavigationActivity" />
 
-        <provider
-            android:name=".database.Provider"
-            android:authorities="com.example.android.leaguestats"
-            android:exported="false" />
     </application>
 
 </manifest>

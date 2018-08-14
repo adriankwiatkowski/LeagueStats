@@ -7,8 +7,7 @@ import android.util.Log;
 import com.example.android.leaguestats.BuildConfig;
 import com.example.android.leaguestats.interfaces.ResultTask;
 import com.example.android.leaguestats.interfaces.SummonerSpellTaskCompleted;
-import com.example.android.leaguestats.interfaces.SummonerTaskCompleted;
-import com.example.android.leaguestats.models.SummonerSpell;
+import com.example.android.leaguestats.room.SummonerSpellEntry;
 import com.example.android.leaguestats.utilities.JSONUtils;
 
 import org.json.JSONArray;
@@ -26,7 +25,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class SummonerSpellAsyncTask extends AsyncTask<String, Integer, List<SummonerSpell>> {
+public class SummonerSpellAsyncTask extends AsyncTask<String, Integer, List<SummonerSpellEntry>> {
 
     private static final String PERSONAL_API_KEY = BuildConfig.HIDDEN_API_KEY;
     private static final String LOG_TAG = SummonerSpellAsyncTask.class.getSimpleName();
@@ -44,19 +43,17 @@ public class SummonerSpellAsyncTask extends AsyncTask<String, Integer, List<Summ
     private static final String TAGS = "tags";
     private static final String QUERY_PARAMETER_DATA_BY_ID = "false";
     private static final String DATA_BY_ID = "dataById";
-    private static final String VERSION = "version";
-    private final String STRING_DIVIDER = "_,_";
 
-    private SummonerSpellTaskCompleted mSummonerSpellListener;
+    private SummonerSpellTaskCompleted mListener;
     private ResultTask mResultListener;
 
-    public SummonerSpellAsyncTask(SummonerSpellTaskCompleted summonerSpellListener, ResultTask resultListener) {
-        mSummonerSpellListener = summonerSpellListener;
-        mResultListener = resultListener;
+    public SummonerSpellAsyncTask(SummonerSpellTaskCompleted summonerSpellListener, ResultTask resultTask) {
+        mListener = summonerSpellListener;
+        mResultListener = resultTask;
     }
 
     @Override
-    protected List<SummonerSpell> doInBackground(String... strings) {
+    protected List<SummonerSpellEntry> doInBackground(String... strings) {
         BufferedReader reader = null;
         String jsonResponse = "";
         HttpURLConnection urlConnection = null;
@@ -121,15 +118,17 @@ public class SummonerSpellAsyncTask extends AsyncTask<String, Integer, List<Summ
         return null;
     }
 
-    private List<SummonerSpell> getJsonData(String json) throws JSONException {
+    private List<SummonerSpellEntry> getJsonData(String json) throws JSONException {
         JSONObject root = new JSONObject(json);
         JSONObject data = root.getJSONObject("data");
 
-        List<SummonerSpell> summonerSpells = new ArrayList<>();
-
         mResultListener.maxProgress(data.length());
+        publishProgress(0);
+
+        List<SummonerSpellEntry> summonerSpells = new ArrayList<>();
 
         Iterator<String> summonerSpellIterator = data.keys();
+        int i = 0;
         while (summonerSpellIterator.hasNext()) {
 
             String jsonSummonerSpellString = summonerSpellIterator.next();
@@ -153,20 +152,21 @@ public class SummonerSpellAsyncTask extends AsyncTask<String, Integer, List<Summ
             int range = rangeArray.getInt(0);
 
             JSONArray modesArray = summonerSpellJson.optJSONArray("modes");
-            String modesString = JSONUtils.getStringFromJSONArray(modesArray);
+            List<String> modesList = JSONUtils.getStringListFromJSONArray(modesArray);
 
-            summonerSpells.add(new SummonerSpell(id, key, name, description,
-                    image, cost, cooldown, range, modesString));
+            summonerSpells.add(new SummonerSpellEntry(id, key, name, description,
+                    image, cost, cooldown, range, modesList));
+
+            i++;
+            publishProgress(i);
         }
         return summonerSpells;
     }
 
     // language[0] - language
-    // language[1] - patch
     private URL createUrl(String[] language) {
         Uri builtUri = Uri.parse(HTTP_ENTRY_URL).buildUpon()
                 .appendQueryParameter(LOCALE, language[0])
-                .appendQueryParameter(VERSION, language[1])
                 .appendQueryParameter(DATA_BY_ID, QUERY_PARAMETER_DATA_BY_ID)
                 .appendQueryParameter(TAGS, QUERY_PARAMETER_TAGS_ALL)
                 .appendQueryParameter(API_KEY, PERSONAL_API_KEY)
@@ -181,15 +181,15 @@ public class SummonerSpellAsyncTask extends AsyncTask<String, Integer, List<Summ
     }
 
     @Override
-    protected void onPostExecute(List<SummonerSpell> summonerSpells) {
-        super.onPostExecute(summonerSpells);
-        mSummonerSpellListener.summonerSpellTaskCompleted(summonerSpells);
-    }
-
-    @Override
     protected void onProgressUpdate(Integer... values) {
         super.onProgressUpdate(values);
 
         mResultListener.resultTask(values[0]);
+    }
+
+    @Override
+    protected void onPostExecute(List<SummonerSpellEntry> summonerSpells) {
+        super.onPostExecute(summonerSpells);
+        mListener.summonerSpellTaskCompleted(summonerSpells);
     }
 }

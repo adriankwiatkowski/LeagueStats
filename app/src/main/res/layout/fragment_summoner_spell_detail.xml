@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/statsLabelColor"
+    tools:context=".SummonerSpellDetailFragment">
+
+    <ImageView
+        android:id="@+id/summoner_spell_detail_image"
+        style="@style/ImageThumbnail"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@drawable/ic_launcher_foreground" />
+
+    <TextView
+        android:id="@+id/summoner_spell_detail_name"
+        style="@style/SummonerSpellDetailTextLabel"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/summoner_spell_detail_image"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Cleanse" />
+
+    <TextView
+        android:id="@+id/summoner_spell_detail_description"
+        style="@style/SummonerSpellDetailText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/summoner_spell_detail_name"
+        app:layout_constraintTop_toBottomOf="@+id/summoner_spell_detail_name"
+        tools:text="Makes you cleaner." />
+
+    <TextView
+        android:id="@+id/summoner_spell_detail_cooldown"
+        style="@style/SummonerSpellDetailText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/summoner_spell_detail_description"
+        app:layout_constraintTop_toBottomOf="@+id/summoner_spell_detail_description"
+        tools:text="25325" />
+</android.support.constraint.ConstraintLayout>

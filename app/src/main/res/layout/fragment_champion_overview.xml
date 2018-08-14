@@ -17,24 +17,10 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/champion_name_tv"
-            style="@style/StatsLabel"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/splash_art_recycler_view"
-            tools:text="Riven" />
-
-        <TextView
-            android:id="@+id/champion_title_tv"
-            style="@style/StatsLabel"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/champion_name_tv"
-            tools:text="The Exile" />
-
-        <TextView
             android:id="@+id/champion_lore_tv"
             style="@style/StatsLabel"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/champion_title_tv"
+            app:layout_constraintTop_toBottomOf="@+id/splash_art_recycler_view"
             tools:text="Riven was the... " />
 
         <ProgressBar

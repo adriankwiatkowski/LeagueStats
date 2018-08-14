@@ -13,12 +13,12 @@
     <string name="magic_resist_label">Odp. Magiczna</string>
     <string name="attack_speed_label">Szybkość Ataku</string>
     <string name="playing_as">Gra jako</string>
-    <string name="playing_against">Gra przeiwko</string>
+    <string name="playing_vs">Gra Vs</string>
     <string name="unknown_name">Nieznane imię</string>
-    <string name="unknown_description">Nieznany błąd</string>
+    <string name="unknown_description">Nieznany opis</string>
     <string name="unknown_resource">Nieznany zasób</string>
     <string name="level">Poziom</string>
-    <string name="overview">Przegląd</string>
+    <string name="overview">Ogólne</string>
     <string name="info">Info</string>
     <string name="tips">Wskazówki</string>
     <string name="summoner_name">Nazwa przywoływacza…</string>

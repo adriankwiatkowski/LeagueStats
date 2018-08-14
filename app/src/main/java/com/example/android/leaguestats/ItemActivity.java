@@ -10,8 +10,7 @@ import android.view.MenuItem;
 
 import com.example.android.leaguestats.utilities.LocaleUtils;
 
-public class ItemActivity extends AppCompatActivity
-        implements ItemListFragment.OnItemSelected {
+public class ItemActivity extends AppCompatActivity implements ItemListFragment.OnItemSelected {
 
     private static final String LOG_TAG = ItemActivity.class.getSimpleName();
 
@@ -28,8 +27,8 @@ public class ItemActivity extends AppCompatActivity
     }
 
     @Override
-    public void onItemSelected(int id) {
-        ItemDetailFragment itemDetailFragment = ItemDetailFragment.newInstance(id);
+    public void onItemSelected() {
+        ItemDetailFragment itemDetailFragment = new ItemDetailFragment();
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.item_container, itemDetailFragment);
         transaction.addToBackStack(null);

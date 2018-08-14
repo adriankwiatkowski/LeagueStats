@@ -20,6 +20,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 public class MatchAsyncTask extends AsyncTask<String, Void, ArrayList<Match>> {
 
@@ -107,35 +108,40 @@ public class MatchAsyncTask extends AsyncTask<String, Void, ArrayList<Match>> {
         JSONObject root = new JSONObject(json);
         ArrayList<Match> matches = new ArrayList<>();
 
-        JSONArray participantIdentities = root.getJSONArray("participantIdentities");
+        List<Integer> participantIdList = new ArrayList<>();
+        List<Long> accountIdList = new ArrayList<>();
+        List<Long> summonerIdList = new ArrayList<>();
+        List<String> summonerNameList = new ArrayList<>();
+        List<Integer> teamIdList = new ArrayList<>();
+        List<Integer> championIdList = new ArrayList<>();
+        List<Integer> spell1IdList = new ArrayList<>();
+        List<Integer> spell2IdList = new ArrayList<>();
 
-        int participantId = 0;
-        String summonerName = "";
-        for (int i = 0; i < participantIdentities.length(); i++) {
-            JSONObject object = participantIdentities.getJSONObject(i);
-            participantId = object.getInt("participantId");
-            JSONObject player = object.getJSONObject("player");
-            summonerName = player.getString("summonerName");
-        }
-
-        int teamId = 0;
-        int championId = 0;
-        int spell1 = 0;
-        int spell2 = 0;
         JSONArray participants = root.getJSONArray("participants");
         for (int i = 0; i < participants.length(); i++) {
             JSONObject object = participants.getJSONObject(i);
-            teamId = object.getInt("teamId");
-            championId = object.getInt("championId");
-            spell1 = object.getInt("spell1Id");
-            spell2 = object.getInt("spell2Id");
+            participantIdList.add(object.getInt("participantId"));
+            teamIdList.add(object.getInt("teamId"));
+            championIdList.add(object.getInt("championId"));
+            spell1IdList.add(object.getInt("spell1Id"));
+            spell2IdList.add(object.getInt("spell2Id"));
+
+        }
+
+        JSONArray participantIdentities = root.getJSONArray("participantIdentities");
+        for (int i = 0; i < participantIdentities.length(); i++) {
+            JSONObject object = participantIdentities.getJSONObject(i);
+            JSONObject player = object.getJSONObject("player");
+            accountIdList.add(player.getLong("accountId"));
+            summonerIdList.add(player.getLong("summonerId"));
+            summonerNameList.add(player.getString("summonerName"));
         }
 
         long gameDuration = root.getLong("gameDuration");
         long gameCreation = root.getLong("gameCreation");
 
-        matches.add(new Match(participantId, summonerName, teamId,
-                championId, spell1, spell2, gameDuration, gameCreation));
+        matches.add(new Match(participantIdList, accountIdList, summonerIdList, summonerNameList,
+                teamIdList, championIdList, spell1IdList, spell2IdList, gameDuration, gameCreation));
 
         return matches;
     }
@@ -168,17 +174,5 @@ public class MatchAsyncTask extends AsyncTask<String, Void, ArrayList<Match>> {
         super.onPostExecute(matches);
 
         mListener.matchTaskCompleted(matches);
-    }
-
-    private String getStringIfNotNull(JSONObject object, String key) throws JSONException {
-        if (object.has(key)) {
-            return object.getString(key);
-        } else return "";
-    }
-
-    private int getIntIfNotNull(JSONObject object, String key) throws JSONException {
-        if (object.has(key)) {
-            return object.getInt(key);
-        } else return 0;
     }
 }

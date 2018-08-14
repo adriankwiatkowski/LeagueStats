@@ -17,7 +17,7 @@
     <string name="attack_speed_label">Attack Speed</string>
     <string name="splash_art_description">Splash Art for Champion.</string>
     <string name="playing_as">Playing As</string>
-    <string name="playing_against">Playing Against</string>
+    <string name="playing_vs">Playing Vs</string>
     <string name="unknown_name">Unknown name</string>
     <string name="unknown_description">Unknown description</string>
     <string name="unknown_resource">Unknown resource</string>

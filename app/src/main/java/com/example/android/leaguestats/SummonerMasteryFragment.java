@@ -1,7 +1,8 @@
 package com.example.android.leaguestats;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
-import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -9,9 +10,6 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -24,14 +22,16 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.android.leaguestats.ViewModels.ChampionViewModelShared;
+import com.example.android.leaguestats.ViewModels.ChampionViewModelSharedFactory;
 import com.example.android.leaguestats.adapters.MasteryAdapter;
-import com.example.android.leaguestats.database.Contract;
 import com.example.android.leaguestats.interfaces.MasteryTaskCompleted;
 import com.example.android.leaguestats.interfaces.SummonerTaskCompleted;
 import com.example.android.leaguestats.models.Mastery;
 import com.example.android.leaguestats.models.Summoner;
+import com.example.android.leaguestats.room.AppDatabase;
+import com.example.android.leaguestats.room.ChampionEntry;
 import com.example.android.leaguestats.utilities.AsyncTasks.MasteryAsyncTask;
-import com.example.android.leaguestats.utilities.DataUtils;
 import com.example.android.leaguestats.utilities.PreferencesUtils;
 import com.example.android.leaguestats.utilities.AsyncTasks.SummonerAsyncTask;
 import com.squareup.picasso.Picasso;
@@ -40,7 +40,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SummonerMasteryFragment extends Fragment
-        implements MasteryAdapter.ListItemClickListener, LoaderManager.LoaderCallbacks<Cursor> {
+        implements MasteryAdapter.ListItemClickListener {
 
     OnChampionClickListener mCallback;
 
@@ -62,9 +62,7 @@ public class SummonerMasteryFragment extends Fragment
     private long mSummonerId;
     private String mSummonerName;
     private String mEntryRegionString;
-    private List<Mastery> mMasteries;
-    private ArrayList<Mastery> mMasteryList = null;
-    private String[] mChampionIdArray;
+    private ArrayList<Mastery> mMasteryList;
     private String LAYOUT_MANAGER_STATE_KEY = "layoutManagerStateKey";
     private Parcelable mLayoutManagerViewState;
     private final String PARCEL_MASTERY = "PARCEL_MASTERY";
@@ -72,7 +70,8 @@ public class SummonerMasteryFragment extends Fragment
     public static final String ENTRY_REGION_STRING = "ENTRY_REGION_STRING";
     private static final String SUMMONER_LEVEL_KEY = "SUMMONER_LEVEL_KEY";
     private static final String PROFILE_ICON_KEY = "PROFILE_ICON_KEY";
-    public static final int LOADER_ID = 3;
+    private AppDatabase mDb;
+    private ChampionViewModelShared mChampionViewModel;
 
     public SummonerMasteryFragment() {
     }
@@ -89,7 +88,7 @@ public class SummonerMasteryFragment extends Fragment
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.i(LOG_TAG, "onCreate");
+        Log.d(LOG_TAG, "onCreate");
 
         Bundle bundle = getArguments();
         if (bundle != null && bundle.containsKey(SUMMONER_NAME_KEY) && bundle.containsKey(ENTRY_REGION_STRING)) {
@@ -102,7 +101,7 @@ public class SummonerMasteryFragment extends Fragment
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_summoner, container, false);
-        Log.i(LOG_TAG, "onCreateView");
+        Log.d(LOG_TAG, "onCreateView");
 
         mRecyclerView = rootView.findViewById(R.id.summoner_recycler_view);
 
@@ -118,7 +117,7 @@ public class SummonerMasteryFragment extends Fragment
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Log.i(LOG_TAG, "onActivityCreated");
+        Log.d(LOG_TAG, "onActivityCreated");
 
         mPatchVersion = PreferencesUtils.getPatchVersion(getContext());
 
@@ -127,11 +126,14 @@ public class SummonerMasteryFragment extends Fragment
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
+        mDb = AppDatabase.getInstance(getActivity().getApplicationContext());
+
         if (savedInstanceState != null) {
             if (savedInstanceState.containsKey(LAYOUT_MANAGER_STATE_KEY)) {
                 mLayoutManagerViewState = savedInstanceState.getParcelable(LAYOUT_MANAGER_STATE_KEY);
                 mRecyclerView.getLayoutManager().onRestoreInstanceState(mLayoutManagerViewState);
             }
+
             if (savedInstanceState.containsKey(PARCEL_MASTERY)) {
                 mMasteryList = savedInstanceState.getParcelableArrayList(PARCEL_MASTERY);
                 mAdapter.swapData(mMasteryList);
@@ -139,12 +141,7 @@ public class SummonerMasteryFragment extends Fragment
                 mSummonerName = savedInstanceState.getString(SUMMONER_NAME_KEY);
                 mSummonerLevel = savedInstanceState.getLong(SUMMONER_LEVEL_KEY);
                 mProfileIconId = savedInstanceState.getInt(PROFILE_ICON_KEY);
-
-                mSummonerNameTv.setText(mSummonerName);
-                mSummonerLevelTv.setText(String.valueOf(mSummonerLevel));
-                loadImage(mProfileIcon, mProfileIconId);
-
-                mRecyclerIndicator.setVisibility(View.INVISIBLE);
+                bindDataToViews();
             } else {
                 getSummonerData(mSummonerName, mEntryRegionString);
             }
@@ -166,9 +163,7 @@ public class SummonerMasteryFragment extends Fragment
                         mSummonerId = summoner.getSummonerId();
                         mSummonerName = summoner.getSummonerName();
 
-                        mSummonerNameTv.setText(mSummonerName);
-                        mSummonerLevelTv.setText(String.valueOf(mSummonerLevel) + " " + getString(R.string.level));
-                        loadImage(mProfileIcon, mProfileIconId);
+                        bindDataToViews();
 
                         getMasteryData(mEntryRegionString, String.valueOf(mSummonerId));
                     } else {
@@ -189,14 +184,23 @@ public class SummonerMasteryFragment extends Fragment
         mRecyclerIndicator.setVisibility(View.VISIBLE);
         MasteryTaskCompleted masteryTaskCompleted = new MasteryTaskCompleted() {
             @Override
-            public void masteryTaskCompleted(List<Mastery> masteries) {
+            public void masteryTaskCompleted(final List<Mastery> masteries) {
                 if (!(masteries == null || masteries.isEmpty())) {
-                    mMasteries = masteries;
-                    mChampionIdArray = new String[masteries.size()];
+                    ChampionViewModelSharedFactory factory = new ChampionViewModelSharedFactory(mDb);
+                    mChampionViewModel = ViewModelProviders.of(getActivity(), factory).get(ChampionViewModelShared.class);
+                    long[] ids = new long[masteries.size()];
                     for (int i = 0; i < masteries.size(); i++) {
-                        mChampionIdArray[i] = String.valueOf(masteries.get(i).getChampionId());
+                        ids[i] = masteries.get(i).getChampionId();
                     }
-                    getActivity().getSupportLoaderManager().initLoader(LOADER_ID, null, SummonerMasteryFragment.this);
+                    mChampionViewModel.setMasteryChampions(ids);
+                    mChampionViewModel.getMasteryChampions().observe(SummonerMasteryFragment.this, new Observer<List<ChampionEntry>>() {
+                        @Override
+                        public void onChanged(@Nullable List<ChampionEntry> championEntries) {
+                            mChampionViewModel.getMasteryChampions().removeObserver(this);
+                            Log.d(LOG_TAG, "Receiving database update from LiveData");
+                            updateUi(championEntries, masteries);
+                        }
+                    });
                 } else {
                     mEmptyViewTv.setText(getString(R.string.no_masteries_found));
                     mEmptyViewTv.setVisibility(View.VISIBLE);
@@ -208,36 +212,13 @@ public class SummonerMasteryFragment extends Fragment
         masteriesAsyncTask.execute(summonerRegion, summonerId);
     }
 
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        final String[] PROJECTION = {
-                Contract.ChampionEntry._ID,
-                Contract.ChampionEntry.COLUMN_CHAMPION_NAME,
-                Contract.ChampionEntry.COLUMN_CHAMPION_THUMBNAIL};
+    private void updateUi(List<ChampionEntry> championEntries, List<Mastery> masteries) {
+        List<Mastery> masteryList = new ArrayList<>();
 
-        String inClause = DataUtils.buildInClause(mChampionIdArray);
+        for (int i = 0; i < masteries.size(); i++) {
 
-        return new CursorLoader(getContext(),
-                Contract.ChampionEntry.CONTENT_URI,
-                PROJECTION,
-                Contract.ChampionEntry._ID + inClause,
-                mChampionIdArray,
-                null);
-    }
-
-    @Override
-    public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor cursor) {
-        if (cursor == null) {
-            Toast.makeText(getContext(), getString(R.string.no_data_found), Toast.LENGTH_SHORT).show();
-            getActivity().onBackPressed();
-        }
-
-        cursor.moveToFirst();
-
-        mMasteryList = new ArrayList<>();
-        while (cursor.moveToNext()) {
-            long id = cursor.getInt(cursor.getColumnIndex(Contract.ChampionEntry._ID));
-
+            String championName = "";
+            String championThumbnail = "";
             long championId = 0;
             int championLevel = 0;
             int championPoints = 0;
@@ -245,42 +226,33 @@ public class SummonerMasteryFragment extends Fragment
             boolean isChestGranted = false;
 
             // Find champion for given id.
-            for (int i = 0; i < cursor.getCount(); i++) {
-                if (id == mMasteries.get(i).getChampionId()) {
-                    championId = mMasteries.get(i).getChampionId();
-                    championLevel = mMasteries.get(i).getChampionLevel();
-                    championPoints = mMasteries.get(i).getChampionPoints();
-                    lastPlayTime = mMasteries.get(i).getLastPlayTime();
-                    isChestGranted = mMasteries.get(i).isChestGranted();
+            for (int j = 0; j < championEntries.size(); j++) {
+                if (masteries.get(i).getChampionId() == championEntries.get(j).getId()) {
+                    championName = championEntries.get(j).getName();
+                    championThumbnail = championEntries.get(j).getThumbnail();
+                    championId = masteries.get(i).getChampionId();
+                    championLevel = masteries.get(i).getChampionLevel();
+                    championPoints = masteries.get(i).getChampionPoints();
+                    lastPlayTime = masteries.get(i).getLastPlayTime();
+                    isChestGranted = masteries.get(i).isChestGranted();
                 }
-
             }
-
-            mMasteryList.add(new Mastery(
-                    cursor.getString(cursor.getColumnIndex(Contract.ChampionEntry.COLUMN_CHAMPION_NAME)),
-                    cursor.getString(cursor.getColumnIndex(Contract.ChampionEntry.COLUMN_CHAMPION_THUMBNAIL)),
-                    championId, championLevel, championPoints, lastPlayTime, isChestGranted));
+            masteryList.add(new Mastery(championName, championThumbnail, championId,
+                    championLevel, championPoints, lastPlayTime, isChestGranted));
         }
-
-        mAdapter.swapData(mMasteryList);
+        mAdapter.swapData(masteryList);
         mRecyclerIndicator.setVisibility(View.INVISIBLE);
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-        mMasteryList.clear();
-    }
-
-    @Override
     public void onListItemClick(long championId) {
-        Log.i(LOG_TAG, "onListItemClick");
+        Log.d(LOG_TAG, "onListItemClick");
         mCallback.onChampionClick(championId);
     }
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        Log.i(LOG_TAG, "onSaveInstanceState");
 
         mLayoutManagerViewState = mRecyclerView.getLayoutManager().onSaveInstanceState();
         outState.putParcelable(LAYOUT_MANAGER_STATE_KEY, mLayoutManagerViewState);
@@ -306,15 +278,18 @@ public class SummonerMasteryFragment extends Fragment
         super.onDetach();
         Log.d(LOG_TAG, "onDetach");
         mRecyclerView.setAdapter(null);
+        mCallback = null;
     }
 
-    private void loadImage(ImageView imageView, int profileIconId) {
+    private void bindDataToViews() {
+        mSummonerNameTv.setText(mSummonerName);
+        mSummonerLevelTv.setText(getString(R.string.level) + " " + String.valueOf(mSummonerLevel));
         Picasso.get()
-                .load("http://ddragon.leagueoflegends.com/cdn/" + mPatchVersion + "/img/profileicon/" + String.valueOf(profileIconId) + ".png")
+                .load("http://ddragon.leagueoflegends.com/cdn/" + mPatchVersion + "/img/profileicon/" + String.valueOf(mProfileIconId) + ".png")
                 .resize(200, 200)
                 .error(R.drawable.ic_launcher_background)
                 .placeholder(R.drawable.ic_launcher_foreground)
-                .into(imageView);
+                .into(mProfileIcon);
     }
 
     private boolean isNetworkAvailable() {

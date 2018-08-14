@@ -19,7 +19,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class PatchAsyncTask extends AsyncTask<Void, Integer, String> {
+public class PatchAsyncTask extends AsyncTask<Void, Void, String> {
 
     private static final String PERSONAL_API_KEY = BuildConfig.HIDDEN_API_KEY;
     private static final String LOG_TAG = PatchAsyncTask.class.getSimpleName();
@@ -34,11 +34,9 @@ public class PatchAsyncTask extends AsyncTask<Void, Integer, String> {
     private static final String API_KEY = "api_key";
 
     private PatchTaskCompleted mIconListener;
-    private ResultTask mResultListener;
 
-    public PatchAsyncTask(PatchTaskCompleted patchListener, ResultTask resultListener) {
+    public PatchAsyncTask(PatchTaskCompleted patchListener) {
         mIconListener = patchListener;
-        mResultListener = resultListener;
     }
 
     @Override
@@ -109,13 +107,6 @@ public class PatchAsyncTask extends AsyncTask<Void, Integer, String> {
     private String getJsonData(String json) throws JSONException {
         JSONArray array = new JSONArray(json);
         String lastVersion = array.getString(0);
-
-        publishProgress(0);
-
-        mResultListener.maxProgress(1);
-
-        publishProgress(1);
-
         return lastVersion;
     }
 
@@ -130,13 +121,6 @@ public class PatchAsyncTask extends AsyncTask<Void, Integer, String> {
             e.printStackTrace();
             return null;
         }
-    }
-
-    @Override
-    protected void onProgressUpdate(Integer... values) {
-        super.onProgressUpdate(values);
-
-        mResultListener.resultTask(values[0]);
     }
 
     @Override

@@ -1,15 +1,12 @@
 package com.example.android.leaguestats;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.res.Configuration;
-import android.database.Cursor;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -20,70 +17,44 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.android.leaguestats.ViewModels.ItemViewModelShared;
+import com.example.android.leaguestats.ViewModels.ItemViewModelSharedFactory;
 import com.example.android.leaguestats.adapters.ItemAdapter;
-import com.example.android.leaguestats.database.Contract;
+import com.example.android.leaguestats.room.AppDatabase;
+import com.example.android.leaguestats.room.ItemEntry;
 import com.example.android.leaguestats.utilities.DataUtils;
-import com.example.android.leaguestats.utilities.ItemLoader;
 import com.example.android.leaguestats.utilities.PreferencesUtils;
 import com.squareup.picasso.Picasso;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ItemDetailFragment extends Fragment
-        implements LoaderManager.LoaderCallbacks<Cursor>, ItemAdapter.ItemClickListener {
+        implements ItemAdapter.ItemClickListener {
 
     private static final String LOG_TAG = ItemDetailFragment.class.getSimpleName();
-    private static final String DB_SIGN = " = ?";
     private String mPatchVersion;
     private TextView mBaseGoldLabel, mTotalGoldLabel, mSellGoldLabel, mDescriptionLabel,
             mPlainTextLabel, mFromLabel, mIntoLabel;
     private TextView mItemNameTv, mBaseGoldTv, mTotalGoldTv, mSellGoldTv, mDescriptionTv,
             mPlainTextTv;
     private ImageView mImage;
-    private String[] mFromArray;
-    private String[] mIntoArray;
     private ItemAdapter mItemFromAdapter;
     private ItemAdapter mItemIntoAdapter;
     private RecyclerView mFromRecycler;
     private RecyclerView mIntoRecycler;
-    public static final String ITEM_ID_KEY = "ITEM_ID_KEY";
-    public static final String FROM_ARRAY_KEY = "FROM_ARRAY_KEY";
-    public static final String INTO_ARRAY_KEY = "INTO_ARRAY_KEY";
-    private ItemLoader mItemLoader;
-    private int mItemId;
-    private String CURRENT_ID_KEY = "CURRENT_ID_KEY";
     private String FROM_LAYOUT_MANAGER_STATE_KEY = "fromLayoutManagerStateKey";
     private String INTO_LAYOUT_MANAGER_STATE_KEY = "intoLayoutManagerStateKey";
+    private ItemViewModelShared mViewModel;
+    private AppDatabase mDb;
 
-    public ItemDetailFragment() {
-    }
-
-    public static ItemDetailFragment newInstance(int championId) {
-        ItemDetailFragment itemDetailFragment = new ItemDetailFragment();
-        Bundle args = new Bundle();
-        args.putInt(ITEM_ID_KEY, championId);
-        itemDetailFragment.setArguments(args);
-        return itemDetailFragment;
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        Log.i(LOG_TAG, "onCreate");
-
-        Bundle args = getArguments();
-        if (args != null && args.containsKey(ITEM_ID_KEY)) {
-            mItemId = args.getInt(ITEM_ID_KEY);
-        } else {
-            Log.w(LOG_TAG, "itemId null");
-        }
-    }
+    public ItemDetailFragment() {}
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_item_detail, container, false);
-        Log.i(LOG_TAG, "onCreateView");
+        Log.d(LOG_TAG, "onCreateView");
 
         mBaseGoldLabel = rootView.findViewById(R.id.base_gold_label);
         mTotalGoldLabel = rootView.findViewById(R.id.total_gold_label);
@@ -110,7 +81,7 @@ public class ItemDetailFragment extends Fragment
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Log.i(LOG_TAG, "onActivityCreated");
+        Log.d(LOG_TAG, "onActivityCreated");
 
         mPatchVersion = PreferencesUtils.getPatchVersion(getContext());
 
@@ -124,16 +95,14 @@ public class ItemDetailFragment extends Fragment
         mFromRecycler.setLayoutManager(new GridLayoutManager(getContext(), gridLayoutColumnCount));
         mFromRecycler.setHasFixedSize(true);
         mFromRecycler.setItemAnimator(new DefaultItemAnimator());
-        mItemFromAdapter = new ItemAdapter(getContext(), null, ItemDetailFragment.this, mPatchVersion);
+        mItemFromAdapter = new ItemAdapter(getContext(), new ArrayList<ItemEntry>(), ItemDetailFragment.this, mPatchVersion);
         mFromRecycler.setAdapter(mItemFromAdapter);
 
         mIntoRecycler.setLayoutManager(new GridLayoutManager(getContext(), gridLayoutColumnCount));
         mIntoRecycler.setHasFixedSize(true);
         mIntoRecycler.setItemAnimator(new DefaultItemAnimator());
-        mItemIntoAdapter = new ItemAdapter(getContext(), null, ItemDetailFragment.this, mPatchVersion);
+        mItemIntoAdapter = new ItemAdapter(getContext(), new ArrayList<ItemEntry>(), ItemDetailFragment.this, mPatchVersion);
         mIntoRecycler.setAdapter(mItemIntoAdapter);
-
-        mItemLoader = new ItemLoader(getContext(), mItemFromAdapter, mItemIntoAdapter);
 
         if (savedInstanceState != null) {
             if (savedInstanceState.containsKey(FROM_LAYOUT_MANAGER_STATE_KEY)) {
@@ -142,122 +111,101 @@ public class ItemDetailFragment extends Fragment
             if (savedInstanceState.containsKey(INTO_LAYOUT_MANAGER_STATE_KEY)) {
                 mIntoRecycler.getLayoutManager().onRestoreInstanceState(savedInstanceState.getParcelable(INTO_LAYOUT_MANAGER_STATE_KEY));
             }
-            if (savedInstanceState.containsKey(CURRENT_ID_KEY)) {
-                mItemId = savedInstanceState.getInt(CURRENT_ID_KEY);
-            }
         }
 
         mFromRecycler.setNestedScrollingEnabled(false);
         mIntoRecycler.setNestedScrollingEnabled(false);
 
-        getActivity().getSupportLoaderManager().initLoader(mItemId, null, this);
+        mDb = AppDatabase.getInstance(getActivity().getApplicationContext());
+
+        getItem();
     }
 
-    @NonNull
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args) {
-        Log.i(LOG_TAG, "onCreateLoader");
-        final String[] PROJECTION = {
-                Contract.ItemEntry._ID,
-                Contract.ItemEntry.COLUMN_NAME,
-                Contract.ItemEntry.COLUMN_BASE_GOLD,
-                Contract.ItemEntry.COLUMN_TOTAL_GOLD,
-                Contract.ItemEntry.COLUMN_SELL_GOLD,
-                Contract.ItemEntry.COLUMN_IMAGE,
-                Contract.ItemEntry.COLUMN_PURCHASABLE,
-                Contract.ItemEntry.COLUMN_SANITIZED_DESCRIPTION,
-                Contract.ItemEntry.COLUMN_PLAIN_TEXT,
-                Contract.ItemEntry.COLUMN_FROM,
-                Contract.ItemEntry.COLUMN_INTO};
-
-        return new CursorLoader(getContext(),
-                Contract.ItemEntry.CONTENT_URI,
-                PROJECTION,
-                Contract.ItemEntry._ID + DB_SIGN,
-                new String[]{String.valueOf(mItemId)},
-                null);
+    private void getItem() {
+        Log.d(LOG_TAG, "Getting item");
+        ItemViewModelSharedFactory factory = new ItemViewModelSharedFactory(mDb);
+        mViewModel = ViewModelProviders.of(getActivity(), factory).get(ItemViewModelShared.class);
+        mViewModel.getSelected().observe(this, new Observer<ItemEntry>() {
+            @Override
+            public void onChanged(@Nullable ItemEntry itemEntry) {
+                mViewModel.getSelected().removeObserver(this);
+                Log.d(LOG_TAG, "Receiving database update from LiveData");
+                updateUi(itemEntry);
+            }
+        });
     }
 
-    @Override
-    public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor cursor) {
-        Log.d(LOG_TAG, "onLoadFinished");
-        if (cursor == null || cursor.getCount() < 1) {
-            Log.d(LOG_TAG, "cursor null");
-            return;
+    private void updateUi(@Nullable ItemEntry itemEntry) {
+        Log.d(LOG_TAG, "updating Ui");
+        String image = itemEntry.getImage();
+
+        Picasso.get()
+                .load("http://ddragon.leagueoflegends.com/cdn/" + mPatchVersion + "/img/item/" + image)
+                .resize(200, 200)
+                .error(R.drawable.ic_launcher_background)
+                .placeholder(R.drawable.ic_launcher_foreground)
+                .into(mImage);
+
+        int baseGold = itemEntry.getBaseGold();
+        int totalGold = itemEntry.getTotalGold();
+        int sellGold = itemEntry.getSellGold();
+
+        String name = itemEntry.getName();
+        String description = itemEntry.getDescription();
+        String plainText = itemEntry.getPlainText();
+
+        mItemFromAdapter.clear();
+        mItemIntoAdapter.clear();
+
+        DataUtils.setTextWithLabel(baseGold, mBaseGoldTv, mBaseGoldLabel);
+        DataUtils.setTextWithLabel(totalGold, mTotalGoldTv, mTotalGoldLabel);
+        DataUtils.setTextWithLabel(sellGold, mSellGoldTv, mSellGoldLabel);
+
+        DataUtils.setTextWithLabel(description, mDescriptionTv, mDescriptionLabel);
+        DataUtils.setTextWithLabel(plainText, mPlainTextTv, mPlainTextLabel);
+
+        mItemNameTv.setText(name);
+
+        List<String> from = itemEntry.getFrom();
+        String[] fromIds = DataUtils.listStringToStringArray(from);
+        if (fromIds.length != 0) {
+            mFromLabel.setVisibility(View.VISIBLE);
+            mViewModel.setItemFrom(fromIds);
+            mViewModel.getItemFrom().observe(this, new Observer<List<ItemEntry>>() {
+                @Override
+                public void onChanged(@Nullable List<ItemEntry> list) {
+                    mViewModel.getItemFrom().removeObserver(this);
+                    Log.d(LOG_TAG, "Receiving fromItems database update from LiveData");
+                    mItemFromAdapter.setData(list);
+                }
+            });
+        } else {
+            mFromLabel.setVisibility(View.INVISIBLE);
         }
 
-        if (cursor.moveToFirst()) {
-            Log.d(LOG_TAG, "cursor not null");
-            int baseGold = cursor.getInt(cursor.getColumnIndex(Contract.ItemEntry.COLUMN_BASE_GOLD));
-            int totalGold = cursor.getInt(cursor.getColumnIndex(Contract.ItemEntry.COLUMN_TOTAL_GOLD));
-            int sellGold = cursor.getInt(cursor.getColumnIndex(Contract.ItemEntry.COLUMN_SELL_GOLD));
-
-            String image = cursor.getString(cursor.getColumnIndex(Contract.ItemEntry.COLUMN_IMAGE));
-            Picasso.get()
-                    .load("http://ddragon.leagueoflegends.com/cdn/" + mPatchVersion + "/img/item/" + image)
-                    .resize(200, 200)
-                    .error(R.drawable.ic_launcher_background)
-                    .placeholder(R.drawable.ic_launcher_foreground)
-                    .into(mImage);
-
-            String name = cursor.getString(cursor.getColumnIndex(Contract.ItemEntry.COLUMN_NAME));
-            String description = cursor.getString(cursor.getColumnIndex(Contract.ItemEntry.COLUMN_SANITIZED_DESCRIPTION));
-            String plainText = cursor.getString(cursor.getColumnIndex(Contract.ItemEntry.COLUMN_PLAIN_TEXT));
-
-            DataUtils.setTextWithLabel(baseGold, mBaseGoldTv, mBaseGoldLabel);
-            DataUtils.setTextWithLabel(totalGold, mTotalGoldTv, mTotalGoldLabel);
-            DataUtils.setTextWithLabel(sellGold, mSellGoldTv, mSellGoldLabel);
-
-            DataUtils.setTextWithLabel(description, mDescriptionTv, mDescriptionLabel);
-            DataUtils.setTextWithLabel(plainText, mPlainTextTv, mPlainTextLabel);
-
-            mItemNameTv.setText(name);
-
-            mItemId = cursor.getInt(cursor.getColumnIndex(Contract.ItemEntry._ID));
-            Log.i(LOG_TAG, "onLoadFinishedItemId" + " " + String.valueOf(mItemId));
-
-            String from = cursor.getString(cursor.getColumnIndex(Contract.ItemEntry.COLUMN_FROM));
-            mFromArray = DataUtils.stringToStringArray(from);
-            Log.i(LOG_TAG, "mFromArray" + " " + Arrays.toString(mFromArray));
-
-            String into = cursor.getString(cursor.getColumnIndex(Contract.ItemEntry.COLUMN_INTO));
-            mIntoArray = DataUtils.stringToStringArray(into);
-            Log.i(LOG_TAG, "mIntoArray" + " " + Arrays.toString(mIntoArray));
-
-            mItemFromAdapter.swapCursor(null);
-            mItemIntoAdapter.swapCursor(null);
-            Bundle args = new Bundle();
-            args.putInt(ITEM_ID_KEY, mItemId);
-            if (mFromArray.length != 0) {
-                mFromLabel.setVisibility(View.VISIBLE);
-                args.putStringArray(FROM_ARRAY_KEY, mFromArray);
-                mItemLoader.setFromArrayId(mItemId);
-                getActivity().getSupportLoaderManager().initLoader(mItemLoader.getFromArrayId(), args, mItemLoader);
-            } else {
-                mFromLabel.setVisibility(View.INVISIBLE);
-            }
-            if (mIntoArray.length != 0) {
-                mIntoLabel.setVisibility(View.VISIBLE);
-                args.putStringArray(INTO_ARRAY_KEY, mIntoArray);
-                mItemLoader.setIntoArrayId(mItemId);
-                getActivity().getSupportLoaderManager().initLoader(mItemLoader.getIntoArrayId(), args, mItemLoader);
-            } else {
-                mIntoLabel.setVisibility(View.INVISIBLE);
-            }
+        List<String> into = itemEntry.getInto();
+        String[] intoIds = DataUtils.listStringToStringArray(into);
+        if (intoIds.length != 0) {
+            mIntoLabel.setVisibility(View.VISIBLE);
+            mViewModel.setItemInto(intoIds);
+            mViewModel.getItemInto().observe(this, new Observer<List<ItemEntry>>() {
+                @Override
+                public void onChanged(@Nullable List<ItemEntry> list) {
+                    mViewModel.getItemInto().removeObserver(this);
+                    Log.d(LOG_TAG, "Receiving fromItems database update from LiveData");
+                    mItemIntoAdapter.setData(list);
+                }
+            });
+        } else {
+            mIntoLabel.setVisibility(View.INVISIBLE);
         }
     }
 
     @Override
-    public void onLoaderReset(@NonNull Loader<Cursor> loader) {
-        Log.i(LOG_TAG, "onLoaderReset");
-        mFromArray = null;
-        mIntoArray = null;
-        mBaseGoldTv.setText("");
-        mTotalGoldTv.setText("");
-        mSellGoldTv.setText("");
-        mDescriptionTv.setText("");
-        mPlainTextTv.setText("");
-        mItemNameTv.setText("");
+    public void onItemClick(ItemEntry itemEntry) {
+        Log.d(LOG_TAG, "onItemClick");
+        mViewModel.select(itemEntry);
+        getItem();
     }
 
     @Override
@@ -273,14 +221,6 @@ public class ItemDetailFragment extends Fragment
         Log.d(LOG_TAG, "onSaveInstanceState");
 
         outState.putParcelable(FROM_LAYOUT_MANAGER_STATE_KEY, mFromRecycler.getLayoutManager().onSaveInstanceState());
-        outState.putInt(CURRENT_ID_KEY, mItemId);
-    }
-
-    @Override
-    public void onItemClick(int id) {
-        Log.i(LOG_TAG, "onItemClick");
-        mItemId = id;
-        Log.i(LOG_TAG, "onItemClickId" + " " + String.valueOf(mItemId));
-        getActivity().getSupportLoaderManager().initLoader(id, null, this);
+        outState.putParcelable(INTO_LAYOUT_MANAGER_STATE_KEY, mIntoRecycler.getLayoutManager().onSaveInstanceState());
     }
 }
