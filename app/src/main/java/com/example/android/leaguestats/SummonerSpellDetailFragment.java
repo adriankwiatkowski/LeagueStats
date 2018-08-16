@@ -12,11 +12,11 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.android.leaguestats.room.AppDatabase;
-import com.example.android.leaguestats.room.SummonerSpellEntry;
+import com.example.android.leaguestats.database.AppDatabase;
+import com.example.android.leaguestats.database.SummonerSpellEntry;
 import com.example.android.leaguestats.utilities.PreferencesUtils;
-import com.example.android.leaguestats.ViewModels.SummonerSpellSharedViewModel;
-import com.example.android.leaguestats.ViewModels.SummonerSpellSharedViewModelFactory;
+import com.example.android.leaguestats.viewModels.SummonerSpellSharedViewModel;
+import com.example.android.leaguestats.viewModels.SummonerSpellSharedViewModelFactory;
 import com.squareup.picasso.Picasso;
 
 public class SummonerSpellDetailFragment extends Fragment {

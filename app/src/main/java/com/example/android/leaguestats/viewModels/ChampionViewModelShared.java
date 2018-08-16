@@ -1,12 +1,12 @@
-package com.example.android.leaguestats.ViewModels;
+package com.example.android.leaguestats.viewModels;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 import android.util.Log;
 
-import com.example.android.leaguestats.room.AppDatabase;
-import com.example.android.leaguestats.room.ChampionEntry;
+import com.example.android.leaguestats.database.AppDatabase;
+import com.example.android.leaguestats.database.ChampionEntry;
 
 import java.util.List;
 

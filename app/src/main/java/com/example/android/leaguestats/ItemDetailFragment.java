@@ -17,11 +17,11 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.android.leaguestats.ViewModels.ItemViewModelShared;
-import com.example.android.leaguestats.ViewModels.ItemViewModelSharedFactory;
+import com.example.android.leaguestats.viewModels.ItemViewModelShared;
+import com.example.android.leaguestats.viewModels.ItemViewModelSharedFactory;
 import com.example.android.leaguestats.adapters.ItemAdapter;
-import com.example.android.leaguestats.room.AppDatabase;
-import com.example.android.leaguestats.room.ItemEntry;
+import com.example.android.leaguestats.database.AppDatabase;
+import com.example.android.leaguestats.database.ItemEntry;
 import com.example.android.leaguestats.utilities.DataUtils;
 import com.example.android.leaguestats.utilities.PreferencesUtils;
 import com.squareup.picasso.Picasso;

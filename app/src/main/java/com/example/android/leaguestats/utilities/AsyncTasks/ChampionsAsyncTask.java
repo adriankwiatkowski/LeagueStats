@@ -7,7 +7,7 @@ import android.util.Log;
 import com.example.android.leaguestats.BuildConfig;
 import com.example.android.leaguestats.interfaces.ChampionTaskCompleted;
 import com.example.android.leaguestats.interfaces.ResultTask;
-import com.example.android.leaguestats.room.ChampionEntry;
+import com.example.android.leaguestats.database.ChampionEntry;
 import com.example.android.leaguestats.utilities.DataUtils;
 import com.example.android.leaguestats.utilities.JSONUtils;
 

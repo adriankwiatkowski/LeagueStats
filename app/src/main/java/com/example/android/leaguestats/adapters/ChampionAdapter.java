@@ -10,7 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.android.leaguestats.R;
-import com.example.android.leaguestats.room.ChampionEntry;
+import com.example.android.leaguestats.database.ChampionEntry;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;

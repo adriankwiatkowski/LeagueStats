@@ -16,12 +16,12 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.android.leaguestats.ViewModels.ChampionViewModelShared;
-import com.example.android.leaguestats.ViewModels.ChampionViewModelSharedFactory;
+import com.example.android.leaguestats.viewModels.ChampionViewModelShared;
+import com.example.android.leaguestats.viewModels.ChampionViewModelSharedFactory;
 import com.example.android.leaguestats.adapters.SpellAdapter;
 import com.example.android.leaguestats.models.Spell;
-import com.example.android.leaguestats.room.AppDatabase;
-import com.example.android.leaguestats.room.ChampionEntry;
+import com.example.android.leaguestats.database.AppDatabase;
+import com.example.android.leaguestats.database.ChampionEntry;
 import com.example.android.leaguestats.utilities.SplashArtUtils;
 import com.squareup.picasso.Picasso;
 

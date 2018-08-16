@@ -1,6 +1,6 @@
 package com.example.android.leaguestats.interfaces;
 
-import com.example.android.leaguestats.room.IconEntry;
+import com.example.android.leaguestats.database.IconEntry;
 
 import java.util.List;
 

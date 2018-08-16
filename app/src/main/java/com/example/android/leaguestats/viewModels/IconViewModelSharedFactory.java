@@ -1,10 +1,10 @@
-package com.example.android.leaguestats.ViewModels;
+package com.example.android.leaguestats.viewModels;
 
 import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProvider;
 import android.support.annotation.NonNull;
 
-import com.example.android.leaguestats.room.AppDatabase;
+import com.example.android.leaguestats.database.AppDatabase;
 
 public class IconViewModelSharedFactory extends ViewModelProvider.NewInstanceFactory {
 

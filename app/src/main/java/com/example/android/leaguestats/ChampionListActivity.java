@@ -22,13 +22,13 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
-import com.example.android.leaguestats.ViewModels.ChampionViewModelShared;
-import com.example.android.leaguestats.ViewModels.ChampionViewModelSharedFactory;
+import com.example.android.leaguestats.viewModels.ChampionViewModelShared;
+import com.example.android.leaguestats.viewModels.ChampionViewModelSharedFactory;
 import com.example.android.leaguestats.adapters.ChampionAdapter;
 import com.example.android.leaguestats.interfaces.ChampionTaskCompleted;
 import com.example.android.leaguestats.interfaces.ResultTask;
-import com.example.android.leaguestats.room.AppDatabase;
-import com.example.android.leaguestats.room.ChampionEntry;
+import com.example.android.leaguestats.database.AppDatabase;
+import com.example.android.leaguestats.database.ChampionEntry;
 import com.example.android.leaguestats.utilities.AsyncTasks.ChampionsAsyncTask;
 import com.example.android.leaguestats.utilities.LocaleUtils;
 import com.example.android.leaguestats.utilities.PreferencesUtils;

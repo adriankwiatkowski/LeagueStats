@@ -13,7 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.android.leaguestats.R;
-import com.example.android.leaguestats.room.ItemEntry;
+import com.example.android.leaguestats.database.ItemEntry;
 import com.example.android.leaguestats.utilities.DataUtils;
 import com.squareup.picasso.Picasso;
 

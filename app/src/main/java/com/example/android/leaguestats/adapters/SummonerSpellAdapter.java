@@ -11,7 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.android.leaguestats.R;
-import com.example.android.leaguestats.room.SummonerSpellEntry;
+import com.example.android.leaguestats.database.SummonerSpellEntry;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;

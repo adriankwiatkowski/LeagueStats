@@ -7,7 +7,7 @@ import android.util.Log;
 import com.example.android.leaguestats.BuildConfig;
 import com.example.android.leaguestats.interfaces.ItemTaskCompleted;
 import com.example.android.leaguestats.interfaces.ResultTask;
-import com.example.android.leaguestats.room.ItemEntry;
+import com.example.android.leaguestats.database.ItemEntry;
 import com.example.android.leaguestats.utilities.JSONUtils;
 
 import org.json.JSONArray;

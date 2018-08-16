@@ -17,11 +17,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.android.leaguestats.ViewModels.SummonerSpellSharedViewModel;
-import com.example.android.leaguestats.ViewModels.SummonerSpellSharedViewModelFactory;
+import com.example.android.leaguestats.viewModels.SummonerSpellSharedViewModel;
+import com.example.android.leaguestats.viewModels.SummonerSpellSharedViewModelFactory;
 import com.example.android.leaguestats.adapters.SummonerSpellAdapter;
-import com.example.android.leaguestats.room.AppDatabase;
-import com.example.android.leaguestats.room.SummonerSpellEntry;
+import com.example.android.leaguestats.database.AppDatabase;
+import com.example.android.leaguestats.database.SummonerSpellEntry;
 import com.example.android.leaguestats.utilities.PreferencesUtils;
 
 import java.util.ArrayList;

@@ -1,6 +1,6 @@
 package com.example.android.leaguestats.interfaces;
 
-import com.example.android.leaguestats.room.ChampionEntry;
+import com.example.android.leaguestats.database.ChampionEntry;
 
 import java.util.List;
 

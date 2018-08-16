@@ -1,4 +1,4 @@
-package com.example.android.leaguestats.room;
+package com.example.android.leaguestats.database;
 
 import android.arch.persistence.db.SupportSQLiteDatabase;
 import android.arch.persistence.room.Database;

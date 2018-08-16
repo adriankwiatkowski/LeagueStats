@@ -7,7 +7,7 @@ import android.util.Log;
 import com.example.android.leaguestats.BuildConfig;
 import com.example.android.leaguestats.interfaces.IconTaskCompleted;
 import com.example.android.leaguestats.interfaces.ResultTask;
-import com.example.android.leaguestats.room.IconEntry;
+import com.example.android.leaguestats.database.IconEntry;
 
 import org.json.JSONException;
 import org.json.JSONObject;

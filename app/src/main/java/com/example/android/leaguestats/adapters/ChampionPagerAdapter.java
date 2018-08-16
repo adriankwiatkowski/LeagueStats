@@ -10,7 +10,7 @@ import com.example.android.leaguestats.ChampionInfoFragment;
 import com.example.android.leaguestats.ChampionOverviewFragment;
 import com.example.android.leaguestats.ChampionTipsFragment;
 import com.example.android.leaguestats.R;
-import com.example.android.leaguestats.room.ChampionEntry;
+import com.example.android.leaguestats.database.ChampionEntry;
 
 public class ChampionPagerAdapter extends FragmentPagerAdapter {
 

@@ -22,11 +22,11 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
-import com.example.android.leaguestats.ViewModels.ChampionViewModelShared;
-import com.example.android.leaguestats.ViewModels.ChampionViewModelSharedFactory;
+import com.example.android.leaguestats.viewModels.ChampionViewModelShared;
+import com.example.android.leaguestats.viewModels.ChampionViewModelSharedFactory;
 import com.example.android.leaguestats.adapters.ChampionPagerAdapter;
-import com.example.android.leaguestats.room.AppDatabase;
-import com.example.android.leaguestats.room.ChampionEntry;
+import com.example.android.leaguestats.database.AppDatabase;
+import com.example.android.leaguestats.database.ChampionEntry;
 import com.example.android.leaguestats.utilities.LocaleUtils;
 
 public class ChampionDetailActivity extends AppCompatActivity {

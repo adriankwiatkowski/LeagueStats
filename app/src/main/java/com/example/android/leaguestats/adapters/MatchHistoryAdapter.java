@@ -11,8 +11,8 @@ import android.widget.TextView;
 
 import com.example.android.leaguestats.R;
 import com.example.android.leaguestats.models.Match;
-import com.example.android.leaguestats.room.ChampionEntry;
-import com.example.android.leaguestats.room.SummonerSpellEntry;
+import com.example.android.leaguestats.database.ChampionEntry;
+import com.example.android.leaguestats.database.SummonerSpellEntry;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;

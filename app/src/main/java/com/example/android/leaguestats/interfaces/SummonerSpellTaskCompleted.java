@@ -1,6 +1,6 @@
 package com.example.android.leaguestats.interfaces;
 
-import com.example.android.leaguestats.room.SummonerSpellEntry;
+import com.example.android.leaguestats.database.SummonerSpellEntry;
 
 import java.util.List;
 
