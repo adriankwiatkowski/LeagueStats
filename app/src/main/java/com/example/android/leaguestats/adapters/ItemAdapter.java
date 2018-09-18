@@ -1,11 +1,9 @@
 package com.example.android.leaguestats.adapters;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,28 +11,23 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.android.leaguestats.R;
-import com.example.android.leaguestats.database.ItemEntry;
-import com.example.android.leaguestats.utilities.DataUtils;
+import com.example.android.leaguestats.database.entity.ItemEntry;
+import com.example.android.leaguestats.database.models.ListItemEntry;
+import com.example.android.leaguestats.interfaces.IdClickListener;
+import com.example.android.leaguestats.utilities.PicassoUtils;
 import com.squareup.picasso.Picasso;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder> {
 
-    private static ItemClickListener mListener;
-
-    public interface ItemClickListener {
-        void onItemClick(ItemEntry itemEntry);
-    }
-
-    private static final String LOG_TAG = ItemAdapter.class.getSimpleName();
     private Context mContext;
-    private List<ItemEntry> mList;
+    private List<ListItemEntry> mList;
+    private IdClickListener mListener;
     private final String PATCH_VERSION;
     private long mLastClickTime = 0;
 
-    public ItemAdapter(Context context, List<ItemEntry> list, ItemClickListener listener, String patchVersion) {
+    public ItemAdapter(Context context, List<ListItemEntry> list, IdClickListener listener, String patchVersion) {
         mContext = context;
         mList = list;
         mListener = listener;
@@ -46,10 +39,6 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
     public ItemViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(mContext).inflate(R.layout.item, parent, false);
 
-        final String HTTP_ENTRY_URL = "http://ddragon.leagueoflegends.com/cdn/" + PATCH_VERSION + "/img/item";
-
-        view.setTag(HTTP_ENTRY_URL);
-
         return new ItemViewHolder(view);
     }
 
@@ -60,17 +49,10 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
 
         String image = mList.get(position).getImage();
 
-        String httpEntryUrl = (String) holder.itemView.getTag();
-
-        Picasso.get()
-                .load(httpEntryUrl + "/" + image)
-                .resize(48, 48)
-                .error(R.drawable.ic_launcher_background)
-                .placeholder(R.drawable.ic_launcher_foreground)
-                .into(holder.mImage);
+        PicassoUtils.getItemCreator(image, PATCH_VERSION, 48, 48).into(holder.mImage);
     }
 
-    public void add(ItemEntry itemEntry) {
+    public void add(ListItemEntry itemEntry) {
         mList.add(itemEntry);
         notifyDataSetChanged();
     }
@@ -80,7 +62,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
         notifyDataSetChanged();
     }
 
-    public void setData(List<ItemEntry> list) {
+    public void setData(List<ListItemEntry> list) {
         clear();
         mList.addAll(list);
         notifyDataSetChanged();
@@ -112,7 +94,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
                 return;
             }
             mLastClickTime = SystemClock.elapsedRealtime();
-            mListener.onItemClick(mList.get(getAdapterPosition()));
+            mListener.onClickListener(mList.get(getAdapterPosition()).getId());
         }
     }
 }

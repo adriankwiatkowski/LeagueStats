@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -27,8 +28,9 @@ public class ItemActivity extends AppCompatActivity implements ItemListFragment.
     }
 
     @Override
-    public void onItemSelected() {
-        ItemDetailFragment itemDetailFragment = new ItemDetailFragment();
+    public void onItemSelected(long id) {
+        Log.d(LOG_TAG, "onItemSelected");
+        ItemDetailFragment itemDetailFragment = ItemDetailFragment.newInstance(id);
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.item_container, itemDetailFragment);
         transaction.addToBackStack(null);

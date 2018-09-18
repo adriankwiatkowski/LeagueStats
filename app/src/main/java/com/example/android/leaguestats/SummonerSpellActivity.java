@@ -27,8 +27,8 @@ public class SummonerSpellActivity extends AppCompatActivity implements Summoner
     }
 
     @Override
-    public void onSummonerSpellSelected() {
-        SummonerSpellDetailFragment summonerSpellDetailFragment = new SummonerSpellDetailFragment();
+    public void onSummonerSpellSelected(String id) {
+        SummonerSpellDetailFragment summonerSpellDetailFragment = SummonerSpellDetailFragment.newInstance(id);
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.summoner_spell_container, summonerSpellDetailFragment);
         transaction.addToBackStack(null);

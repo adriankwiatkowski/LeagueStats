@@ -16,14 +16,15 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.android.leaguestats.viewModels.ChampionViewModelShared;
-import com.example.android.leaguestats.viewModels.ChampionViewModelSharedFactory;
+import com.example.android.leaguestats.utilities.InjectorUtils;
+import com.example.android.leaguestats.utilities.PicassoUtils;
+import com.example.android.leaguestats.utilities.PreferencesUtils;
+import com.example.android.leaguestats.viewModels.ChampionDetailModel;
+import com.example.android.leaguestats.viewModels.ChampionDetailModelFactory;
 import com.example.android.leaguestats.adapters.SpellAdapter;
 import com.example.android.leaguestats.models.Spell;
-import com.example.android.leaguestats.database.AppDatabase;
-import com.example.android.leaguestats.database.ChampionEntry;
-import com.example.android.leaguestats.utilities.SplashArtUtils;
-import com.squareup.picasso.Picasso;
+import com.example.android.leaguestats.database.entity.ChampionEntry;
+import com.squareup.picasso.RequestCreator;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -38,9 +39,8 @@ public class ChampionInfoFragment extends Fragment {
     private TextView mHealthTv, mHealthRegenTv, mManaTv, mRangeTv, mArmorTv, mManaRegenTv, mMoveSpeedTv,
             mAttackDamageTv, mMagicResistTv, mAttackSpeedTv;
     private String SPELL_LAYOUT_MANAGER_STATE_KEY = "spellLayoutManagerStateKey";
-    private static final String HTTP_ENTRY_URL_SPLASH_ART = "http://ddragon.leagueoflegends.com/cdn/img/champion/splash";
     private static final int SPELL_COUNT = 4;
-    private AppDatabase mDb;
+    private String mPatchVersion;
 
     public ChampionInfoFragment() {
     }
@@ -74,10 +74,12 @@ public class ChampionInfoFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         Log.d(LOG_TAG, "onActivityCreated");
 
+        mPatchVersion = PreferencesUtils.getPatchVersion(getContext());
+
         mSpellRecyclerView.setHasFixedSize(true);
         mSpellRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mSpellRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mSpellAdapter = new SpellAdapter(getActivity(), new ArrayList<Spell>());
+        mSpellAdapter = new SpellAdapter(getActivity(), new ArrayList<Spell>(), mPatchVersion);
         mSpellRecyclerView.setAdapter(mSpellAdapter);
 
         if (savedInstanceState != null) {
@@ -88,18 +90,18 @@ public class ChampionInfoFragment extends Fragment {
 
         mSpellRecyclerView.setNestedScrollingEnabled(false);
 
-        mDb = AppDatabase.getInstance(getActivity().getApplicationContext());
         setupViewModel();
     }
 
     private void setupViewModel() {
-        ChampionViewModelSharedFactory factory = new ChampionViewModelSharedFactory(mDb);
-        final ChampionViewModelShared viewModel =
-                ViewModelProviders.of(getActivity(), factory).get(ChampionViewModelShared.class);
-        viewModel.getSelected().observe(this, new Observer<ChampionEntry>() {
+        ChampionDetailModelFactory factory =
+                InjectorUtils.provideChampionDetailModelFactory(getActivity().getApplicationContext());
+        final ChampionDetailModel viewModel =
+                ViewModelProviders.of(getActivity(), factory).get(ChampionDetailModel.class);
+        viewModel.getChampion().observe(this, new Observer<ChampionEntry>() {
             @Override
             public void onChanged(@Nullable ChampionEntry championEntry) {
-                viewModel.getSelected().removeObserver(this);
+                viewModel.getChampion().removeObserver(this);
                 Log.d(LOG_TAG, "Receiving database update from LiveData");
                 updateUi(championEntry);
             }
@@ -110,18 +112,8 @@ public class ChampionInfoFragment extends Fragment {
         // Get Default Splash Art.
         String splashArt = championEntry.getSplashArt().get(0);
 
-        int splashArtWidth = SplashArtUtils.getWidth(getContext());
-        int splashArtHeight = SplashArtUtils.getHeight(getContext());
-
-        // Load Default Splash Art.
-        Picasso.get()
-                .load(HTTP_ENTRY_URL_SPLASH_ART + "/" + splashArt)
-                .resize(splashArtWidth, splashArtHeight)
-                .centerCrop()
-                .error(R.drawable.ic_launcher_background)
-                .placeholder(R.drawable.ic_launcher_foreground)
-                .into(mSplashArtImage);
-
+        RequestCreator splashArtCreator = PicassoUtils.getSplashArtCreator(getContext(), splashArt);
+        splashArtCreator.into(mSplashArtImage);
 
         double attackSpeedDouble = 0.625 / (1 + championEntry.getAttackSpeedOffset());
         DecimalFormat decimalFormat = new DecimalFormat("#.###");

@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <dimen name="champion_match_group_width">48dp</dimen>
+    <dimen name="champion_match_group_height">48dp</dimen>
+    <dimen name="summoner_spell_match_group_width">24dp</dimen>
+    <dimen name="summoner_spell_match_group_height">24dp</dimen>
+
+    <dimen name="champion_match_child_width">24dp</dimen>
+    <dimen name="champion_match_child_height">24dp</dimen>
+    <dimen name="summoner_spell_match_child_width">12dp</dimen>
+    <dimen name="summoner_spell_match_child_height">12dp</dimen>
+
+    <dimen name="mastery_champion_width">48dp</dimen>
+    <dimen name="mastery_champion_height">48dp</dimen>
+
     <dimen name="thumbnail_width">96dp</dimen>
     <dimen name="thumbnail_height">96dp</dimen>
 

@@ -32,67 +32,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ProgressBar
-        android:id="@+id/champion_indicator"
-        style="@style/MainProgressBar"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/select_language_tv" />
-
-    <TextView
-        android:id="@+id/champion_indicator_tv"
-        style="@style/MainProgressBarTv"
-        app:layout_constraintEnd_toEndOf="@+id/champion_indicator"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/champion_indicator"
-        tools:text="0/141" />
-
-    <ProgressBar
-        android:id="@+id/icon_indicator"
-        style="@style/MainProgressBar"
-        app:layout_constraintEnd_toEndOf="@+id/champion_indicator"
-        app:layout_constraintHorizontal_bias="0.487"
-        app:layout_constraintStart_toStartOf="@+id/champion_indicator"
-        app:layout_constraintTop_toBottomOf="@+id/champion_indicator_tv" />
-
-    <TextView
-        android:id="@+id/icon_indicator_tv"
-        style="@style/MainProgressBarTv"
-        app:layout_constraintEnd_toEndOf="@+id/icon_indicator"
-        app:layout_constraintStart_toStartOf="@+id/icon_indicator"
-        app:layout_constraintTop_toBottomOf="@+id/icon_indicator"
-        tools:text="0/13375" />
-
-    <ProgressBar
-        android:id="@+id/item_indicator"
-        style="@style/MainProgressBar"
-        app:layout_constraintEnd_toEndOf="@+id/champion_indicator"
-        app:layout_constraintStart_toStartOf="@+id/champion_indicator"
-        app:layout_constraintTop_toBottomOf="@+id/icon_indicator_tv" />
-
-    <TextView
-        android:id="@+id/item_indicator_tv"
-        style="@style/MainProgressBarTv"
-        app:layout_constraintEnd_toEndOf="@+id/item_indicator"
-        app:layout_constraintStart_toStartOf="@+id/item_indicator"
-        app:layout_constraintTop_toBottomOf="@+id/item_indicator"
-        tools:text="0/1352" />
-
-    <ProgressBar
-        android:id="@+id/summoner_spell_indicator"
-        style="@style/MainProgressBar"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/item_indicator_tv" />
-
-    <TextView
-        android:id="@+id/summoner_spell_indicator_tv"
-        style="@style/MainProgressBarTv"
-        app:layout_constraintEnd_toEndOf="@+id/summoner_spell_indicator"
-        app:layout_constraintStart_toStartOf="@+id/summoner_spell_indicator"
-        app:layout_constraintTop_toBottomOf="@+id/summoner_spell_indicator"
-        tools:text="4/23" />
-
     <android.support.constraint.Guideline
         android:id="@+id/guideline"
         android:layout_width="wrap_content"

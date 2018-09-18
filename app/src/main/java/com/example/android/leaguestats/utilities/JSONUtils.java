@@ -9,8 +9,6 @@ import java.util.List;
 
 public class JSONUtils {
 
-    private static final String LOG_TAG = JSONUtils.class.getSimpleName();
-
     public static List<String> getStringListFromJSONArray(JSONArray jsonArray) throws JSONException {
         List<String> stringList = new ArrayList<>();
         for (int i = 0; i < jsonArray.length(); i++) {
@@ -47,12 +45,12 @@ public class JSONUtils {
         return integerList;
     }
 
-    public static List<String> getSplashArtPathFromJSONObjectFromJSONArray(JSONArray jsonArray, String key, String championName) throws JSONException {
+    public static List<String> getSplashArtPathFromJSONObjectFromJSONArray(JSONArray jsonArray, String key, String championKey) throws JSONException {
         List<String> stringList = new ArrayList<>();
         for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject object = jsonArray.getJSONObject(i);
             int splashArtId = object.optInt(key);
-            String splashArtPath = championName + "_" + String.valueOf(splashArtId) + ".jpg";
+            String splashArtPath = championKey + "_" + String.valueOf(splashArtId) + ".jpg";
             stringList.add(i, splashArtPath);
         }
         return stringList;

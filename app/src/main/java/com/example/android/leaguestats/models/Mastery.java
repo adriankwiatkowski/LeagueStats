@@ -5,6 +5,15 @@ import android.os.Parcelable;
 
 public class Mastery implements Parcelable {
 
+    private long mPlayerId;
+    private String mChampionId;
+    private int mChampionLevel;
+    private int mChampionPoints;
+    private long mLastPlayTime;
+    private boolean mIsChestGranted;
+    private String mChampionName;
+    private String mChampionImage;
+
     public static final Creator<Mastery> CREATOR = new Creator<Mastery>() {
         @Override
         public Mastery createFromParcel(Parcel in) {
@@ -17,24 +26,14 @@ public class Mastery implements Parcelable {
         }
     };
 
-    private long mPlayerId;
-    private long mChampionId;
-    private int mChampionLevel;
-    private int mChampionPoints;
-    private long mLastPlayTime;
-    private boolean mIsChestGranted;
-    private String mChampionName;
-    private String mChampionImage;
-
     protected Mastery(Parcel in) {
-        mPlayerId = in.readLong();
-        mChampionId = in.readLong();
+        mChampionName = in.readString();
+        mChampionImage = in.readString();
+        mChampionId = in.readString();
         mChampionLevel = in.readInt();
         mChampionPoints = in.readInt();
         mLastPlayTime = in.readLong();
         mIsChestGranted = in.readByte() != 0;
-        mChampionName = in.readString();
-        mChampionImage = in.readString();
     }
 
     @Override
@@ -46,14 +45,14 @@ public class Mastery implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(mChampionName);
         dest.writeString(mChampionImage);
-        dest.writeLong(mChampionId);
+        dest.writeString(mChampionId);
         dest.writeInt(mChampionLevel);
         dest.writeInt(mChampionPoints);
         dest.writeLong(mLastPlayTime);
         dest.writeByte((byte) (mIsChestGranted ? 1 : 0));
     }
 
-    public Mastery(long playerId, long championId, int championLevel, int championPoints, long lastPlayTime, boolean chestGranted) {
+    public Mastery(long playerId, String championId, int championLevel, int championPoints, long lastPlayTime, boolean chestGranted) {
         mPlayerId = playerId;
         mChampionId = championId;
         mChampionLevel = championLevel;
@@ -62,7 +61,7 @@ public class Mastery implements Parcelable {
         mIsChestGranted = chestGranted;
     }
 
-    public Mastery(String name, String image, long championId, int championLevel, int championPoints, long lastPlayTime, boolean chestGranted) {
+    public Mastery(String name, String image, String championId, int championLevel, int championPoints, long lastPlayTime, boolean chestGranted) {
         mChampionName = name;
         mChampionImage = image;
         mChampionId = championId;
@@ -80,11 +79,11 @@ public class Mastery implements Parcelable {
         this.mPlayerId = playerId;
     }
 
-    public long getChampionId() {
+    public String getChampionId() {
         return mChampionId;
     }
 
-    public void setChampionId(long championId) {
+    public void setChampionId(String championId) {
         this.mChampionId = championId;
     }
 

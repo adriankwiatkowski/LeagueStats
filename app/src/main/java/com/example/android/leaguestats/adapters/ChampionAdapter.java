@@ -1,7 +1,6 @@
 package com.example.android.leaguestats.adapters;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,25 +9,23 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.android.leaguestats.R;
-import com.example.android.leaguestats.database.ChampionEntry;
-import com.squareup.picasso.Picasso;
+import com.example.android.leaguestats.database.models.ListChampionEntry;
+import com.example.android.leaguestats.interfaces.IdClickListener;
+import com.example.android.leaguestats.interfaces.StringIdClickListener;
+import com.example.android.leaguestats.utilities.PicassoUtils;
 
 import java.util.List;
 
 public class ChampionAdapter extends RecyclerView.Adapter<ChampionAdapter.ChampionViewHolder> {
 
-    private static ChampionClickListener mListener;
+    private static StringIdClickListener mListener;
 
-    public interface ChampionClickListener {
-        void onChampionClick(long id);
-    }
-
-    private static final String LOG_TAG = ChampionAdapter.class.getSimpleName();
     private Context mContext;
-    private static List<ChampionEntry> mList;
+    private static List<ListChampionEntry> mList;
     private final String PATCH_VERSION;
 
-    public ChampionAdapter(Context context, List<ChampionEntry> championEntries, ChampionClickListener listener, String patchVersion) {
+    public ChampionAdapter(Context context, List<ListChampionEntry> championEntries,
+                           StringIdClickListener listener, String patchVersion) {
         mContext = context;
         mList = championEntries;
         mListener = listener;
@@ -39,10 +36,6 @@ public class ChampionAdapter extends RecyclerView.Adapter<ChampionAdapter.Champi
     public ChampionAdapter.ChampionViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(mContext).inflate(R.layout.champion_item, parent, false);
 
-        final String HTTP_ENTRY_THUMBNAIL_URL = "https://ddragon.leagueoflegends.com/cdn/" + PATCH_VERSION + "/img/champion";
-
-        view.setTag(HTTP_ENTRY_THUMBNAIL_URL);
-
         return new ChampionViewHolder(view);
     }
 
@@ -51,17 +44,12 @@ public class ChampionAdapter extends RecyclerView.Adapter<ChampionAdapter.Champi
         holder.mNameTv.setText(mList.get(position).getName());
         holder.mTitleTv.setText(mList.get(position).getTitle());
 
-        String httpEntryUrl = (String) holder.itemView.getTag();
-        String image = mList.get(position).getThumbnail();
+        String imagePath = mList.get(position).getImage();
 
-        Picasso.get()
-                .load(httpEntryUrl + "/" + image)
-                .error(R.drawable.ic_launcher_background)
-                .placeholder(R.drawable.ic_launcher_foreground)
-                .into(holder.mImage);
+        PicassoUtils.getChampionThumbnailCreator(imagePath, PATCH_VERSION).into(holder.mImage);
     }
 
-    public void add(ChampionEntry championEntry) {
+    public void add(ListChampionEntry championEntry) {
         mList.add(championEntry);
         notifyDataSetChanged();
     }
@@ -71,7 +59,7 @@ public class ChampionAdapter extends RecyclerView.Adapter<ChampionAdapter.Champi
         notifyDataSetChanged();
     }
 
-    public void setData(List<ChampionEntry> list) {
+    public void setData(List<ListChampionEntry> list) {
         clear();
         mList.addAll(list);
         notifyDataSetChanged();
@@ -82,7 +70,7 @@ public class ChampionAdapter extends RecyclerView.Adapter<ChampionAdapter.Champi
         return mList.size();
     }
 
-    public static class ChampionViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    static class ChampionViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView mNameTv;
         TextView mTitleTv;
         ImageView mImage;
@@ -99,7 +87,7 @@ public class ChampionAdapter extends RecyclerView.Adapter<ChampionAdapter.Champi
 
         @Override
         public void onClick(View v) {
-            mListener.onChampionClick(mList.get(getAdapterPosition()).getId());
+            mListener.onClickListener(mList.get(getAdapterPosition()).getKey());
         }
     }
 }

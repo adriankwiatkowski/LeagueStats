@@ -15,44 +15,41 @@ import android.widget.TextView;
 
 import com.example.android.leaguestats.R;
 import com.example.android.leaguestats.models.Spell;
+import com.example.android.leaguestats.utilities.PicassoUtils;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
 import java.util.List;
 
-public class SpellAdapter extends RecyclerView.Adapter<SpellAdapter.ViewHolder> {
+public class SpellAdapter extends RecyclerView.Adapter<SpellAdapter.SpellViewHolder> {
 
-    private static final String HTTP_ENTRY_URL_SPELL = "http://ddragon.leagueoflegends.com/cdn/8.11.1/img/spell";
     private final Context mContext;
     private final List<Spell> mSpell;
+    private final String PATCH_VERSION;
 
-    public SpellAdapter(Context context, List<Spell> spells) {
+    public SpellAdapter(Context context, List<Spell> spells, String patchVersion) {
         this.mContext = context;
         this.mSpell = spells;
+        PATCH_VERSION = patchVersion;
     }
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public SpellViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(mContext).inflate(R.layout.spell_item, parent, false);
 
-        ViewHolder viewHolder = new ViewHolder(view);
-        return viewHolder;
+        return new SpellViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull SpellViewHolder holder, int position) {
         holder.mSpellNameTv.setText(mSpell.get(position).getName());
         holder.mSpellDescriptionTv.setText(mSpell.get(position).getDescription());
         holder.mSpellCostTv.setText(mSpell.get(position).getCost());
         holder.mSpellCooldownTv.setText(mSpell.get(position).getCooldown());
 
-        Picasso.get()
-                .load(HTTP_ENTRY_URL_SPELL + "/" + mSpell.get(position).getImage())
-                .resize(125, 125)
-                .error(R.drawable.ic_launcher_background)
-                .placeholder(R.drawable.ic_launcher_foreground)
-                .into(holder.mTarget);
+        String spellPath = mSpell.get(position).getImage();
+        PicassoUtils.getSpellCreator(spellPath, PATCH_VERSION, 125, 125).into(holder.mTarget);
     }
 
     public void add(Spell spell) {
@@ -75,7 +72,7 @@ public class SpellAdapter extends RecyclerView.Adapter<SpellAdapter.ViewHolder> 
         return mSpell.size();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class SpellViewHolder extends RecyclerView.ViewHolder {
         ConstraintLayout mLayout;
         TextView mSpellNameTv;
         TextView mSpellDescriptionTv;
@@ -84,7 +81,7 @@ public class SpellAdapter extends RecyclerView.Adapter<SpellAdapter.ViewHolder> 
         ImageView mSpellImage;
         Target mTarget;
 
-        public ViewHolder(View itemView) {
+        public SpellViewHolder(View itemView) {
             super(itemView);
             mLayout = itemView.findViewById(R.id.spell_item_layout);
             mSpellNameTv = itemView.findViewById(R.id.spell_name_tv);

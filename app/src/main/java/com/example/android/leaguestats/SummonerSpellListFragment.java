@@ -17,21 +17,23 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.android.leaguestats.viewModels.SummonerSpellSharedViewModel;
-import com.example.android.leaguestats.viewModels.SummonerSpellSharedViewModelFactory;
+import com.example.android.leaguestats.database.models.ListSummonerSpellEntry;
+import com.example.android.leaguestats.interfaces.IdClickListener;
+import com.example.android.leaguestats.interfaces.StringIdClickListener;
+import com.example.android.leaguestats.utilities.InjectorUtils;
+import com.example.android.leaguestats.viewModels.SummonerSpellListModel;
+import com.example.android.leaguestats.viewModels.SummonerSpellListModelFactory;
 import com.example.android.leaguestats.adapters.SummonerSpellAdapter;
 import com.example.android.leaguestats.database.AppDatabase;
-import com.example.android.leaguestats.database.SummonerSpellEntry;
 import com.example.android.leaguestats.utilities.PreferencesUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class SummonerSpellListFragment extends Fragment
-        implements SummonerSpellAdapter.SummonerSpellClickListener {
+public class SummonerSpellListFragment extends Fragment implements StringIdClickListener {
 
     public interface OnSummonerSpellSelected {
-        void onSummonerSpellSelected();
+        void onSummonerSpellSelected(String id);
     }
 
     private static final String LOG_TAG = SummonerSpellListFragment.class.getSimpleName();
@@ -40,8 +42,7 @@ public class SummonerSpellListFragment extends Fragment
     private SummonerSpellAdapter mAdapter;
     private String LAYOUT_MANAGER_STATE_KEY = "layoutManagerStateKey";
     private Parcelable mLayoutManagerViewState;
-    private SummonerSpellSharedViewModel mViewModel;
-    private AppDatabase mDb;
+    private SummonerSpellListModel mViewModel;
 
     public SummonerSpellListFragment() {}
 
@@ -72,34 +73,33 @@ public class SummonerSpellListFragment extends Fragment
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
         String patchVersion = PreferencesUtils.getPatchVersion(getContext());
-        mAdapter = new SummonerSpellAdapter(getContext(), new ArrayList<SummonerSpellEntry>(), this, patchVersion);
+        mAdapter = new SummonerSpellAdapter(getContext(), new ArrayList<ListSummonerSpellEntry>(), this, patchVersion);
         mRecyclerView.setAdapter(mAdapter);
 
         if (savedInstanceState != null && savedInstanceState.containsKey(LAYOUT_MANAGER_STATE_KEY)) {
             mLayoutManagerViewState = savedInstanceState.getParcelable(LAYOUT_MANAGER_STATE_KEY);
         }
 
-        mDb = AppDatabase.getInstance(getActivity().getApplicationContext());
-
         setupViewModel();
     }
 
     private void setupViewModel() {
-        SummonerSpellSharedViewModelFactory factory = new SummonerSpellSharedViewModelFactory(mDb);
-        mViewModel = ViewModelProviders.of(getActivity(), factory).get(SummonerSpellSharedViewModel.class);
-        mViewModel.getSummonerSpells().observe(this, new Observer<List<SummonerSpellEntry>>() {
+        SummonerSpellListModelFactory factory =
+                InjectorUtils.provideSummonerSpellListModelFactory(getActivity().getApplicationContext());
+        mViewModel = ViewModelProviders.of(this, factory).get(SummonerSpellListModel.class);
+        mViewModel.getSpellList().observe(this, new Observer<List<ListSummonerSpellEntry>>() {
             @Override
-            public void onChanged(@Nullable List<SummonerSpellEntry> list) {
+            public void onChanged(@Nullable List<ListSummonerSpellEntry> listSummonerSpellEntries) {
                 Log.d(LOG_TAG, "Receiving database update from LiveData");
-                mAdapter.setData(list);
+                mViewModel.getSpellList().removeObserver(this);
+                mAdapter.setData(listSummonerSpellEntries);
             }
         });
     }
 
     @Override
-    public void onSummonerSpellClick(SummonerSpellEntry summonerSpellEntry) {
-        mViewModel.select(summonerSpellEntry);
-        mCallback.onSummonerSpellSelected();
+    public void onClickListener(String id) {
+        mCallback.onSummonerSpellSelected(id);
     }
 
     @Override

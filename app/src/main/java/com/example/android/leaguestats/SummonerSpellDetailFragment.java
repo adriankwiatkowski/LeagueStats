@@ -3,6 +3,7 @@ package com.example.android.leaguestats;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -13,10 +14,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.android.leaguestats.database.AppDatabase;
-import com.example.android.leaguestats.database.SummonerSpellEntry;
+import com.example.android.leaguestats.database.entity.SummonerSpellEntry;
+import com.example.android.leaguestats.utilities.InjectorUtils;
+import com.example.android.leaguestats.utilities.PicassoUtils;
 import com.example.android.leaguestats.utilities.PreferencesUtils;
-import com.example.android.leaguestats.viewModels.SummonerSpellSharedViewModel;
-import com.example.android.leaguestats.viewModels.SummonerSpellSharedViewModelFactory;
+import com.example.android.leaguestats.viewModels.SummonerSpellDetailModel;
+import com.example.android.leaguestats.viewModels.SummonerSpellDetailModelFactory;
 import com.squareup.picasso.Picasso;
 
 public class SummonerSpellDetailFragment extends Fragment {
@@ -27,9 +30,26 @@ public class SummonerSpellDetailFragment extends Fragment {
     private TextView mSummonerSpellDescriptionTv;
     private TextView mSummonerSpellCooldownTv;
     private String mPatchVersion;
-    private AppDatabase mDb;
+    private String mSummonerSpellId;
+    private SummonerSpellDetailModel mViewModel;
+    private static final String SUMMONER_SPELL_EXTRA_ID = "SUMMONER_SPELL_EXTRA_ID";
 
     public SummonerSpellDetailFragment() {}
+
+    public static SummonerSpellDetailFragment newInstance(String id) {
+        SummonerSpellDetailFragment fragment = new SummonerSpellDetailFragment();
+        Bundle args = new Bundle();
+        args.putString(SUMMONER_SPELL_EXTRA_ID, id);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Bundle args = getArguments();
+        mSummonerSpellId = args.getString(SUMMONER_SPELL_EXTRA_ID);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -49,19 +69,21 @@ public class SummonerSpellDetailFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         Log.d(LOG_TAG, "onActivityCreated");
 
-        mPatchVersion = PreferencesUtils.getPatchVersion(getContext());
+        if (savedInstanceState != null && savedInstanceState.containsKey(SUMMONER_SPELL_EXTRA_ID)) {
+            mSummonerSpellId = savedInstanceState.getString(SUMMONER_SPELL_EXTRA_ID);
+        }
 
-        mDb = AppDatabase.getInstance(getActivity().getApplicationContext());
+        mPatchVersion = PreferencesUtils.getPatchVersion(getContext());
 
         setupViewModel();
     }
 
     private void setupViewModel() {
         Log.d(LOG_TAG, "Getting summonerSpell");
-        SummonerSpellSharedViewModelFactory factory = new SummonerSpellSharedViewModelFactory(mDb);
-        final SummonerSpellSharedViewModel viewModel =
-                ViewModelProviders.of(getActivity(), factory).get(SummonerSpellSharedViewModel.class);
-        viewModel.getSelected().observe(this, new Observer<SummonerSpellEntry>() {
+        SummonerSpellDetailModelFactory factory =
+                InjectorUtils.provideSummonerSpellDetailModelFactory(getActivity().getApplicationContext(), mSummonerSpellId);
+        mViewModel = ViewModelProviders.of(this, factory).get(SummonerSpellDetailModel.class);
+        mViewModel.getSummonerSpell().observe(this, new Observer<SummonerSpellEntry>() {
             @Override
             public void onChanged(@Nullable SummonerSpellEntry summonerSpellEntry) {
                 Log.d(LOG_TAG, "Receiving database update from LiveData");
@@ -81,10 +103,18 @@ public class SummonerSpellDetailFragment extends Fragment {
         mSummonerSpellDescriptionTv.setText(description);
         mSummonerSpellCooldownTv.setText(String.valueOf(cooldown));
 
+        PicassoUtils.getSpellCreator(image, mPatchVersion).into(mSummonerSpellImage);
+
         Picasso.get()
                 .load("http://ddragon.leagueoflegends.com/cdn/" + mPatchVersion + "/img/spell/" + image)
                 .error(R.drawable.ic_launcher_background)
                 .placeholder(R.drawable.ic_launcher_foreground)
                 .into(mSummonerSpellImage);
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(SUMMONER_SPELL_EXTRA_ID, mSummonerSpellId);
     }
 }

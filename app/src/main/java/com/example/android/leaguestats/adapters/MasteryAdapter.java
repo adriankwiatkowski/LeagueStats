@@ -13,7 +13,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.android.leaguestats.R;
+import com.example.android.leaguestats.interfaces.StringIdClickListener;
 import com.example.android.leaguestats.models.Mastery;
+import com.example.android.leaguestats.utilities.PicassoUtils;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -21,62 +23,52 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-public class MasteryAdapter extends RecyclerView.Adapter<MasteryAdapter.ViewHolder> {
+public class MasteryAdapter extends RecyclerView.Adapter<MasteryAdapter.MasteryViewHolder> {
 
-    static private ListItemClickListener mOnClickListener;
+    static private StringIdClickListener mListener;
 
     private static List<Mastery> mMastery;
     private final Context mContext;
-    private final String mVersion;
+    private final String PATCH_VERSION;
 
     public interface ListItemClickListener {
         void onListItemClick(long championId);
     }
 
-    public MasteryAdapter(Context context, List<Mastery> mastery, ListItemClickListener listener,
+    public MasteryAdapter(Context context, List<Mastery> mastery, StringIdClickListener listener,
                           String patchVersion) {
         mContext = context;
         mMastery = mastery;
-        mOnClickListener = listener;
-        mVersion = patchVersion;
+        mListener = listener;
+        PATCH_VERSION = patchVersion;
     }
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public MasteryViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(mContext).inflate(R.layout.mastery_item, parent, false);
 
-        final String HTTP_ENTRY_THUMBNAIL_URL =
-                "https://ddragon.leagueoflegends.com/cdn/" + mVersion + "/img/champion";
-
-        view.setTag(R.id.mastery_thumbnail_tag, HTTP_ENTRY_THUMBNAIL_URL);
-
-        return new ViewHolder(view);
+        return new MasteryViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull MasteryViewHolder holder, int position) {
         String name = mMastery.get(position).getChampionName();
         int level = mMastery.get(position).getChampionLevel();
         int points = mMastery.get(position).getChampionPoints();
-        long timeStamp = mMastery.get(position).getLastPlayTime();
-
-        String httpEntryUrl = (String) holder.itemView.getTag(R.id.mastery_thumbnail_tag);
+        long timestamp = mMastery.get(position).getLastPlayTime();
 
         String imagePath = mMastery.get(position).getChampionImage();
-        Picasso.get()
-                .load(httpEntryUrl + "/" + imagePath)
-                .resize(200, 200)
-                .centerCrop()
-                .error(R.drawable.ic_launcher_background)
-                .placeholder(R.drawable.ic_launcher_foreground)
+
+        PicassoUtils.getChampionThumbnailCreator(imagePath, PATCH_VERSION,
+                R.dimen.mastery_champion_width, R.dimen.mastery_champion_height)
                 .into(holder.mTarget);
 
         holder.mChampionNameTv.setText(name);
         holder.mChampionLevelTv.setText(String.valueOf(level));
         holder.mChampionPointsTv.setText(String.valueOf(points));
 
-        Date dateObject = new Date(timeStamp);
+        Date dateObject = new Date(timestamp);
         SimpleDateFormat dateFormat = new SimpleDateFormat("LLL dd, yyyy");
         String formattedDate = dateFormat.format(dateObject);
         SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a");
@@ -105,7 +97,7 @@ public class MasteryAdapter extends RecyclerView.Adapter<MasteryAdapter.ViewHold
         notifyDataSetChanged();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    static class MasteryViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         ImageView mChampionImage;
         TextView mChampionNameTv;
@@ -115,7 +107,7 @@ public class MasteryAdapter extends RecyclerView.Adapter<MasteryAdapter.ViewHold
         TextView mIsChestGrantedTv;
         Target mTarget;
 
-        public ViewHolder(final View itemView) {
+        public MasteryViewHolder(final View itemView) {
             super(itemView);
 
             itemView.setOnClickListener(this);
@@ -164,8 +156,8 @@ public class MasteryAdapter extends RecyclerView.Adapter<MasteryAdapter.ViewHold
 
         @Override
         public void onClick(View v) {
-            long championId = mMastery.get(getAdapterPosition()).getChampionId();
-            mOnClickListener.onListItemClick(championId);
+            String championId = mMastery.get(getAdapterPosition()).getChampionId();
+            mListener.onClickListener(championId);
         }
     }
 }

@@ -44,10 +44,10 @@ public class NavigationActivity extends AppCompatActivity implements View.OnClic
     private void setBackground() {
         String language = PreferencesUtils.getUserLanguage(this);
         switch (language) {
-            case "pl":
+            case "pl_PL":
                 mBackgroundImage.setImageResource(R.drawable.polish_flag);
                 break;
-            case "en":
+            case "en_US":
                 mBackgroundImage.setImageResource(R.drawable.usa_flag);
                 break;
         }

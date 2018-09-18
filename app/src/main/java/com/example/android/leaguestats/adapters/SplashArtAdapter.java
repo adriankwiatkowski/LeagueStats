@@ -1,38 +1,27 @@
 package com.example.android.leaguestats.adapters;
 
 import android.content.Context;
-import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
 import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.Log;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.android.leaguestats.R;
-import com.example.android.leaguestats.utilities.SplashArtUtils;
+import com.example.android.leaguestats.utilities.PicassoUtils;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.RequestCreator;
 import com.squareup.picasso.Target;
 
 import java.util.List;
 
-public class SplashArtAdapter extends RecyclerView.Adapter<SplashArtAdapter.ViewHolder> {
+public class SplashArtAdapter extends RecyclerView.Adapter<SplashArtAdapter.SplashArtViewHolder> {
 
     private static final String LOG_TAG = SplashArtAdapter.class.getSimpleName();
     private static final String HTTP_ENTRY_URL_SPLASH_ART = "http://ddragon.leagueoflegends.com/cdn/img/champion/splash";
@@ -47,26 +36,17 @@ public class SplashArtAdapter extends RecyclerView.Adapter<SplashArtAdapter.View
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public SplashArtViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(mContext).inflate(R.layout.splash_art_item, parent, false);
 
-        return new ViewHolder(view);
+        return new SplashArtViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
+    public void onBindViewHolder(final SplashArtViewHolder holder, int position) {
 
-        int width = SplashArtUtils.getWidth(mContext);
-        int height = SplashArtUtils.getHeight(mContext);
-
-        // Set Splash Art on Text.
-        Picasso.get()
-                .load(HTTP_ENTRY_URL_SPLASH_ART + "/" + mSplashArt.get(position))
-                .resize(width, height)
-                .centerCrop()
-                .error(R.drawable.ic_launcher_background)
-                .placeholder(R.drawable.ic_launcher_foreground)
-                .into(holder.mTarget);
+        RequestCreator splashArtCreator = PicassoUtils.getSplashArtCreator(mContext, mSplashArt.get(position));
+        splashArtCreator.into(holder.mTarget);
 
         // Set Splash Art Name on Text;
         holder.mSplashArtNameTv.setText(mSplashArtName.get(position));
@@ -96,11 +76,11 @@ public class SplashArtAdapter extends RecyclerView.Adapter<SplashArtAdapter.View
         return mSplashArt.size();
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder {
+    static class SplashArtViewHolder extends RecyclerView.ViewHolder {
         TextView mSplashArtNameTv;
         Target mTarget;
 
-        public ViewHolder(final View itemView) {
+        public SplashArtViewHolder(final View itemView) {
             super(itemView);
             mSplashArtNameTv = itemView.findViewById(R.id.splash_art_name);
 

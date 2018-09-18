@@ -11,18 +11,9 @@ import java.util.List;
 
 public class DataUtils {
 
-    private static final String LOG_TAG = DataUtils.class.getSimpleName();
-
-    public static final String STRING_DIVIDER = "_,_";
-
-    public static final String API_KEY = "api_key";
-    public static final String PERSONAL_API_KEY = BuildConfig.HIDDEN_API_KEY;
-
-    public static final String REQUEST_METHOD_GET = "GET";
-
-    public static final String ENTRY_URL_SUMMONER_EUNE = "https://eun1.api.riotgames.com";
-    public static final String ENTRY_URL_SUMMONER_EUW = "https://euw1.api.riotgames.com";
-    public static final String ENTRY_URL_SUMMONER_NA = "https://na1.api.riotgames.com";
+    private static final String ENTRY_URL_SUMMONER_EUNE = "https://eun1.api.riotgames.com";
+    private static final String ENTRY_URL_SUMMONER_EUW = "https://euw1.api.riotgames.com";
+    private static final String ENTRY_URL_SUMMONER_NA = "https://na1.api.riotgames.com";
     public static final String[] ENTRY_URL_SUMMONER_ARRAY = {ENTRY_URL_SUMMONER_EUNE, ENTRY_URL_SUMMONER_EUW, ENTRY_URL_SUMMONER_NA};
 
     public static final String[] CHAMPION_NAME_ARRAY = new String[]{"Jax", "Sona", "Tristana",
@@ -42,10 +33,6 @@ public class DataUtils {
             "Morgana", "Nocturne", "Diana", "AurelionSol", "Zyra", "Viktor", "Cassiopeia", "Nasus",
             "Twitch", "DrMundo", "Orianna", "Evelynn", "RekSai", "Lux", "Sion", "Camille", "MasterYi",
             "Ryze", "Malphite", "Anivia", "Shen", "JarvanIV", "Malzahar", "Zac", "Gragas"};
-
-    public static String[] listStringToStringArray(@NonNull List<String> stringList) {
-        return stringList.toArray(new String[stringList.size()]);
-    }
 
     public static void setTextWithLabel(String string, TextView textView, TextView textViewLabel) {
         if (TextUtils.isEmpty(string)) {

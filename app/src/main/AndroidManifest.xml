@@ -41,6 +41,17 @@
             android:name=".SummonerSpellActivity"
             android:parentActivityName=".NavigationActivity" />
 
+        <service
+            android:name=".sync.LeagueSyncIntentService"
+            android:exported="false" />
+        <service
+            android:name=".sync.LeagueFirebaseJobService"
+            android:exported="false" >
+            <intent-filter>
+                <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE" />
+            </intent-filter>
+        </service>
+
     </application>
 
 </manifest>

@@ -4,14 +4,8 @@ import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.database.Cursor;
-import android.net.Uri;
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -22,29 +16,25 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
-import com.example.android.leaguestats.viewModels.ChampionViewModelShared;
-import com.example.android.leaguestats.viewModels.ChampionViewModelSharedFactory;
+import com.example.android.leaguestats.database.models.ListChampionEntry;
+import com.example.android.leaguestats.interfaces.IdClickListener;
+import com.example.android.leaguestats.interfaces.StringIdClickListener;
+import com.example.android.leaguestats.utilities.InjectorUtils;
+import com.example.android.leaguestats.viewModels.ChampionListModel;
+import com.example.android.leaguestats.viewModels.ChampionListModelFactory;
 import com.example.android.leaguestats.adapters.ChampionAdapter;
-import com.example.android.leaguestats.interfaces.ChampionTaskCompleted;
-import com.example.android.leaguestats.interfaces.ResultTask;
-import com.example.android.leaguestats.database.AppDatabase;
-import com.example.android.leaguestats.database.ChampionEntry;
-import com.example.android.leaguestats.utilities.AsyncTasks.ChampionsAsyncTask;
 import com.example.android.leaguestats.utilities.LocaleUtils;
 import com.example.android.leaguestats.utilities.PreferencesUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ChampionListActivity extends AppCompatActivity
-        implements ChampionAdapter.ChampionClickListener {
+public class ChampionListActivity extends AppCompatActivity implements StringIdClickListener {
 
     private static final String LOG_TAG = ChampionListActivity.class.getSimpleName();
     private RecyclerView mRecyclerView;
     private ChampionAdapter mChampionAdapter;
     private String LAYOUT_MANAGER_STATE_KEY = "layoutManagerStateKey";
-    private ChampionViewModelShared mViewModel;
-    private AppDatabase mDb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,40 +54,32 @@ public class ChampionListActivity extends AppCompatActivity
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
         String patchVersion = PreferencesUtils.getPatchVersion(this);
-        mChampionAdapter = new ChampionAdapter(this, new ArrayList<ChampionEntry>(), this, patchVersion);
+        mChampionAdapter = new ChampionAdapter(this, new ArrayList<ListChampionEntry>(), this, patchVersion);
         mRecyclerView.setAdapter(mChampionAdapter);
 
         if (savedInstanceState != null && savedInstanceState.containsKey(LAYOUT_MANAGER_STATE_KEY)) {
             mRecyclerView.getLayoutManager().onRestoreInstanceState(savedInstanceState.getParcelable(LAYOUT_MANAGER_STATE_KEY));
         }
 
-        mDb = AppDatabase.getInstance(getApplicationContext());
-
         setupViewModel();
     }
 
     private void setupViewModel() {
-        ChampionViewModelSharedFactory factory = new ChampionViewModelSharedFactory(mDb);
-        mViewModel = ViewModelProviders.of(this, factory).get(ChampionViewModelShared.class);
-        mViewModel.getChampions().observe(this, new Observer<List<ChampionEntry>>() {
+        ChampionListModelFactory factory = InjectorUtils.provideChampionListModelFactory(this.getApplicationContext());
+        final ChampionListModel viewModel =
+                ViewModelProviders.of(this, factory).get(ChampionListModel.class);
+
+        viewModel.getChampions().observe(this, new Observer<List<ListChampionEntry>>() {
             @Override
-            public void onChanged(@Nullable List<ChampionEntry> championEntries) {
-                mViewModel.getChampions().removeObserver(this);
+            public void onChanged(@Nullable List<ListChampionEntry> listChampionEntries) {
                 Log.d(LOG_TAG, "Receiving database update from LiveData");
-                mChampionAdapter.setData(championEntries);
+                mChampionAdapter.setData(listChampionEntries);
             }
         });
     }
 
     @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-        outState.putParcelable(LAYOUT_MANAGER_STATE_KEY, mRecyclerView.getLayoutManager().onSaveInstanceState());
-    }
-
-    @Override
-    public void onChampionClick(long id) {
+    public void onClickListener(String id) {
         Intent intent = new Intent(ChampionListActivity.this, ChampionDetailActivity.class);
         intent.putExtra(ChampionDetailActivity.CHAMPION_ID_KEY, id);
         startActivity(intent);
@@ -119,5 +101,12 @@ public class ChampionListActivity extends AppCompatActivity
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putParcelable(LAYOUT_MANAGER_STATE_KEY, mRecyclerView.getLayoutManager().onSaveInstanceState());
     }
 }

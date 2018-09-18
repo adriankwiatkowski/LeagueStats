@@ -1,7 +1,6 @@
 package com.example.android.leaguestats.adapters;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -11,40 +10,33 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.android.leaguestats.R;
-import com.example.android.leaguestats.database.SummonerSpellEntry;
+import com.example.android.leaguestats.database.models.ListSummonerSpellEntry;
+import com.example.android.leaguestats.interfaces.IdClickListener;
+import com.example.android.leaguestats.interfaces.StringIdClickListener;
+import com.example.android.leaguestats.utilities.PicassoUtils;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
 public class SummonerSpellAdapter extends RecyclerView.Adapter<SummonerSpellAdapter.SummonerSpellViewHolder> {
 
-    private static SummonerSpellClickListener mListener;
-
-    public interface SummonerSpellClickListener {
-        void onSummonerSpellClick(SummonerSpellEntry summonerSpellEntry);
-    }
-
-    private static final String LOG_TAG = SummonerSpellAdapter.class.getSimpleName();
     private Context mContext;
-    private static List<SummonerSpellEntry> mList;
+    private static List<ListSummonerSpellEntry> mList;
+    private static StringIdClickListener mListener;
     private final String PATCH_VERSION;
 
-    public SummonerSpellAdapter(Context context, List<SummonerSpellEntry> list,
-                                SummonerSpellClickListener listener, String patchVersion) {
+    public SummonerSpellAdapter(Context context, List<ListSummonerSpellEntry> list,
+                                StringIdClickListener listener, String patchVersion) {
         mContext = context;
         mList = list;
-        PATCH_VERSION = patchVersion;
         mListener = listener;
+        PATCH_VERSION = patchVersion;
     }
 
     @NonNull
     @Override
     public SummonerSpellViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(mContext).inflate(R.layout.summoner_spell_item, parent, false);
-
-        final String HTTP_ENTRY_URL = "http://ddragon.leagueoflegends.com/cdn/" + PATCH_VERSION + "/img/spell";
-
-        view.setTag(HTTP_ENTRY_URL);
 
         return new SummonerSpellViewHolder(view);
     }
@@ -54,17 +46,12 @@ public class SummonerSpellAdapter extends RecyclerView.Adapter<SummonerSpellAdap
         holder.mNameTv.setText(mList.get(position).getName());
         holder.mCooldownTv.setText(String.valueOf(mList.get(position).getCooldown()));
 
-        String httpEntryUrl = (String) holder.itemView.getTag();
+        String image = mList.get(position).getImage();
 
-        Picasso.get()
-                .load(httpEntryUrl + "/" + mList.get(position).getImage())
-                .resize(200, 200)
-                .error(R.drawable.ic_launcher_background)
-                .placeholder(R.drawable.ic_launcher_foreground)
-                .into(holder.mImage);
+        PicassoUtils.getSpellCreator(image, PATCH_VERSION, 200, 200).into(holder.mImage);
     }
 
-    public void add(SummonerSpellEntry summonerSpellEntry) {
+    public void add(ListSummonerSpellEntry summonerSpellEntry) {
         mList.add(summonerSpellEntry);
         notifyDataSetChanged();
     }
@@ -74,7 +61,7 @@ public class SummonerSpellAdapter extends RecyclerView.Adapter<SummonerSpellAdap
         notifyDataSetChanged();
     }
 
-    public void setData(List<SummonerSpellEntry> list) {
+    public void setData(List<ListSummonerSpellEntry> list) {
         clear();
         mList.addAll(list);
         notifyDataSetChanged();
@@ -102,7 +89,7 @@ public class SummonerSpellAdapter extends RecyclerView.Adapter<SummonerSpellAdap
 
         @Override
         public void onClick(View v) {
-            mListener.onSummonerSpellClick(mList.get(getAdapterPosition()));
+            mListener.onClickListener(mList.get(getAdapterPosition()).getId());
         }
     }
 }

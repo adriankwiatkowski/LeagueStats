@@ -1,7 +1,9 @@
 package com.example.android.leaguestats;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -10,6 +12,8 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -24,11 +28,10 @@ public class SummonerSearchFragment extends Fragment {
     OnSubmitListener mCallback;
 
     public interface OnSubmitListener {
-        void onMasteryListener(String summonerName, String entryString);
-        void onHistoryListener(String summonerName, String entryString);
+        void onMasteryListener(String entryUrlString, String summonerName);
+        void onHistoryListener(String entryUrlString, String summonerName);
     }
 
-    private static final String LOG_TAG = SummonerSearchFragment.class.getSimpleName();
     private EditText mUserNameEdit;
     private Button mMasteryButton;
     private Button mHistoryButton;
@@ -61,6 +64,9 @@ public class SummonerSearchFragment extends Fragment {
         });
 
         setupSpinner();
+
+        // Show keyboard.
+        getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
 
         mUserNameEdit.setOnKeyListener(new View.OnKeyListener() {
             @Override
@@ -103,7 +109,7 @@ public class SummonerSearchFragment extends Fragment {
     private void showMastery() {
         String summonerName = mUserNameEdit.getText().toString().trim();
         if (!(summonerName.isEmpty())) {
-            mCallback.onMasteryListener(summonerName, mEntryRegion);
+            mCallback.onMasteryListener(mEntryRegion, summonerName);
         } else {
             Toast.makeText(getContext(), R.string.enter_summoner_name, Toast.LENGTH_LONG).show();
         }
@@ -112,7 +118,7 @@ public class SummonerSearchFragment extends Fragment {
     private void showHistory() {
         String summonerName = mUserNameEdit.getText().toString().trim();
         if (!(summonerName.isEmpty())) {
-            mCallback.onHistoryListener(summonerName, mEntryRegion);
+            mCallback.onHistoryListener(mEntryRegion, summonerName);
         } else {
             Toast.makeText(getContext(), R.string.enter_summoner_name, Toast.LENGTH_LONG).show();
         }
@@ -127,5 +133,11 @@ public class SummonerSearchFragment extends Fragment {
         } catch (ClassCastException e) {
             throw new ClassCastException(context.toString() + " must implement OnSubmitListener");
         }
+    }
+
+    private void hideKeyboard(Context context) {
+        InputMethodManager imm = (InputMethodManager) context.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        IBinder iBinder = getView().getRootView().getWindowToken();
+        imm.hideSoftInputFromWindow(iBinder, 0);
     }
 }

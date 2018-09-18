@@ -2,39 +2,28 @@ package com.example.android.leaguestats;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.ContentUris;
-import android.content.Intent;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.example.android.leaguestats.viewModels.ChampionViewModelShared;
-import com.example.android.leaguestats.viewModels.ChampionViewModelSharedFactory;
+import com.example.android.leaguestats.utilities.InjectorUtils;
+import com.example.android.leaguestats.viewModels.ChampionDetailModel;
+import com.example.android.leaguestats.viewModels.ChampionDetailModelFactory;
 import com.example.android.leaguestats.adapters.SplashArtAdapter;
 import com.example.android.leaguestats.database.AppDatabase;
-import com.example.android.leaguestats.database.ChampionEntry;
-import com.example.android.leaguestats.utilities.DataUtils;
+import com.example.android.leaguestats.database.entity.ChampionEntry;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class ChampionOverviewFragment extends Fragment {
@@ -42,15 +31,12 @@ public class ChampionOverviewFragment extends Fragment {
     private static final String LOG_TAG = ChampionOverviewFragment.class.getSimpleName();
     private RecyclerView mSplashArtRecyclerView;
     private SplashArtAdapter mAdapter;
-    private List<String> mSplashArtArray;
-    private List<String> mSplashArtNameArray;
     private TextView mChampionLoreTv;
     private ProgressBar mDifficultyProgressBar;
     private ProgressBar mAttackProgressBar;
     private ProgressBar mDefenseProgressBar;
     private ProgressBar mMagicProgressBar;
     private String SPLASH_ART_LAYOUT_MANAGER_STATE_KEY = "splashArtLayoutManagerStateKey";
-    private AppDatabase mDb;
 
     public ChampionOverviewFragment() {}
 
@@ -90,15 +76,15 @@ public class ChampionOverviewFragment extends Fragment {
 
         mSplashArtRecyclerView.setNestedScrollingEnabled(false);
 
-        mDb = AppDatabase.getInstance(getActivity().getApplicationContext());
         setupViewModel();
     }
 
     private void setupViewModel() {
-        ChampionViewModelSharedFactory factory = new ChampionViewModelSharedFactory(mDb);
-        final ChampionViewModelShared viewModel =
-                ViewModelProviders.of(getActivity(), factory).get(ChampionViewModelShared.class);
-        viewModel.getSelected().observe(this, new Observer<ChampionEntry>() {
+        ChampionDetailModelFactory factory =
+                InjectorUtils.provideChampionDetailModelFactory(getActivity().getApplicationContext());
+        final ChampionDetailModel viewModel =
+                ViewModelProviders.of(getActivity(), factory).get(ChampionDetailModel.class);
+        viewModel.getChampion().observe(this, new Observer<ChampionEntry>() {
             @Override
             public void onChanged(@Nullable ChampionEntry championEntry) {
                 Log.d(LOG_TAG, "Receiving database update from LiveData");

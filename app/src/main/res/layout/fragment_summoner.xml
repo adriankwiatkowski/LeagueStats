@@ -3,8 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/statsLabelColor">
+    android:layout_height="match_parent">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/summoner_recycler_view"
@@ -12,35 +11,14 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/summoner_profile" />
-
-    <ImageView
-        android:id="@+id/summoner_profile"
-        style="@style/ProfileImageThumbnail"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:background="@color/statsLabelColor"
-        tools:src="@drawable/ic_launcher_foreground" />
-
-    <TextView
-        android:id="@+id/summoner_name_tv"
-        style="@style/SummonerText"
-        app:layout_constraintStart_toEndOf="@+id/summoner_profile"
-        app:layout_constraintTop_toTopOf="@+id/summoner_profile"
-        tools:text="FC Swidnik" />
-
-    <TextView
-        android:id="@+id/summoner_level_tv"
-        style="@style/SummonerText"
-        app:layout_constraintStart_toEndOf="@+id/summoner_profile"
-        app:layout_constraintTop_toBottomOf="@+id/summoner_name_tv"
-        tools:text="30 LEVEL" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ProgressBar
         android:id="@+id/summoner_recycler_indicator"
         style="?android:attr/progressBarStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/summoner_recycler_view"
         app:layout_constraintStart_toStartOf="@+id/summoner_recycler_view"
@@ -52,6 +30,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/summoner_level_tv" />
+        app:layout_constraintTop_toTopOf="parent" />
 
 </android.support.constraint.ConstraintLayout>
