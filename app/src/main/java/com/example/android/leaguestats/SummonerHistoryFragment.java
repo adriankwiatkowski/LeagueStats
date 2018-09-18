@@ -126,6 +126,10 @@ public class SummonerHistoryFragment extends Fragment {
         mExpandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+                switch (v.getId()) {
+                    case R.id.match_champion_child_image:
+                        break;
+                }
                 return false;
             }
         });

@@ -25,6 +25,7 @@ import com.firebase.jobdispatcher.Job;
 import com.firebase.jobdispatcher.Lifetime;
 import com.firebase.jobdispatcher.Trigger;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -115,27 +116,11 @@ public class LeagueNetworkDataSource {
 
                     OpenDataJsonParser openDataJsonParser = new OpenDataJsonParser();
 
-                    boolean isFetchNeeded = false;
-
-                    URL patchRequestUrl = NetworkUtils.getPatchUrl();
-                    String jsonPatchResponse = NetworkUtils.getResponse(patchRequestUrl);
-
-                    String responsePatch = openDataJsonParser.parsePatchResponse(jsonPatchResponse);
-                    String currentPatch = PreferencesUtils.getPatchVersion(mContext);
-
-                    if (responsePatch != null) {
-                        if (!responsePatch.isEmpty()) {
-                            if (!responsePatch.equals(currentPatch)) {
-                                PreferencesUtils.savePatchVersion(mContext, responsePatch);
-                                isFetchNeeded = true;
-                            }
-                        }
-                    }
-
-                    if (!isFetchNeeded) {
+                    if (!isFetchNeeded()) {
                         Log.d(LOG_TAG, "fetching isnt needed");
-                        // TODO
                         return;
+                    } else {
+                        Log.d(LOG_TAG, "fetching needed");
                     }
 
                     URL championRequestUrl = NetworkUtils.getChampionUrl(mContext);
@@ -182,6 +167,36 @@ public class LeagueNetworkDataSource {
         });
     }
 
+    private boolean isFetchNeeded() {
+        // TODO
+
+        OpenDataJsonParser openDataJsonParser = new OpenDataJsonParser();
+
+        boolean isFetchNeeded = false;
+
+        URL patchRequestUrl = NetworkUtils.getPatchUrl();
+        String jsonPatchResponse = null;
+        try {
+            jsonPatchResponse = NetworkUtils.getResponse(patchRequestUrl);
+
+            String responsePatch = openDataJsonParser.parsePatchResponse(jsonPatchResponse);
+            String currentPatch = PreferencesUtils.getPatchVersion(mContext);
+
+            if (responsePatch != null) {
+                if (!responsePatch.isEmpty()) {
+                    if (!responsePatch.equals(currentPatch)) {
+                        PreferencesUtils.savePatchVersion(mContext, responsePatch);
+                        isFetchNeeded = true;
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return isFetchNeeded;
+    }
+
     void fetchSummoner(final String entryUrlString, final String summonerName) {
         Log.d(LOG_TAG, "Fetch summoner started");
         mExecutors.networkIO().execute(new Runnable() {
@@ -197,11 +212,15 @@ public class LeagueNetworkDataSource {
 
                     if (response != null) {
                         Log.d(LOG_TAG, "summoner JSON not null");
-                        mDownloadedSummoner.postValue(response);
-                        mDownloadedEntryUrlString.postValue(entryUrlString);
+                    } else {
+                        Log.d(LOG_TAG, "summoner JSON null");
                     }
+                    mDownloadedEntryUrlString.postValue(entryUrlString);
+                    mDownloadedSummoner.postValue(response);
                 } catch (Exception e) {
                     e.printStackTrace();
+                    mDownloadedSummoner.postValue(null);
+                    mDownloadedEntryUrlString.postValue(null);
                 }
             }
         });

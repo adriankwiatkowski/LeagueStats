@@ -16,7 +16,7 @@ import java.util.List;
 @Dao
 public interface SummonerSpellDao {
 
-    @Query("SELECT id, summoner_spell_key name, cooldown, image FROM summoner_spell")
+    @Query("SELECT id, summoner_spell_key, name, cooldown, image FROM summoner_spell")
     LiveData<List<ListSummonerSpellEntry>> loadSpellList();
 
     @Query("SELECT * FROM summoner_spell WHERE summoner_spell_key = :id")

@@ -117,6 +117,7 @@ public class LeagueRepository {
                 Log.d(LOG_TAG, "Summoner changed");
             }
         });
+        // TODO observe summoner name and cache data. memory and/or db.
         LiveData<List<Mastery>> networkMasteries = mLeagueNetworkDataSource.getMasteries();
         networkMasteries.observeForever(new Observer<List<Mastery>>() {
             @Override

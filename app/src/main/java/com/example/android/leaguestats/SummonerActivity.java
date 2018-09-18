@@ -205,7 +205,7 @@ public class SummonerActivity extends AppCompatActivity
                 } else {
                     Toast.makeText(SummonerActivity.this, getString(R.string.summoner_not_found)
                             + " " + getString(R.string.check_spelling_and_region), Toast.LENGTH_LONG).show();
-                    onBackPressed();
+                    //onBackPressed();
                 }
             }
         });
