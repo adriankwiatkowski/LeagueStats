@@ -6,6 +6,6 @@
     android:layout_height="wrap_content"
     android:textAllCaps="true"
     android:textStyle="bold"
-    tools:background="@color/statsLabelColor"
+    android:textColor="@color/lightWhiteColor"
     tools:drawableTop="@drawable/ic_launcher_foreground"
     tools:text="Default"/>

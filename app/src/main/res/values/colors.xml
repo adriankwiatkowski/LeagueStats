@@ -3,6 +3,10 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
-    
-    <color name="statsLabelColor">#c9aa71</color>
+
+    <color name="victoryColor">#4fc3f7</color>
+    <color name="loseColor">#ef5350</color>
+
+    <color name="lightWhiteColor">#bdbdbd</color>
+    <color name="darkWhiteColor">#616161</color>
 </resources>

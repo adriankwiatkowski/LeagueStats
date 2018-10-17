@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/champion_recycler"
-    android:background="@color/statsLabelColor"
-    tools:context=".ChampionListActivity">
+    android:background="@drawable/summoner_background"
+    tools:context=".ui.ChampionListActivity">
 
 </android.support.v7.widget.RecyclerView>

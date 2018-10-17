@@ -5,14 +5,27 @@
     <dimen name="champion_match_group_height">48dp</dimen>
     <dimen name="summoner_spell_match_group_width">24dp</dimen>
     <dimen name="summoner_spell_match_group_height">24dp</dimen>
+    <dimen name="match_item_width">48dp</dimen>
+    <dimen name="match_item_height">48dp</dimen>
 
     <dimen name="champion_match_child_width">24dp</dimen>
     <dimen name="champion_match_child_height">24dp</dimen>
     <dimen name="summoner_spell_match_child_width">12dp</dimen>
     <dimen name="summoner_spell_match_child_height">12dp</dimen>
+    <dimen name="match_item_child_width">24dp</dimen>
+    <dimen name="match_item_child_height">24dp</dimen>
 
     <dimen name="mastery_champion_width">48dp</dimen>
     <dimen name="mastery_champion_height">48dp</dimen>
+
+    <dimen name="spell_width">48dp</dimen>
+    <dimen name="spell_height">48dp</dimen>
+
+    <dimen name="summoner_spell_width">48dp</dimen>
+    <dimen name="summoner_spell_height">48dp</dimen>
+
+    <dimen name="icon_width">48dp</dimen>
+    <dimen name="icon_height">48dp</dimen>
 
     <dimen name="thumbnail_width">96dp</dimen>
     <dimen name="thumbnail_height">96dp</dimen>
@@ -22,5 +35,7 @@
 
     <dimen name="button_image_main_width">123dp</dimen>
     <dimen name="button_image_main_height">65dp</dimen>
+
+    <dimen name="empty_text_size">24sp</dimen>
 
 </resources>

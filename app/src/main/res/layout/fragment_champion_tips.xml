@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/strategy_root_layout"
-    tools:context=".ChampionTipsFragment">
+    tools:context=".ui.ChampionTipsFragment">
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
@@ -21,29 +21,22 @@
             tools:src="@drawable/ic_launcher_foreground" />
 
         <TextView
-            android:id="@+id/tips_label_tv"
-            style="@style/TipsLabelText"
-            android:text="@string/tips"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/splash_art_tips_image" />
-
-        <TextView
             android:id="@+id/playing_as_label_tv"
-            style="@style/TipsLabelText"
+            style="@style/LabelText"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tips_label_tv"
+            app:layout_constraintTop_toBottomOf="@+id/splash_art_tips_image"
             tools:text="Playing As Riven" />
 
         <TextView
             android:id="@+id/playing_against_label_tv"
-            style="@style/TipsLabelText"
+            style="@style/LabelText"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/playing_as_tv"
             tools:text="Playing Against Riven" />
 
         <TextView
             android:id="@+id/playing_as_tv"
-            style="@style/TipsText"
+            style="@style/BoldText"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@+id/playing_as_label_tv"
             app:layout_constraintTop_toBottomOf="@+id/playing_as_label_tv"
@@ -51,7 +44,7 @@
 
         <TextView
             android:id="@+id/playing_against_tv"
-            style="@style/TipsText"
+            style="@style/BoldText"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@+id/playing_against_label_tv"

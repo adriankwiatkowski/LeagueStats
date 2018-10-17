@@ -10,11 +10,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.android.leaguestats.R;
-import com.example.android.leaguestats.database.models.ListSummonerSpellEntry;
+import com.example.android.leaguestats.data.database.models.ListSummonerSpellEntry;
 import com.example.android.leaguestats.interfaces.IdClickListener;
-import com.example.android.leaguestats.interfaces.StringIdClickListener;
 import com.example.android.leaguestats.utilities.PicassoUtils;
-import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -22,11 +20,11 @@ public class SummonerSpellAdapter extends RecyclerView.Adapter<SummonerSpellAdap
 
     private Context mContext;
     private static List<ListSummonerSpellEntry> mList;
-    private static StringIdClickListener mListener;
+    private static IdClickListener mListener;
     private final String PATCH_VERSION;
 
     public SummonerSpellAdapter(Context context, List<ListSummonerSpellEntry> list,
-                                StringIdClickListener listener, String patchVersion) {
+                                IdClickListener listener, String patchVersion) {
         mContext = context;
         mList = list;
         mListener = listener;
@@ -37,7 +35,6 @@ public class SummonerSpellAdapter extends RecyclerView.Adapter<SummonerSpellAdap
     @Override
     public SummonerSpellViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(mContext).inflate(R.layout.summoner_spell_item, parent, false);
-
         return new SummonerSpellViewHolder(view);
     }
 
@@ -48,7 +45,8 @@ public class SummonerSpellAdapter extends RecyclerView.Adapter<SummonerSpellAdap
 
         String image = mList.get(position).getImage();
 
-        PicassoUtils.getSpellCreator(image, PATCH_VERSION, 200, 200).into(holder.mImage);
+        PicassoUtils.setSpellImage(holder.mImage, image, PATCH_VERSION,
+                R.dimen.summoner_spell_width, R.dimen.summoner_spell_height);
     }
 
     public void add(ListSummonerSpellEntry summonerSpellEntry) {

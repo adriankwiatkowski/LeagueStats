@@ -8,14 +8,14 @@
 
     <ImageView
         android:id="@+id/summoner_spell_image_item"
-        style="@style/ItemImageThumbnail"
+        style="@style/SmallImageThumbnail"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:src="@drawable/ic_launcher_foreground" />
 
     <TextView
         android:id="@+id/summoner_spell_name_item"
-        style="@style/SummonerItemText"
+        style="@style/BoldText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/summoner_spell_image_item"
         app:layout_constraintTop_toTopOf="@+id/summoner_spell_image_item"
@@ -23,9 +23,10 @@
 
     <TextView
         android:id="@+id/summoner_spell_cooldown_item"
-        style="@style/SummonerItemText"
+        style="@style/BoldText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/summoner_spell_image_item"
         app:layout_constraintTop_toBottomOf="@+id/summoner_spell_name_item"
         tools:text="240" />
+
 </android.support.constraint.ConstraintLayout>

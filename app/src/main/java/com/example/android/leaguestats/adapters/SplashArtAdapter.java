@@ -23,8 +23,6 @@ import java.util.List;
 
 public class SplashArtAdapter extends RecyclerView.Adapter<SplashArtAdapter.SplashArtViewHolder> {
 
-    private static final String LOG_TAG = SplashArtAdapter.class.getSimpleName();
-    private static final String HTTP_ENTRY_URL_SPLASH_ART = "http://ddragon.leagueoflegends.com/cdn/img/champion/splash";
     private final Context mContext;
     private final List<String> mSplashArt;
     private final List<String> mSplashArtName;
@@ -45,8 +43,7 @@ public class SplashArtAdapter extends RecyclerView.Adapter<SplashArtAdapter.Spla
     @Override
     public void onBindViewHolder(final SplashArtViewHolder holder, int position) {
 
-        RequestCreator splashArtCreator = PicassoUtils.getSplashArtCreator(mContext, mSplashArt.get(position));
-        splashArtCreator.into(holder.mTarget);
+        PicassoUtils.setSplashArt(holder.mTarget, mContext, mSplashArt.get(position));
 
         // Set Splash Art Name on Text;
         holder.mSplashArtNameTv.setText(mSplashArtName.get(position));
@@ -89,24 +86,6 @@ public class SplashArtAdapter extends RecyclerView.Adapter<SplashArtAdapter.Spla
                 public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
                     Drawable imageDrawable = new BitmapDrawable(Resources.getSystem(), bitmap);
                     mSplashArtNameTv.setCompoundDrawablesWithIntrinsicBounds(null, imageDrawable, null, null);
-
-                    Palette.from(bitmap)
-                            .generate(new Palette.PaletteAsyncListener() {
-                                @Override
-                                public void onGenerated(@NonNull Palette palette) {
-                                    Palette.Swatch textSwatch = palette.getVibrantSwatch();
-                                    if (textSwatch == null) {
-                                        return;
-                                    }
-                                    mSplashArtNameTv.setBackgroundColor(textSwatch.getRgb());
-                                    mSplashArtNameTv.setTextColor(textSwatch.getTitleTextColor());
-
-                                    // Prevent from changing background on every swap. It'd be weird experience.
-                                    if (getAdapterPosition() == 0) {
-                                        itemView.getRootView().setBackgroundColor(textSwatch.getRgb());
-                                    }
-                                }
-                            });
                 }
 
                 @Override

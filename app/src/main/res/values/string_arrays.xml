@@ -1,8 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <string-array name="pref_language_options">
+        <item>@string/pref_language_label_pl</item>
+        <item>@string/pref_language_label_en</item>
+    </string-array>
+
+    <string-array name="pref_language_values">
+        <item>@string/pref_language_pl</item>
+        <item>@string/pref_language_en</item>
+    </string-array>
+
     <string-array name="string_region_array">
         <item>@string/region_eune</item>
         <item>@string/region_euw</item>
         <item>@string/region_na</item>
     </string-array>
+
 </resources>

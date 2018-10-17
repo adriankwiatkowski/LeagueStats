@@ -1,12 +1,13 @@
 package com.example.android.leaguestats.models;
 
-import android.os.Parcel;
-import android.os.Parcelable;
+import com.example.android.leaguestats.data.network.api.models.MasteryResponse;
+import com.example.android.leaguestats.data.database.models.ListChampionEntry;
 
-public class Mastery implements Parcelable {
+import java.util.List;
 
-    private long mPlayerId;
-    private String mChampionId;
+public class Mastery {
+
+    private int mChampionId;
     private int mChampionLevel;
     private int mChampionPoints;
     private long mLastPlayTime;
@@ -14,54 +15,8 @@ public class Mastery implements Parcelable {
     private String mChampionName;
     private String mChampionImage;
 
-    public static final Creator<Mastery> CREATOR = new Creator<Mastery>() {
-        @Override
-        public Mastery createFromParcel(Parcel in) {
-            return new Mastery(in);
-        }
-
-        @Override
-        public Mastery[] newArray(int size) {
-            return new Mastery[size];
-        }
-    };
-
-    protected Mastery(Parcel in) {
-        mChampionName = in.readString();
-        mChampionImage = in.readString();
-        mChampionId = in.readString();
-        mChampionLevel = in.readInt();
-        mChampionPoints = in.readInt();
-        mLastPlayTime = in.readLong();
-        mIsChestGranted = in.readByte() != 0;
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(mChampionName);
-        dest.writeString(mChampionImage);
-        dest.writeString(mChampionId);
-        dest.writeInt(mChampionLevel);
-        dest.writeInt(mChampionPoints);
-        dest.writeLong(mLastPlayTime);
-        dest.writeByte((byte) (mIsChestGranted ? 1 : 0));
-    }
-
-    public Mastery(long playerId, String championId, int championLevel, int championPoints, long lastPlayTime, boolean chestGranted) {
-        mPlayerId = playerId;
-        mChampionId = championId;
-        mChampionLevel = championLevel;
-        mChampionPoints = championPoints;
-        mLastPlayTime = lastPlayTime;
-        mIsChestGranted = chestGranted;
-    }
-
-    public Mastery(String name, String image, String championId, int championLevel, int championPoints, long lastPlayTime, boolean chestGranted) {
+    public Mastery(String name, String image, int championId, int championLevel,
+                   int championPoints, long lastPlayTime, boolean chestGranted) {
         mChampionName = name;
         mChampionImage = image;
         mChampionId = championId;
@@ -71,19 +26,42 @@ public class Mastery implements Parcelable {
         mIsChestGranted = chestGranted;
     }
 
-    public long getPlayerId() {
-        return mPlayerId;
+    public Mastery(MasteryResponse masteries, List<ListChampionEntry> championEntries) {
+
+        String championName = "";
+        String championThumbnail = "";
+        int championId = 0;
+        int championLevel = 0;
+        int championPoints = 0;
+        long lastPlayTime = 0;
+        boolean isChestGranted = false;
+
+        // Find champion for given id.
+        for (int j = 0; j < championEntries.size(); j++) {
+            if (masteries.getChampionId() == (championEntries.get(j).getId())) {
+                championName = championEntries.get(j).getName();
+                championThumbnail = championEntries.get(j).getImage();
+                championId = masteries.getChampionId();
+                championLevel = masteries.getChampionLevel();
+                championPoints = masteries.getChampionPoints();
+                lastPlayTime = masteries.getLastPlayTime();
+                isChestGranted = masteries.isChestGranted();
+            }
+        }
+        mChampionName = championName;
+        mChampionImage = championThumbnail;
+        mChampionId = championId;
+        mChampionLevel = championLevel;
+        mChampionPoints = championPoints;
+        mLastPlayTime = lastPlayTime;
+        mIsChestGranted = isChestGranted;
     }
 
-    public void setPlayerId(long playerId) {
-        this.mPlayerId = playerId;
-    }
-
-    public String getChampionId() {
+    public int getChampionId() {
         return mChampionId;
     }
 
-    public void setChampionId(String championId) {
+    public void setChampionId(int championId) {
         this.mChampionId = championId;
     }
 

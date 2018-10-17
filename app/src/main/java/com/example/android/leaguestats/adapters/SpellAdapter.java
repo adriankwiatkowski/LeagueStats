@@ -37,7 +37,6 @@ public class SpellAdapter extends RecyclerView.Adapter<SpellAdapter.SpellViewHol
     @Override
     public SpellViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(mContext).inflate(R.layout.spell_item, parent, false);
-
         return new SpellViewHolder(view);
     }
 
@@ -49,7 +48,8 @@ public class SpellAdapter extends RecyclerView.Adapter<SpellAdapter.SpellViewHol
         holder.mSpellCooldownTv.setText(mSpell.get(position).getCooldown());
 
         String spellPath = mSpell.get(position).getImage();
-        PicassoUtils.getSpellCreator(spellPath, PATCH_VERSION, 125, 125).into(holder.mTarget);
+        PicassoUtils.setSpellImage(holder.mSpellImage, spellPath, PATCH_VERSION,
+                R.dimen.spell_width, R.dimen.spell_height);
     }
 
     public void add(Spell spell) {
@@ -79,7 +79,6 @@ public class SpellAdapter extends RecyclerView.Adapter<SpellAdapter.SpellViewHol
         TextView mSpellCooldownTv;
         TextView mSpellCostTv;
         ImageView mSpellImage;
-        Target mTarget;
 
         public SpellViewHolder(View itemView) {
             super(itemView);
@@ -89,44 +88,6 @@ public class SpellAdapter extends RecyclerView.Adapter<SpellAdapter.SpellViewHol
             mSpellCooldownTv = itemView.findViewById(R.id.spell_cooldown_tv);
             mSpellCostTv = itemView.findViewById(R.id.spell_cost_tv);
             mSpellImage = itemView.findViewById(R.id.spell_image);
-
-            mTarget = new Target() {
-                @Override
-                public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-
-                    mSpellImage.setImageBitmap(bitmap);
-
-                    Palette.from(bitmap)
-                            .generate(new Palette.PaletteAsyncListener() {
-                                @Override
-                                public void onGenerated(@NonNull Palette palette) {
-                                    Palette.Swatch swatch = palette.getVibrantSwatch();
-                                    if (swatch == null) {
-                                        return;
-                                    }
-                                    setTextBodyColor(mSpellNameTv, swatch);
-                                    setTextBodyColor(mSpellDescriptionTv, swatch);
-                                    setTextBodyColor(mSpellCooldownTv, swatch);
-                                    setTextBodyColor(mSpellCostTv, swatch);
-                                    mLayout.setBackgroundColor(swatch.getRgb());
-                                }
-                            });
-                }
-
-                @Override
-                public void onBitmapFailed(Exception e, Drawable errorDrawable) {
-                    mSpellImage.setImageDrawable(errorDrawable);
-                }
-
-                @Override
-                public void onPrepareLoad(Drawable placeHolderDrawable) {
-                    mSpellImage.setImageDrawable(placeHolderDrawable);
-                }
-
-                void setTextBodyColor(TextView textView, Palette.Swatch swatch) {
-                    textView.setTextColor(swatch.getBodyTextColor());
-                }
-            };
         }
     }
 }

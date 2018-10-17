@@ -3,29 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/statsLabelColor">
-
-    <EditText
-        android:id="@+id/summoner_edit_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:hint="@string/summoner_name"
-        android:inputType="text">
-        <requestFocus />
-    </EditText>
-
-    <Spinner
-        android:id="@+id/summoner_spinner"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:spinnerMode="dropdown" />
-
-    <Button
-        android:id="@+id/summoner_submit_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/submit" />
+    android:background="@drawable/summoner_background">
 
     <FrameLayout
         android:id="@+id/summoner_container"
@@ -34,8 +12,7 @@
 
     <android.support.design.widget.TabLayout
         android:id="@+id/summoner_tab"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        style="@style/PagerTab" />
 
     <android.support.v4.view.ViewPager
         android:id="@+id/summoner_viewpager"

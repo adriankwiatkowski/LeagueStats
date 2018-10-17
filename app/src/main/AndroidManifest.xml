@@ -13,40 +13,72 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.MainActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <meta-data
+                android:name="android.app.default_searchable"
+                android:value=".SummonerActivity" />
         </activity>
         <activity
-            android:name=".NavigationActivity"
-            android:screenOrientation="portrait" />
+            android:name=".ui.SummonerActivity"
+            android:launchMode="singleTop"
+            android:parentActivityName=".ui.MainActivity"
+            android:theme="@style/ActivityPagerTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/summoner_searchable" />
+        </activity>
         <activity
-            android:name=".SummonerActivity"
-            android:parentActivityName=".NavigationActivity" />
+            android:name=".ui.ChampionListActivity"
+            android:parentActivityName=".ui.MainActivity">
+            <meta-data
+                android:name="android.app.default_searchable"
+                android:value=".ChampionDetailActivity" />
+        </activity>
         <activity
-            android:name=".ChampionListActivity"
-            android:parentActivityName=".NavigationActivity" />
+            android:name=".ui.ChampionDetailActivity"
+            android:launchMode="singleTop"
+            android:parentActivityName=".ui.MainActivity"
+            android:theme="@style/ActivityPagerTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
+        </activity>
         <activity
-            android:name=".ChampionDetailActivity"
-            android:parentActivityName=".NavigationActivity"
-            android:theme="@style/ChampionTheme" />
+            android:name=".ui.ItemListActivity"
+            android:launchMode="singleTop"
+            android:parentActivityName=".ui.MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
+        </activity>
         <activity
-            android:name=".ItemActivity"
-            android:parentActivityName=".NavigationActivity" />
-        <activity
-            android:name=".SummonerSpellActivity"
-            android:parentActivityName=".NavigationActivity" />
+            android:name=".ui.SummonerSpellActivity"
+            android:parentActivityName=".ui.MainActivity" />
+
+        <activity android:name=".ui.SettingsActivity" />
 
         <service
-            android:name=".sync.LeagueSyncIntentService"
+            android:name=".data.network.LeagueSyncIntentService"
             android:exported="false" />
         <service
-            android:name=".sync.LeagueFirebaseJobService"
-            android:exported="false" >
+            android:name=".data.network.LeagueFirebaseJobService"
+            android:exported="false">
             <intent-filter>
                 <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE" />
             </intent-filter>

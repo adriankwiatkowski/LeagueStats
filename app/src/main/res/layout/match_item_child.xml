@@ -59,4 +59,88 @@
         tools:layout_width="50dp"
         tools:srcCompat="@drawable/ic_launcher_foreground" />
 
+    <ImageView
+        android:id="@+id/match_item_1_child_image"
+        android:layout_width="@dimen/match_item_child_width"
+        android:layout_height="@dimen/match_item_child_height"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintBottom_toBottomOf="@+id/match_summoner_name_child_tv"
+        app:layout_constraintStart_toEndOf="@+id/match_summoner_name_child_tv"
+        app:layout_constraintTop_toTopOf="@+id/match_summoner_name_child_tv"
+        tools:background="@color/statsLabelColor"
+        tools:srcCompat="@drawable/ic_launcher_foreground" />
+
+    <ImageView
+        android:id="@+id/match_item_2_child_image"
+        android:layout_width="@dimen/match_item_child_width"
+        android:layout_height="@dimen/match_item_child_height"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintBottom_toBottomOf="@+id/match_summoner_name_child_tv"
+        app:layout_constraintStart_toEndOf="@+id/match_item_1_child_image"
+        app:layout_constraintTop_toTopOf="@+id/match_summoner_name_child_tv"
+        tools:background="@color/statsLabelColor"
+        tools:srcCompat="@drawable/ic_launcher_foreground" />
+
+    <ImageView
+        android:id="@+id/match_item_3_child_image"
+        android:layout_width="@dimen/match_item_child_width"
+        android:layout_height="@dimen/match_item_child_height"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintBottom_toBottomOf="@+id/match_summoner_name_child_tv"
+        app:layout_constraintStart_toEndOf="@+id/match_item_2_child_image"
+        app:layout_constraintTop_toTopOf="@+id/match_summoner_name_child_tv"
+        tools:background="@color/statsLabelColor"
+        tools:srcCompat="@drawable/ic_launcher_foreground" />
+
+    <ImageView
+        android:id="@+id/match_item_4_child_image"
+        android:layout_width="@dimen/match_item_child_width"
+        android:layout_height="@dimen/match_item_child_height"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintBottom_toBottomOf="@+id/match_summoner_name_child_tv"
+        app:layout_constraintStart_toEndOf="@+id/match_item_3_child_image"
+        app:layout_constraintTop_toTopOf="@+id/match_summoner_name_child_tv"
+        tools:background="@color/statsLabelColor"
+        tools:srcCompat="@drawable/ic_launcher_foreground" />
+
+    <ImageView
+        android:id="@+id/match_item_5_child_image"
+        android:layout_width="@dimen/match_item_child_width"
+        android:layout_height="@dimen/match_item_child_height"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintBottom_toBottomOf="@+id/match_summoner_name_child_tv"
+        app:layout_constraintStart_toEndOf="@+id/match_item_4_child_image"
+        app:layout_constraintTop_toTopOf="@+id/match_summoner_name_child_tv"
+        tools:background="@color/statsLabelColor"
+        tools:srcCompat="@drawable/ic_launcher_foreground" />
+
+    <ImageView
+        android:id="@+id/match_item_6_child_image"
+        android:layout_width="@dimen/match_item_child_width"
+        android:layout_height="@dimen/match_item_child_height"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintBottom_toBottomOf="@+id/match_summoner_name_child_tv"
+        app:layout_constraintStart_toEndOf="@+id/match_item_5_child_image"
+        app:layout_constraintTop_toTopOf="@+id/match_summoner_name_child_tv"
+        tools:background="@color/statsLabelColor"
+        tools:srcCompat="@drawable/ic_launcher_foreground" />
+
+    <ImageView
+        android:id="@+id/match_item_7_child_image"
+        android:layout_width="@dimen/match_item_child_width"
+        android:layout_height="@dimen/match_item_child_height"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintBottom_toBottomOf="@+id/match_summoner_name_child_tv"
+        app:layout_constraintStart_toEndOf="@+id/match_item_6_child_image"
+        app:layout_constraintTop_toTopOf="@+id/match_summoner_name_child_tv"
+        tools:background="@color/statsLabelColor"
+        tools:srcCompat="@drawable/ic_launcher_foreground" />
+
 </android.support.constraint.ConstraintLayout>

@@ -3,77 +3,86 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:layout_height="wrap_content">
+
+    <android.support.constraint.Barrier
+        android:id="@+id/barrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="end"
+        app:constraint_referenced_ids="champion_name_label_tv, champion_level_label_tv, champion_points_label_tv, last_played_label_tv, chest_granted_label_tv"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/champion_thumbnail"
-        style="@style/ItemImageThumbnail"
+        style="@style/SmallImageThumbnail"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:background="@color/statsLabelColor"
         tools:layout_height="100dp"
         tools:layout_width="100dp" />
 
     <TextView
         android:id="@+id/champion_name_label_tv"
-        style="@style/MasteryLabelText"
+        style="@style/LabelText"
         android:text="@string/champion_name"
         app:layout_constraintStart_toEndOf="@+id/champion_thumbnail"
-        app:layout_constraintTop_toTopOf="@+id/champion_thumbnail" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/champion_name_tv"
-        style="@style/MasteryText"
-        app:layout_constraintStart_toEndOf="@+id/champion_name_label_tv"
+        style="@style/BoldText"
+        app:layout_constraintStart_toEndOf="@+id/barrier"
         app:layout_constraintTop_toTopOf="@+id/champion_name_label_tv"
         tools:text="Riven" />
 
     <TextView
         android:id="@+id/champion_level_label_tv"
-        style="@style/MasteryLabelText"
+        style="@style/LabelText"
         android:text="@string/champion_level"
         app:layout_constraintStart_toEndOf="@+id/champion_thumbnail"
         app:layout_constraintTop_toBottomOf="@+id/champion_name_label_tv" />
 
     <TextView
         android:id="@+id/champion_level_tv"
-        style="@style/MasteryText"
-        app:layout_constraintStart_toEndOf="@+id/champion_level_label_tv"
+        style="@style/BoldText"
+        app:layout_constraintStart_toEndOf="@+id/barrier"
         app:layout_constraintTop_toTopOf="@+id/champion_level_label_tv"
         tools:text="5" />
 
     <TextView
         android:id="@+id/champion_points_label_tv"
-        style="@style/MasteryLabelText"
+        style="@style/LabelText"
         android:text="@string/champion_points"
         app:layout_constraintStart_toEndOf="@+id/champion_thumbnail"
         app:layout_constraintTop_toBottomOf="@+id/champion_level_label_tv" />
 
     <TextView
         android:id="@+id/champion_points_tv"
-        style="@style/MasteryText"
-        app:layout_constraintStart_toEndOf="@+id/champion_points_label_tv"
+        style="@style/BoldText"
+        app:layout_constraintStart_toEndOf="@+id/barrier"
         app:layout_constraintTop_toTopOf="@+id/champion_points_label_tv"
         tools:text="2325425425" />
 
     <TextView
         android:id="@+id/last_played_label_tv"
-        style="@style/MasteryLabelText"
+        style="@style/LabelText"
         android:text="@string/last_played"
         app:layout_constraintStart_toEndOf="@+id/champion_thumbnail"
         app:layout_constraintTop_toBottomOf="@+id/champion_points_label_tv" />
 
     <TextView
         android:id="@+id/last_played_tv"
-        style="@style/MasteryText"
-        app:layout_constraintStart_toEndOf="@+id/last_played_label_tv"
+        style="@style/BoldText"
+        app:layout_constraintStart_toEndOf="@+id/barrier"
         app:layout_constraintTop_toTopOf="@+id/last_played_label_tv"
         tools:text="12:34" />
 
     <TextView
         android:id="@+id/chest_granted_label_tv"
-        style="@style/MasteryLabelText"
+        style="@style/LabelText"
         android:text="@string/chest_granted"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/champion_thumbnail"
@@ -82,8 +91,8 @@
 
     <TextView
         android:id="@+id/chest_granted_tv"
-        style="@style/MasteryText"
-        app:layout_constraintStart_toEndOf="@+id/chest_granted_label_tv"
+        style="@style/BoldText"
+        app:layout_constraintStart_toEndOf="@+id/barrier"
         app:layout_constraintTop_toTopOf="@+id/chest_granted_label_tv"
         tools:text="Yes" />
 

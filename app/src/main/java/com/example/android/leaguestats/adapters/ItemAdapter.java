@@ -11,11 +11,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.android.leaguestats.R;
-import com.example.android.leaguestats.database.entity.ItemEntry;
-import com.example.android.leaguestats.database.models.ListItemEntry;
+import com.example.android.leaguestats.data.database.models.ListItemEntry;
 import com.example.android.leaguestats.interfaces.IdClickListener;
 import com.example.android.leaguestats.utilities.PicassoUtils;
-import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -49,7 +47,8 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
 
         String image = mList.get(position).getImage();
 
-        PicassoUtils.getItemCreator(image, PATCH_VERSION, 48, 48).into(holder.mImage);
+        PicassoUtils.setItemImage(holder.mImage, image, PATCH_VERSION,
+                R.dimen.item_thumbnail_width, R.dimen.item_thumbnail_height);
     }
 
     public void add(ListItemEntry itemEntry) {

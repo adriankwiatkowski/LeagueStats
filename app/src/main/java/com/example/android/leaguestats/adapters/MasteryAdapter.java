@@ -1,10 +1,7 @@
 package com.example.android.leaguestats.adapters;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
-import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,11 +10,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.android.leaguestats.R;
-import com.example.android.leaguestats.interfaces.StringIdClickListener;
+import com.example.android.leaguestats.interfaces.IdClickListener;
 import com.example.android.leaguestats.models.Mastery;
 import com.example.android.leaguestats.utilities.PicassoUtils;
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -25,17 +20,13 @@ import java.util.List;
 
 public class MasteryAdapter extends RecyclerView.Adapter<MasteryAdapter.MasteryViewHolder> {
 
-    static private StringIdClickListener mListener;
+    static private IdClickListener mListener;
 
     private static List<Mastery> mMastery;
     private final Context mContext;
     private final String PATCH_VERSION;
 
-    public interface ListItemClickListener {
-        void onListItemClick(long championId);
-    }
-
-    public MasteryAdapter(Context context, List<Mastery> mastery, StringIdClickListener listener,
+    public MasteryAdapter(Context context, List<Mastery> mastery, IdClickListener listener,
                           String patchVersion) {
         mContext = context;
         mMastery = mastery;
@@ -60,9 +51,8 @@ public class MasteryAdapter extends RecyclerView.Adapter<MasteryAdapter.MasteryV
 
         String imagePath = mMastery.get(position).getChampionImage();
 
-        PicassoUtils.getChampionThumbnailCreator(imagePath, PATCH_VERSION,
-                R.dimen.mastery_champion_width, R.dimen.mastery_champion_height)
-                .into(holder.mTarget);
+        PicassoUtils.setChampionThumbnail(holder.mChampionImage, imagePath, PATCH_VERSION,
+                R.dimen.mastery_champion_width, R.dimen.mastery_champion_height);
 
         holder.mChampionNameTv.setText(name);
         holder.mChampionLevelTv.setText(String.valueOf(level));
@@ -70,10 +60,7 @@ public class MasteryAdapter extends RecyclerView.Adapter<MasteryAdapter.MasteryV
 
         Date dateObject = new Date(timestamp);
         SimpleDateFormat dateFormat = new SimpleDateFormat("LLL dd, yyyy");
-        String formattedDate = dateFormat.format(dateObject);
-        SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a");
-        String formattedTime = timeFormat.format(dateObject);
-        String date = formattedDate + "    " + formattedTime;
+        String date = dateFormat.format(dateObject);
         holder.mLastPlayTimeTv.setText(date);
 
         boolean chestGranted = mMastery.get(position).isChestGranted();
@@ -105,7 +92,6 @@ public class MasteryAdapter extends RecyclerView.Adapter<MasteryAdapter.MasteryV
         TextView mChampionPointsTv;
         TextView mLastPlayTimeTv;
         TextView mIsChestGrantedTv;
-        Target mTarget;
 
         public MasteryViewHolder(final View itemView) {
             super(itemView);
@@ -118,45 +104,11 @@ public class MasteryAdapter extends RecyclerView.Adapter<MasteryAdapter.MasteryV
             mChampionPointsTv = itemView.findViewById(R.id.champion_points_tv);
             mLastPlayTimeTv = itemView.findViewById(R.id.last_played_tv);
             mIsChestGrantedTv = itemView.findViewById(R.id.chest_granted_tv);
-
-            mTarget = new Target() {
-                @Override
-                public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                    mChampionImage.setImageBitmap(bitmap);
-
-                    Palette.from(bitmap)
-                            .generate(new Palette.PaletteAsyncListener() {
-                                @Override
-                                public void onGenerated(@NonNull Palette palette) {
-                                    Palette.Swatch swatch = palette.getVibrantSwatch();
-                                    if (swatch == null) {
-                                        return;
-                                    }
-                                    itemView.setBackgroundColor(swatch.getRgb());
-                                    mChampionNameTv.setTextColor(swatch.getBodyTextColor());
-                                    mChampionLevelTv.setTextColor(swatch.getBodyTextColor());
-                                    mChampionPointsTv.setTextColor(swatch.getBodyTextColor());
-                                    mLastPlayTimeTv.setTextColor(swatch.getBodyTextColor());
-                                    mIsChestGrantedTv.setTextColor(swatch.getBodyTextColor());
-                                }
-                            });
-                }
-
-                @Override
-                public void onBitmapFailed(Exception e, Drawable errorDrawable) {
-                    mChampionImage.setImageDrawable(errorDrawable);
-                }
-
-                @Override
-                public void onPrepareLoad(Drawable placeHolderDrawable) {
-                    mChampionImage.setImageDrawable(placeHolderDrawable);
-                }
-            };
         }
 
         @Override
         public void onClick(View v) {
-            String championId = mMastery.get(getAdapterPosition()).getChampionId();
+            int championId = mMastery.get(getAdapterPosition()).getChampionId();
             mListener.onClickListener(championId);
         }
     }

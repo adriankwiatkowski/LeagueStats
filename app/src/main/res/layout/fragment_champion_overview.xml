@@ -11,14 +11,14 @@
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/splash_art_recycler_view"
-            style="@style/ChampionRecyclerView"
+            style="@style/RecyclerViewStyle"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/champion_lore_tv"
-            style="@style/StatsLabel"
+            style="@style/LabelText"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/splash_art_recycler_view"
             tools:text="Riven was the... " />
@@ -54,28 +54,28 @@
 
         <TextView
             android:id="@+id/champion_difficulty_tv"
-            style="@style/StatsLabel"
+            style="@style/LabelText"
             android:text="@string/difficulty"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/champion_lore_tv" />
 
         <TextView
             android:id="@+id/champion_attack_tv"
-            style="@style/StatsLabel"
+            style="@style/LabelText"
             android:text="@string/attack"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/champion_difficulty_tv" />
 
         <TextView
             android:id="@+id/champion_defense_tv"
-            style="@style/StatsLabel"
+            style="@style/LabelText"
             android:text="@string/defense"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/champion_attack_tv" />
 
         <TextView
             android:id="@+id/champion_magic_tv"
-            style="@style/StatsLabel"
+            style="@style/LabelText"
             android:text="@string/magic"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/champion_defense_tv" />

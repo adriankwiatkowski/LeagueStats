@@ -9,23 +9,22 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.android.leaguestats.R;
-import com.example.android.leaguestats.database.models.ListChampionEntry;
+import com.example.android.leaguestats.data.database.models.ListChampionEntry;
 import com.example.android.leaguestats.interfaces.IdClickListener;
-import com.example.android.leaguestats.interfaces.StringIdClickListener;
 import com.example.android.leaguestats.utilities.PicassoUtils;
 
 import java.util.List;
 
 public class ChampionAdapter extends RecyclerView.Adapter<ChampionAdapter.ChampionViewHolder> {
 
-    private static StringIdClickListener mListener;
+    private static IdClickListener mListener;
 
     private Context mContext;
     private static List<ListChampionEntry> mList;
     private final String PATCH_VERSION;
 
     public ChampionAdapter(Context context, List<ListChampionEntry> championEntries,
-                           StringIdClickListener listener, String patchVersion) {
+                           IdClickListener listener, String patchVersion) {
         mContext = context;
         mList = championEntries;
         mListener = listener;
@@ -35,7 +34,6 @@ public class ChampionAdapter extends RecyclerView.Adapter<ChampionAdapter.Champi
     @Override
     public ChampionAdapter.ChampionViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(mContext).inflate(R.layout.champion_item, parent, false);
-
         return new ChampionViewHolder(view);
     }
 
@@ -46,7 +44,7 @@ public class ChampionAdapter extends RecyclerView.Adapter<ChampionAdapter.Champi
 
         String imagePath = mList.get(position).getImage();
 
-        PicassoUtils.getChampionThumbnailCreator(imagePath, PATCH_VERSION).into(holder.mImage);
+        PicassoUtils.setChampionThumbnail(holder.mImage, imagePath, PATCH_VERSION);
     }
 
     public void add(ListChampionEntry championEntry) {
@@ -87,7 +85,7 @@ public class ChampionAdapter extends RecyclerView.Adapter<ChampionAdapter.Champi
 
         @Override
         public void onClick(View v) {
-            mListener.onClickListener(mList.get(getAdapterPosition()).getKey());
+            mListener.onClickListener(mList.get(getAdapterPosition()).getId());
         }
     }
 }

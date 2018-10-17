@@ -7,8 +7,11 @@
 
     <ExpandableListView
         android:id="@+id/summoner_expandable_list"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        style="@style/RecyclerViewStyle"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ProgressBar
         android:id="@+id/summoner_recycler_indicator"
@@ -23,7 +26,7 @@
 
     <TextView
         android:id="@+id/summoner_empty_view_tv"
-        style="@style/SummonerEmptyText"
+        style="@style/EmptyText"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

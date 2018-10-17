@@ -3,36 +3,37 @@ package com.example.android.leaguestats.utilities;
 import android.content.Context;
 
 import com.example.android.leaguestats.AppExecutors;
-import com.example.android.leaguestats.database.AppDatabase;
-import com.example.android.leaguestats.sync.LeagueNetworkDataSource;
-import com.example.android.leaguestats.sync.LeagueRepository;
-import com.example.android.leaguestats.viewModels.ChampionDetailModelFactory;
-import com.example.android.leaguestats.viewModels.ChampionListModelFactory;
-import com.example.android.leaguestats.viewModels.HistoryModelFactory;
-import com.example.android.leaguestats.viewModels.ItemDetailModelFactory;
-import com.example.android.leaguestats.viewModels.ItemListModelFactory;
-import com.example.android.leaguestats.viewModels.MasteryModelFactory;
-import com.example.android.leaguestats.viewModels.SummonerModelFactory;
-import com.example.android.leaguestats.viewModels.SummonerSpellDetailModelFactory;
-import com.example.android.leaguestats.viewModels.SummonerSpellListModelFactory;
+import com.example.android.leaguestats.data.database.LeagueDatabase;
+import com.example.android.leaguestats.data.network.LeagueNetworkDataSource;
+import com.example.android.leaguestats.data.LeagueRepository;
+import com.example.android.leaguestats.data.network.api.RetrofitInstance;
+import com.example.android.leaguestats.viewmodels.ChampionDetailModelFactory;
+import com.example.android.leaguestats.viewmodels.ChampionListModelFactory;
+import com.example.android.leaguestats.viewmodels.HistoryModelFactory;
+import com.example.android.leaguestats.viewmodels.ItemDetailModelFactory;
+import com.example.android.leaguestats.viewmodels.ItemListModelFactory;
+import com.example.android.leaguestats.viewmodels.MasteryModelFactory;
+import com.example.android.leaguestats.viewmodels.SummonerModelFactory;
+import com.example.android.leaguestats.viewmodels.SummonerSpellDetailModelFactory;
+import com.example.android.leaguestats.viewmodels.SummonerSpellListModelFactory;
+
+import retrofit2.Retrofit;
 
 public class InjectorUtils {
 
     public static LeagueRepository provideRepository(Context context) {
-        AppDatabase database = AppDatabase.getInstance(context.getApplicationContext());
+        LeagueDatabase database = LeagueDatabase.getInstance(context.getApplicationContext());
         AppExecutors executors = AppExecutors.getInstance();
         LeagueNetworkDataSource networkDataSource  =
-                LeagueNetworkDataSource.getInstance(context.getApplicationContext(), executors);
+                LeagueNetworkDataSource.getInstance(context.getApplicationContext());
+        Retrofit retrofit = RetrofitInstance.getRetrofitInstance(context.getApplicationContext());
 
-        return LeagueRepository.getInstance(
-                database.championDao(), database.itemDao(), database.iconDao(),
-                database.summonerSpellDao(), networkDataSource, executors);
+        return LeagueRepository.getInstance(database, networkDataSource, executors, retrofit);
     }
 
     public static LeagueNetworkDataSource provideNetworkDataSource(Context context) {
         provideRepository(context.getApplicationContext());
-        AppExecutors executors = AppExecutors.getInstance();
-        return LeagueNetworkDataSource.getInstance(context.getApplicationContext(), executors);
+        return LeagueNetworkDataSource.getInstance(context.getApplicationContext());
     }
 
     public static ChampionListModelFactory provideChampionListModelFactory(Context context) {
@@ -45,9 +46,9 @@ public class InjectorUtils {
         return new ChampionDetailModelFactory(repository);
     }
 
-    public static ItemDetailModelFactory provideItemDetailModelFactory(Context context, long id) {
+    public static ItemDetailModelFactory provideItemDetailModelFactory(Context context) {
         LeagueRepository repository = provideRepository(context.getApplicationContext());
-        return new ItemDetailModelFactory(repository, id);
+        return new ItemDetailModelFactory(repository);
     }
 
     public static ItemListModelFactory provideItemListModelFactory(Context context) {
@@ -65,7 +66,12 @@ public class InjectorUtils {
         return new SummonerModelFactory(repository);
     }
 
-    public static SummonerSpellDetailModelFactory provideSummonerSpellDetailModelFactory(Context context, String id) {
+    public static HistoryModelFactory provideHistoryModelFactory(Context context) {
+        LeagueRepository repository = provideRepository(context.getApplicationContext());
+        return new HistoryModelFactory(repository);
+    }
+
+    public static SummonerSpellDetailModelFactory provideSummonerSpellDetailModelFactory(Context context, int id) {
         LeagueRepository repository = provideRepository(context.getApplicationContext());
         return new SummonerSpellDetailModelFactory(repository, id);
     }
@@ -73,10 +79,5 @@ public class InjectorUtils {
     public static SummonerSpellListModelFactory provideSummonerSpellListModelFactory(Context context) {
         LeagueRepository repository = provideRepository(context.getApplicationContext());
         return new SummonerSpellListModelFactory(repository);
-    }
-
-    public static HistoryModelFactory provideHistoryModelFactory(Context context) {
-        LeagueRepository repository = provideRepository(context.getApplicationContext());
-        return new HistoryModelFactory(repository);
     }
 }

@@ -8,8 +8,24 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="ChampionTheme" parent="AppTheme" >
-        <item name="actionBarStyle">@style/ChampionAppBarStyle</item>
+    <style name="ActivityPagerTheme" parent="AppTheme" >
+        <item name="actionBarStyle">@style/PagerBarStyle</item>
+    </style>
+
+    <style name="PagerBarStyle" parent="Widget.AppCompat.Light.ActionBar.Solid.Inverse" >
+        <item name="elevation">0dp</item>
+    </style>
+
+    <style name="PagerTab" parent="Widget.Design.TabLayout" >
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="tabIndicatorColor">@color/darkWhiteColor</item>
+        <item name="tabSelectedTextColor">@color/lightWhiteColor</item>
+        <item name="tabTextAppearance">@style/PagerTabTextAppearance</item>
+    </style>
+
+    <style name="PagerTabTextAppearance" parent="TextAppearance.Design.Tab" >
+        <item name="android:textColor">@color/darkWhiteColor</item>
     </style>
 
     <style name="LabelText" >
@@ -17,36 +33,44 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textStyle">italic</item>
         <item name="android:textAllCaps">true</item>
+        <item name="android:layout_marginTop">8dp</item>
+        <item name="android:layout_marginBottom">8dp</item>
+        <item name="android:layout_marginLeft">8dp</item>
+        <item name="android:layout_marginStart">8dp</item>
+        <item name="android:layout_marginRight">8dp</item>
+        <item name="android:layout_marginEnd">8dp</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">@color/darkWhiteColor</item>
     </style>
 
-    <style name="Text" >
+    <style name="BoldText" >
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginLeft">8dp</item>
+        <item name="android:layout_marginStart">8dp</item>
+        <item name="android:layout_marginRight">8dp</item>
+        <item name="android:layout_marginEnd">8dp</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/lightWhiteColor</item>
+    </style>
+
+    <style name="MatchGroupText" parent="BoldText" >
+        <item name="android:layout_marginLeft">8dp</item>
+        <item name="android:layout_marginStart">8dp</item>
+        <item name="android:layout_marginRight">8dp</item>
+        <item name="android:layout_marginEnd">8dp</item>
+        <item name="android:layout_marginTop">8dp</item>
+        <item name="android:layout_marginBottom">8dp</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <style name="EmptyText" >
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textStyle">bold</item>
-    </style>
-
-    <style name="MasteryLabelText" parent="LabelText" >
-        <item name="android:layout_marginLeft">8dp</item>
-        <item name="android:layout_marginStart">8dp</item>
-        <item name="android:textSize">12sp</item>
-    </style>
-
-    <style name="MasteryText" parent="Text" >
-        <item name="android:layout_marginLeft">8dp</item>
-        <item name="android:layout_marginStart">8dp</item>
-        <item name="android:textSize">12sp</item>
-    </style>
-
-    <style name="StatsLabel" parent="LabelText">
-        <item name="android:layout_marginLeft">8dp</item>
-        <item name="android:layout_marginStart">8dp</item>
-        <item name="android:layout_marginTop">8dp</item>
-        <item name="android:textColor">@color/statsLabelColor</item>
-    </style>
-
-    <style name="StatsText" parent="Text">
-        <item name="android:layout_marginLeft">8dp</item>
-        <item name="android:layout_marginStart">8dp</item>
+        <item name="android:textSize">@dimen/empty_text_size</item>
+        <item name="android:visibility">invisible</item>
     </style>
 
     <style name="StatsProgressBar" parent="@style/Widget.AppCompat.ProgressBar.Horizontal">
@@ -60,112 +84,22 @@
         <item name="android:max">10</item>
     </style>
 
-    <style name="MainProgressBar" parent="@style/Widget.AppCompat.ProgressBar.Horizontal" >
-        <item name="android:layout_width">0dp</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginRight">8dp</item>
-        <item name="android:layout_marginEnd">8dp</item>
-        <item name="android:layout_marginLeft">8dp</item>
-        <item name="android:layout_marginStart">8dp</item>
-        <item name="android:layout_marginTop">8dp</item>
-        <item name="android:visibility">invisible</item>
-    </style>
-
-    <style name="MainProgressBarTv" parent="Text" >
-        <item name="android:layout_marginRight">8dp</item>
-        <item name="android:layout_marginEnd">8dp</item>
-        <item name="android:layout_marginLeft">8dp</item>
-        <item name="android:layout_marginStart">8dp</item>
-        <item name="android:layout_marginTop">8dp</item>
-        <item name="android:visibility">invisible</item>
-    </style>
-
-    <style name="TipsLabelText" parent="LabelText">
-        <item name="android:layout_marginLeft">8dp</item>
-        <item name="android:layout_marginStart">8dp</item>
-        <item name="android:layout_marginTop">12dp</item>
-    </style>
-
-    <style name="TipsText" parent="Text">
-        <item name="android:layout_width">0dp</item>
-        <item name="android:layout_marginRight">8dp</item>
-        <item name="android:layout_marginEnd">8dp</item>
-        <item name="android:layout_marginTop">4dp</item>
-    </style>
-    <style name="ItemDetailLabel" parent="LabelText" >
-        <item name="android:layout_marginLeft">8dp</item>
-        <item name="android:layout_marginStart">8dp</item>
-        <item name="android:layout_marginTop">8dp</item>
-    </style>
-
-    <style name="ItemDetailText" parent="Text" >
-        <item name="android:layout_width">0dp</item>
-        <item name="android:layout_marginRight">8dp</item>
-        <item name="android:layout_marginEnd">8dp</item>
-        <item name="android:layout_marginLeft">8dp</item>
-        <item name="android:layout_marginStart">8dp</item>
-        <item name="android:layout_marginTop">8dp</item>
-    </style>
-
-    <style name="ItemText" parent="Text" >
-        <item name="android:layout_width">0dp</item>
-        <item name="android:layout_marginRight">8dp</item>
-        <item name="android:layout_marginEnd">8dp</item>
-        <item name="android:layout_marginLeft">8dp</item>
-        <item name="android:layout_marginStart">8dp</item>
-    </style>
-
-    <style name="ItemDetailRecyclerLabel" parent="LabelText" >
-        <item name="android:layout_marginRight">8dp</item>
-        <item name="android:layout_marginEnd">8dp</item>
-        <item name="android:layout_marginLeft">8dp</item>
-        <item name="android:layout_marginStart">8dp</item>
-        <item name="android:layout_marginTop">8dp</item>
-    </style>
-
-    <style name="ItemDetailGoldLabel" parent="LabelText">
-        <item name="android:layout_marginRight">8dp</item>
-        <item name="android:layout_marginEnd">8dp</item>
-        <item name="android:layout_marginTop">8dp</item>
-    </style>
-
-    <style name="ItemDetailGoldText" parent="Text">
-        <item name="android:layout_marginRight">8dp</item>
-        <item name="android:layout_marginEnd">8dp</item>
-    </style>
-
     <style name="ImageThumbnail" >
         <item name="android:layout_width">@dimen/thumbnail_width</item>
         <item name="android:layout_height">@dimen/thumbnail_height</item>
-    </style>
-
-    <style name="ChampionImageThumbnail" >
-        <item name="android:layout_width">@dimen/item_thumbnail_width</item>
-        <item name="android:layout_height">@dimen/item_thumbnail_height</item>
-    </style>
-
-    <style name="ChampionText" parent="Text" >
-        <item name="android:layout_width">0dp</item>
-    </style>
-
-    <style name="ProfileImageThumbnail" parent="ImageThumbnail">
         <item name="android:layout_marginLeft">8dp</item>
         <item name="android:layout_marginStart">8dp</item>
         <item name="android:layout_marginTop">8dp</item>
+        <item name="android:layout_marginBottom">8dp</item>
     </style>
 
-    <style name="ItemDetailImageThumbnail" parent="ImageThumbnail" >
-        <item name="android:layout_marginLeft">8dp</item>
-        <item name="android:layout_marginStart">8dp</item>
-        <item name="android:layout_marginTop">8dp</item>
-    </style>
-
-    <style name="ItemImageThumbnail" parent="ImageThumbnail" >
+    <style name="SmallImageThumbnail" >
         <item name="android:layout_width">@dimen/item_thumbnail_width</item>
         <item name="android:layout_height">@dimen/item_thumbnail_height</item>
         <item name="android:layout_marginLeft">8dp</item>
         <item name="android:layout_marginStart">8dp</item>
         <item name="android:layout_marginTop">8dp</item>
+        <item name="android:layout_marginBottom">8dp</item>
     </style>
 
     <style name="TipsSplashArt" >
@@ -173,89 +107,20 @@
         <item name="android:layout_height">wrap_content</item>
     </style>
 
-    <style name="ChampionRecyclerView" >
+    <style name="RecyclerViewStyle" >
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">wrap_content</item>
-    </style>
-
-    <style name="ItemDetailRecyclerView" >
-        <item name="android:layout_width">0dp</item>
-        <item name="android:layout_height">wrap_content</item>
-    </style>
-
-    <style name="ItemListRecyclerView" >
-        <item name="android:layout_width">0dp</item>
-        <item name="android:layout_height">0dp</item>
         <item name="android:layout_marginLeft">8dp</item>
         <item name="android:layout_marginStart">8dp</item>
         <item name="android:layout_marginRight">8dp</item>
         <item name="android:layout_marginEnd">8dp</item>
         <item name="android:layout_marginBottom">8dp</item>
         <item name="android:layout_marginTop">8dp</item>
-    </style>
-
-    <style name="SummonerText" parent="Text" >
-        <item name="android:layout_marginLeft">8dp</item>
-        <item name="android:layout_marginStart">8dp</item>
-        <item name="android:textAllCaps">true</item>
-    </style>
-
-    <style name="SummonerItemText" parent="Text" >
-        <item name="android:layout_width">0dp</item>
-        <item name="android:layout_marginLeft">8dp</item>
-        <item name="android:layout_marginStart">8dp</item>
-        <item name="android:layout_marginRight">8dp</item>
-        <item name="android:layout_marginEnd">8dp</item>
-    </style>
-
-    <style name="SummonerEmptyText" parent="Text" >
-        <item name="android:layout_marginLeft">8dp</item>
-        <item name="android:layout_marginStart">8dp</item>
-        <item name="android:layout_marginRight">8dp</item>
-        <item name="android:layout_marginEnd">8dp</item>
-        <item name="android:layout_marginTop">8dp</item>
-        <item name="android:textSize">24sp</item>
-        <item name="android:visibility">invisible</item>
-    </style>
-
-    <style name="SummonerSpellDetailText" parent="Text" >
-        <item name="android:layout_width">0dp</item>
-    </style>
-
-    <style name="SummonerSpellDetailTextLabel" parent="LabelText" >
-        <item name="android:layout_width">0dp</item>
-        <item name="android:layout_marginLeft">8dp</item>
-        <item name="android:layout_marginStart">8dp</item>
-        <item name="android:layout_marginRight">8dp</item>
-        <item name="android:layout_marginEnd">8dp</item>
     </style>
 
     <style name="ButtonImageMain" >
         <item name="android:layout_width">@dimen/button_image_main_width</item>
         <item name="android:layout_height">@dimen/button_image_main_height</item>
-        <item name="android:layout_marginBottom">8dp</item>
-        <item name="android:layout_marginLeft">8dp</item>
-        <item name="android:layout_marginStart">8dp</item>
-        <item name="android:layout_marginRight">8dp</item>
-        <item name="android:layout_marginEnd">8dp</item>
-    </style>
-
-    <style name="SelectLanguageMainText" parent="Text" >
-        <item name="android:textSize">42sp</item>
-    </style>
-
-    <style name="ChampionAppBarStyle" parent="Widget.AppCompat.Light.ActionBar.Solid.Inverse" >
-        <item name="elevation">0dp</item>
-    </style>
-
-    <style name="ChampionTab" parent="Widget.Design.TabLayout" >
-        <item name="tabIndicatorColor">@android:color/white</item>
-        <item name="tabSelectedTextColor">@android:color/white</item>
-        <item name="tabTextAppearance">@style/ChampionTabTextAppearance</item>
-    </style>
-
-    <style name="ChampionTabTextAppearance" parent="TextAppearance.Design.Tab" >
-        <item name="android:textColor">#a9a29f</item>
     </style>
 
 </resources>

@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/statsLabelColor"
-    tools:context=".SummonerSpellDetailFragment">
+    tools:context=".ui.SummonerSpellDetailFragment">
 
     <ImageView
         android:id="@+id/summoner_spell_detail_image"
@@ -16,7 +15,7 @@
 
     <TextView
         android:id="@+id/summoner_spell_detail_name"
-        style="@style/SummonerSpellDetailTextLabel"
+        style="@style/LabelText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/summoner_spell_detail_image"
         app:layout_constraintTop_toTopOf="parent"
@@ -24,7 +23,7 @@
 
     <TextView
         android:id="@+id/summoner_spell_detail_description"
-        style="@style/SummonerSpellDetailText"
+        style="@style/BoldText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/summoner_spell_detail_name"
         app:layout_constraintTop_toBottomOf="@+id/summoner_spell_detail_name"
@@ -32,7 +31,7 @@
 
     <TextView
         android:id="@+id/summoner_spell_detail_cooldown"
-        style="@style/SummonerSpellDetailText"
+        style="@style/BoldText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/summoner_spell_detail_description"
         app:layout_constraintTop_toBottomOf="@+id/summoner_spell_detail_description"

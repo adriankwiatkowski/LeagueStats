@@ -4,84 +4,63 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/spell_item_layout"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content" >
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/spell_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="8dp"
+        android:contentDescription="@string/image_for_spell"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:background="@color/statsLabelColor"
+        tools:layout_height="50dp"
+        tools:layout_width="50dp" />
 
     <TextView
         android:id="@+id/spell_name_tv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
-        android:layout_marginStart="8dp"
+        style="@style/LabelText"
         app:layout_constraintStart_toEndOf="@+id/spell_image"
         app:layout_constraintTop_toTopOf="@+id/spell_image"
         tools:text="Broken Wings" />
 
     <TextView
         android:id="@+id/spell_description_tv"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        style="@style/BoldText"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/spell_cooldown_tv"
-        app:layout_constraintVertical_bias="0.0"
         tools:text="Pretty good." />
-
-    <ImageView
-        android:id="@+id/spell_image"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:background="@color/statsLabelColor"
-        tools:layout_height="50dp"
-        tools:layout_width="50dp"
-        android:contentDescription="@string/image_for_spell" />
 
     <TextView
         android:id="@+id/spell_cost_tv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="@+id/spell_cost_label"
+        style="@style/BoldText"
+        app:layout_constraintStart_toEndOf="@+id/spell_image"
         app:layout_constraintTop_toBottomOf="@+id/spell_cost_label"
         tools:text="656" />
 
     <TextView
         android:id="@+id/spell_cooldown_tv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="@+id/cost_cooldown_label"
+        style="@style/BoldText"
+        app:layout_constraintStart_toEndOf="@+id/spell_image"
         app:layout_constraintTop_toBottomOf="@+id/cost_cooldown_label"
         tools:text="13/13/13/13/13" />
 
     <TextView
         android:id="@+id/spell_cost_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        style="@style/LabelText"
         android:text="@string/cost"
-        android:textAllCaps="true"
-        android:textStyle="italic"
-        app:layout_constraintStart_toStartOf="@+id/spell_name_tv"
+        app:layout_constraintStart_toEndOf="@+id/spell_image"
         app:layout_constraintTop_toBottomOf="@+id/spell_name_tv" />
 
     <TextView
         android:id="@+id/cost_cooldown_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        style="@style/LabelText"
         android:text="@string/cooldown"
-        android:textAllCaps="true"
-        android:textStyle="italic"
-        app:layout_constraintStart_toStartOf="@+id/spell_cost_tv"
+        app:layout_constraintStart_toEndOf="@+id/spell_image"
         app:layout_constraintTop_toBottomOf="@+id/spell_cost_tv" />
 </android.support.constraint.ConstraintLayout>

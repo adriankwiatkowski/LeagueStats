@@ -5,10 +5,12 @@ import android.content.res.Configuration;
 import android.graphics.Point;
 import android.view.Display;
 import android.view.WindowManager;
+import android.widget.ImageView;
 
 import com.example.android.leaguestats.R;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
+import com.squareup.picasso.Target;
 
 public final class PicassoUtils {
 
@@ -21,65 +23,103 @@ public final class PicassoUtils {
     private static final int ERROR_DRAWABLE = R.drawable.ic_launcher_background;
     private static final int PLACEHOLDER = R.drawable.ic_launcher_foreground;
 
-    public static RequestCreator getSplashArtCreator(Context context, String url) {
-        return Picasso.get()
-                .load(HTTP_ENTRY_URL_SPLASH_ART + "/" + url)
+    public static void setSplashArt(ImageView imageView, Context context, String path) {
+        Picasso.get()
+                .load(HTTP_ENTRY_URL_SPLASH_ART + "/" + path)
                 .resize(getWidth(context), getHeight(context))
                 .centerCrop()
                 .error(ERROR_DRAWABLE)
-                .placeholder(PLACEHOLDER);
+                .placeholder(PLACEHOLDER)
+                .into(imageView);
     }
 
-    public static RequestCreator getSpellCreator(String path, String patchVersion) {
-        return Picasso.get()
+    public static void setSplashArt(Target target, Context context, String path) {
+        Picasso.get()
+                .load(HTTP_ENTRY_URL_SPLASH_ART + "/" + path)
+                .resize(getWidth(context), getHeight(context))
+                .centerCrop()
+                .error(ERROR_DRAWABLE)
+                .placeholder(PLACEHOLDER)
+                .into(target);
+    }
+
+    public static void setSpellImage(ImageView imageView, String path, String patchVersion) {
+        Picasso.get()
                 .load(HTTP_ENTRY_DRAGON_URL + patchVersion + SPELL_PATH + "/" + path)
                 .error(R.drawable.ic_launcher_background)
-                .placeholder(R.drawable.ic_launcher_foreground);
+                .placeholder(R.drawable.ic_launcher_foreground)
+                .into(imageView);
     }
 
-    public static RequestCreator getChampionThumbnailCreator(String path, String patchVersion) {
-        return Picasso.get()
+    public static void setChampionThumbnail(ImageView imageView, String path, String patchVersion) {
+        Picasso.get()
                 .load(HTTP_ENTRY_DRAGON_URL + patchVersion + CHAMPION_THUMBNAIL_PATH + "/" + path)
-                .error(R.drawable.ic_launcher_background)
-                .placeholder(R.drawable.ic_launcher_foreground);
+                .error(ERROR_DRAWABLE)
+                .placeholder(PLACEHOLDER)
+                .into(imageView);
     }
 
     // TODO Check .fit() :).
-    public static RequestCreator getChampionThumbnailCreator(String path, String patchVersion,
-                                                             int widthResId, int heightResId) {
-        return Picasso.get()
+    public static void setChampionThumbnail(ImageView imageView, String path, String patchVersion,
+                                            int widthResId, int heightResId) {
+        Picasso.get()
                 .load(HTTP_ENTRY_DRAGON_URL + patchVersion + CHAMPION_THUMBNAIL_PATH + "/" + path)
                 .resizeDimen(widthResId, heightResId)
                 .centerCrop()
-                .error(R.drawable.ic_launcher_background)
-                .placeholder(R.drawable.ic_launcher_foreground);
+                .error(ERROR_DRAWABLE)
+                .placeholder(PLACEHOLDER)
+                .into(imageView);
     }
 
-    public static RequestCreator getSpellCreator(String path, String patchVersion,
-                                                 int widthResId, int heightResId) {
-        return Picasso.get()
+    public static void setChampionThumbnail(Target target, String path, String patchVersion,
+                                            int widthResId, int heightResId) {
+        Picasso.get()
+                .load(HTTP_ENTRY_DRAGON_URL + patchVersion + CHAMPION_THUMBNAIL_PATH + "/" + path)
+                .resizeDimen(widthResId, heightResId)
+                .centerCrop()
+                .error(ERROR_DRAWABLE)
+                .placeholder(PLACEHOLDER)
+                .into(target);
+    }
+
+    public static void setSpellImage(ImageView imageView, String path, String patchVersion,
+                                     int widthResId, int heightResId) {
+        Picasso.get()
                 .load(HTTP_ENTRY_DRAGON_URL + patchVersion + SPELL_PATH + "/" + path)
                 .resizeDimen(widthResId, heightResId)
-                .error(R.drawable.ic_launcher_background)
-                .placeholder(R.drawable.ic_launcher_foreground);
+                .error(ERROR_DRAWABLE)
+                .placeholder(PLACEHOLDER)
+                .into(imageView);
     }
 
-    public static RequestCreator getItemCreator(String path, String patchVersion,
-                                                int width, int height) {
-        return Picasso.get()
+    public static void setSpellImage(Target target, String path, String patchVersion,
+                                     int widthResId, int heightResId) {
+        Picasso.get()
+                .load(HTTP_ENTRY_DRAGON_URL + patchVersion + SPELL_PATH + "/" + path)
+                .resizeDimen(widthResId, heightResId)
+                .error(ERROR_DRAWABLE)
+                .placeholder(PLACEHOLDER)
+                .into(target);
+    }
+
+    public static void setItemImage(ImageView imageView, String path, String patchVersion,
+                                    int widthResId, int heightResId) {
+        Picasso.get()
                 .load(HTTP_ENTRY_DRAGON_URL + patchVersion + ITEM_PATH + "/" + path)
-                .resize(width, height)
-                .error(R.drawable.ic_launcher_background)
-                .placeholder(R.drawable.ic_launcher_foreground);
+                .resizeDimen(widthResId, heightResId)
+                .error(ERROR_DRAWABLE)
+                .placeholder(PLACEHOLDER)
+                .into(imageView);
     }
 
-    public static RequestCreator getIconCreator(String path, String patchVersion,
-                                                int width, int height) {
-        return Picasso.get()
+    public static void setIconImage(ImageView imageView, String path, String patchVersion,
+                                              int widthResId, int heightResId) {
+        Picasso.get()
                 .load(HTTP_ENTRY_DRAGON_URL + patchVersion + ICON_PATH + "/" + path + ".png")
-                .resize(width, height)
-                .error(R.drawable.ic_launcher_background)
-                .placeholder(R.drawable.ic_launcher_foreground);
+                .resizeDimen(widthResId, heightResId)
+                .error(ERROR_DRAWABLE)
+                .placeholder(PLACEHOLDER)
+                .into(imageView);
     }
 
     private static int getWidth(Context context) {

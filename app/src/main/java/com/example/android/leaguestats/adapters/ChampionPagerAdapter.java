@@ -6,9 +6,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-import com.example.android.leaguestats.ChampionInfoFragment;
-import com.example.android.leaguestats.ChampionOverviewFragment;
-import com.example.android.leaguestats.ChampionTipsFragment;
+import com.example.android.leaguestats.ui.ChampionInfoFragment;
+import com.example.android.leaguestats.ui.ChampionOverviewFragment;
+import com.example.android.leaguestats.ui.ChampionTipsFragment;
 import com.example.android.leaguestats.R;
 
 public class ChampionPagerAdapter extends FragmentPagerAdapter {
