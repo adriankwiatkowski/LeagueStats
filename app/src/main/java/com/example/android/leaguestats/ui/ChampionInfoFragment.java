@@ -41,8 +41,7 @@ public class ChampionInfoFragment extends Fragment {
     private static final int SPELL_COUNT = 4;
     private String mPatchVersion;
 
-    public ChampionInfoFragment() {
-    }
+    public ChampionInfoFragment() {}
 
     @Nullable
     @Override

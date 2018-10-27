@@ -30,6 +30,7 @@ public class MainActivity extends AppCompatActivity
         mFragmentManager = getSupportFragmentManager();
 
         setupViewPager();
+        setupUpButton();
     }
 
     private void setupViewPager() {
@@ -53,11 +54,7 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onPageSelected(int position) {
-                Fragment fragment = getCurrentFragment();
-                if (fragment != null) {
-                    boolean canBack = fragment.getChildFragmentManager().getBackStackEntryCount() > 0;
-                    getSupportActionBar().setDisplayHomeAsUpEnabled(canBack);
-                }
+                setupUpButton();
             }
 
             @Override
@@ -65,6 +62,14 @@ public class MainActivity extends AppCompatActivity
 
             }
         });
+    }
+
+    private void setupUpButton() {
+        Fragment fragment = getCurrentFragment();
+        if (fragment != null) {
+            boolean canBack = fragment.getChildFragmentManager().getBackStackEntryCount() > 0;
+            getSupportActionBar().setDisplayHomeAsUpEnabled(canBack);
+        }
     }
 
     @Override

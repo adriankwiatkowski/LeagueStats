@@ -8,13 +8,13 @@ import android.arch.persistence.room.PrimaryKey;
 public class IconEntry {
 
     @PrimaryKey
-    @ColumnInfo(name = "icon_id")
-    private int iconId;
+    @ColumnInfo(name = "id")
+    private int id;
     private String icon;
 
-    public IconEntry(int iconId, String icon) {
+    public IconEntry(int id, String icon) {
         this.icon = icon;
-        this.iconId = iconId;
+        this.id = id;
     }
 
     public String getIcon() {
@@ -25,11 +25,11 @@ public class IconEntry {
         this.icon = iconPath;
     }
 
-    public int getIconId() {
-        return iconId;
+    public int getId() {
+        return id;
     }
 
-    public void setIconId(int iconId) {
-        this.iconId = iconId;
+    public void setId(int id) {
+        this.id = id;
     }
 }

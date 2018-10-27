@@ -21,7 +21,7 @@ public class InjectorUtils {
         LeagueNetworkDataSource networkDataSource  =
                 LeagueNetworkDataSource.getInstance(context.getApplicationContext(), retrofit);
 
-        return LeagueRepository.getInstance(context.getApplicationContext(), database, networkDataSource, retrofit);
+        return LeagueRepository.getInstance(context.getApplicationContext(), database, networkDataSource);
     }
 
     public static LeagueNetworkDataSource provideNetworkDataSource(Context context) {

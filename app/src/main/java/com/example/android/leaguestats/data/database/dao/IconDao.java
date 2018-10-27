@@ -17,7 +17,7 @@ public interface IconDao {
     @Query("SELECT * FROM icon")
     LiveData<List<IconEntry>> loadAllIcons();
 
-    @Query("SELECT * FROM icon WHERE icon_id = :id")
+    @Query("SELECT * FROM icon WHERE id = :id")
     LiveData<IconEntry> loadIconById(int id);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

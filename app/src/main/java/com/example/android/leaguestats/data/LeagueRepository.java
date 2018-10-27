@@ -1,15 +1,16 @@
 package com.example.android.leaguestats.data;
 
+import android.arch.core.util.Function;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.Transformations;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.example.android.leaguestats.data.network.api.models.MasteryResponse;
-import com.example.android.leaguestats.data.network.api.models.MatchListResponse;
-import com.example.android.leaguestats.data.network.api.RetrofitDataService;
-import com.example.android.leaguestats.data.network.api.RetrofitInstance;
 import com.example.android.leaguestats.data.network.api.models.match.MatchResponse;
 import com.example.android.leaguestats.data.network.api.models.match.Participant;
 import com.example.android.leaguestats.data.database.LeagueDatabase;
@@ -22,19 +23,11 @@ import com.example.android.leaguestats.models.Mastery;
 import com.example.android.leaguestats.models.Match;
 import com.example.android.leaguestats.data.network.api.models.MatchList;
 import com.example.android.leaguestats.models.Summoner;
-import com.example.android.leaguestats.data.network.OpenDataJsonParser;
 import com.example.android.leaguestats.utilities.LeaguePreferences;
-import com.google.gson.JsonElement;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
 
 public class LeagueRepository {
 
@@ -49,24 +42,19 @@ public class LeagueRepository {
     private final LeagueNetworkDataSource mLeagueNetworkDataSource;
     private boolean mInitialized = false;
 
-    private RetrofitDataService mService;
-
     private LeagueRepository(Context context, LeagueDatabase leagueDatabase,
-                             LeagueNetworkDataSource leagueNetworkDataSource,
-                             Retrofit retrofit) {
-        mService = retrofit.create(RetrofitDataService.class);
+                             LeagueNetworkDataSource leagueNetworkDataSource) {
         mDb = leagueDatabase;
         mLeagueNetworkDataSource = leagueNetworkDataSource;
         initializeData(context.getApplicationContext());
     }
 
     public synchronized static LeagueRepository getInstance(Context context, LeagueDatabase leagueDatabase,
-                                                            LeagueNetworkDataSource leagueNetworkDataSource,
-                                                            Retrofit retrofit) {
+                                                            LeagueNetworkDataSource leagueNetworkDataSource) {
         Log.d(LOG_TAG, "Getting the repository");
         if (sInstance == null) {
             synchronized (LOCK) {
-                sInstance = new LeagueRepository(context.getApplicationContext(), leagueDatabase, leagueNetworkDataSource, retrofit);
+                sInstance = new LeagueRepository(context.getApplicationContext(), leagueDatabase, leagueNetworkDataSource);
                 Log.d(LOG_TAG, "Made new repository");
             }
         }
@@ -92,375 +80,188 @@ public class LeagueRepository {
         }.execute();
     }
 
-    public void fetchData(Context context) {
+    public void fetchData(final Context context) {
         Log.d(LOG_TAG, "Fetch data started");
 
         String patchVersion = LeaguePreferences.getPatchVersion(context);
         String language = LeaguePreferences.getLanguage(context);
-        OpenDataJsonParser openDataJsonParser = new OpenDataJsonParser();
 
-        fetchChampionData(patchVersion, language, openDataJsonParser);
-        fetchItemData(patchVersion, language, openDataJsonParser);
-        fetchSummonerSpellData(patchVersion, language, openDataJsonParser);
-        fetchIconData(patchVersion, language, openDataJsonParser);
-    }
+        final LiveData<ChampionEntry[]> championEntryData =
+                mLeagueNetworkDataSource.fetchChampionData(patchVersion, language);
 
-    private void fetchChampionData(final String patchVersion, final String language, final OpenDataJsonParser openDataJsonParser) {
-
-        Call<JsonElement> championListCall = mService.getChampions(patchVersion, language);
-
-        try {
-
-            String jsonChampionsResponse = championListCall.execute().body().toString();
-
-            String[] championId = openDataJsonParser.parseChampions(jsonChampionsResponse);
-
-            ChampionEntry[] championEntries = new ChampionEntry[championId.length];
-
-            for (int i = 0; i < championEntries.length; i++) {
-
-                Call<JsonElement> championCall = mService.getChampion(patchVersion, language, championId[i]);
-
-                String jsonChampionResponse = championCall.execute().body().toString();
-
-                ChampionEntry championEntry = openDataJsonParser.parseChampionResponse(jsonChampionResponse);
-
-                championEntries[i] = championEntry;
-                Log.d(LOG_TAG, "champion fetched " + String.valueOf(i));
+        championEntryData.observeForever(new Observer<ChampionEntry[]>() {
+            @Override
+            public void onChanged(@Nullable ChampionEntry[] championEntries) {
+                // TODO cant remove observer on background thread e.g. IntentService.
+                //championEntriesData.removeObserver(this);
+                mDb.championDao().deleteChampions();
+                mDb.championDao().bulkInsert(championEntries);
             }
+        });
 
-            mDb.championDao().deleteChampions();
-            mDb.championDao().bulkInsert(championEntries);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+        LiveData<ItemEntry[]> itemEntryData =
+                mLeagueNetworkDataSource.fetchItemData(patchVersion, language);
 
-    private void fetchItemData(String patchVersion, String language, final OpenDataJsonParser openDataJsonParser) {
+        itemEntryData.observeForever(new Observer<ItemEntry[]>() {
+            @Override
+            public void onChanged(@Nullable ItemEntry[] itemEntries) {
+                mDb.itemDao().deleteItems();
+                mDb.itemDao().bulkInsert(itemEntries);
+            }
+        });
 
-        Call<JsonElement> call = mService.getItems(patchVersion, language);
+        LiveData<SummonerSpellEntry[]> summonerSpellEntryData =
+                mLeagueNetworkDataSource.fetchSummonerSpellData(patchVersion, language);
 
-        try {
+        summonerSpellEntryData.observeForever(new Observer<SummonerSpellEntry[]>() {
+            @Override
+            public void onChanged(@Nullable SummonerSpellEntry[] summonerSpellEntries) {
+                mDb.summonerSpellDao().deleteSpells();
+                mDb.summonerSpellDao().bulkInsert(summonerSpellEntries);
+            }
+        });
 
-            String itemJsonResponse = call.execute().body().toString();
+        LiveData<IconEntry[]> iconEntryData =
+                mLeagueNetworkDataSource.fetchIconData(patchVersion, language);
 
-            ItemEntry[] itemEntries = openDataJsonParser.parseItemResponse(itemJsonResponse);
-
-            mDb.itemDao().deleteItems();
-            mDb.itemDao().bulkInsert(itemEntries);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void fetchSummonerSpellData(String patchVersion, String language, final OpenDataJsonParser openDataJsonParser) {
-
-        Call<JsonElement> call = mService.getSummonerSpells(patchVersion, language);
-
-        try {
-
-            String summonerSpellJsonResponse = call.execute().body().toString();
-
-            SummonerSpellEntry[] summonerSpellEntries = openDataJsonParser.parseSummonerSpellResponse(summonerSpellJsonResponse);
-
-            mDb.summonerSpellDao().deleteSpells();
-            mDb.summonerSpellDao().bulkInsert(summonerSpellEntries);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void fetchIconData(String patchVersion, String language, final OpenDataJsonParser openDataJsonParser) {
-
-        Call<JsonElement> call = mService.getIcons(patchVersion, language);
-
-        try {
-
-            String iconJsonResponse = call.execute().body().toString();
-
-            IconEntry[] iconEntries = openDataJsonParser.parseIconResponse(iconJsonResponse);
-
-            mDb.iconDao().deleteIcons();
-            mDb.iconDao().bulkInsert(iconEntries);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        iconEntryData.observeForever(new Observer<IconEntry[]>() {
+            @Override
+            public void onChanged(@Nullable IconEntry[] iconEntries) {
+                mDb.iconDao().deleteIcons();
+                mDb.iconDao().bulkInsert(iconEntries);
+            }
+        });
     }
 
     public LiveData<Summoner> getSummoner(final String entryUrlString, String summonerName) {
         Log.d(LOG_TAG, "Getting summoner");
-
-        final MutableLiveData<Summoner> summonerMutableLiveData = new MutableLiveData<>();
-
-        Call<Summoner> call = mService.getSummoner(RetrofitInstance.getSummonerUrl(entryUrlString, summonerName));
-
-        call.enqueue(new Callback<Summoner>() {
-
-            @Override
-            public void onResponse(Call<Summoner> call, Response<Summoner> response) {
-                if (response.isSuccessful()) {
-                    Log.d(LOG_TAG, "Summoner response successful");
-                    response.body().setEntryUrl(entryUrlString);
-                    summonerMutableLiveData.postValue(response.body());
-                } else {
-                    Log.d(LOG_TAG, "call failed against the url: " + call.request().url());
-                    Log.d(LOG_TAG, "Summoner response not successful");
-                    summonerMutableLiveData.postValue(null);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<Summoner> call, Throwable t) {
-                Log.d(LOG_TAG, "call failed against the url: " + call.request().url());
-                Log.d(LOG_TAG, "Failed to fetch summoner");
-                Log.d(LOG_TAG, t.getMessage());
-                summonerMutableLiveData.postValue(null);
-            }
-        });
-
-        return summonerMutableLiveData;
+        return mLeagueNetworkDataSource.fetchSummoner(entryUrlString, summonerName);
     }
 
-    // TODO switchMap to the rescue?
     public LiveData<List<Mastery>> getMasteries(String entryUrlString, long summonerId) {
         Log.d(LOG_TAG, "Getting masteries");
 
-        final MutableLiveData<List<Mastery>> masteryMutableLiveData = new MutableLiveData<>();
+        LiveData<List<MasteryResponse>> masteryNetworkResponse =
+                mLeagueNetworkDataSource.fetchMasteries(entryUrlString, summonerId);
 
-        Call<List<MasteryResponse>> call = mService.getMasteries(RetrofitInstance.getMasteryUrl(entryUrlString, summonerId));
-
-        call.enqueue(new Callback<List<MasteryResponse>>() {
-
+        return Transformations.switchMap(masteryNetworkResponse, new Function<List<MasteryResponse>, LiveData<List<Mastery>>>() {
             @Override
-            public void onResponse(Call<List<MasteryResponse>> call, Response<List<MasteryResponse>> response) {
-                if (response.isSuccessful()) {
-                    final List<MasteryResponse> masteries = response.body();
-                    postMasteryValue(masteryMutableLiveData, masteries);
-                } else {
-                    Log.d(LOG_TAG, "call failed against the url: " + call.request().url());
-                    Log.d(LOG_TAG, "Mastery response not successful");
-                    masteryMutableLiveData.postValue(null);
-                }
-            }
+            public LiveData<List<Mastery>> apply(final List<MasteryResponse> masteryResponse) {
 
-            @Override
-            public void onFailure(Call<List<MasteryResponse>> call, Throwable t) {
-                Log.d(LOG_TAG, "call failed against the url: " + call.request().url());
-                Log.d(LOG_TAG, "Failed to fetch masteries");
-                Log.d(LOG_TAG, t.getMessage());
-                masteryMutableLiveData.postValue(null);
+                final MutableLiveData<List<Mastery>> masteries = new MutableLiveData<>();
 
-                // todo log to some central bug tracking service
-                if (t instanceof IOException) {
-                    Log.d(LOG_TAG, "this is an actual network failure :( inform the user and possibly retry");
-                    // logging probably not necessary
+                if (masteryResponse != null) {
+                    new AsyncTask<Void, Void, Void>() {
+                        @Override
+                        protected Void doInBackground(Void... voids) {
+                            final int[] championId = new int[masteryResponse.size()];
+                            for (int i = 0; i < masteryResponse.size(); i++) {
+                                championId[i] = masteryResponse.get(i).getChampionId();
+                            }
+
+                            List<ChampionEntry> championEntries = getChampionEntries(championId);
+
+                            List<Mastery> masteryList = new ArrayList<>();
+
+                            for (int i = 0; i < masteryResponse.size(); i++) {
+                                MasteryResponse response = masteryResponse.get(i);
+                                Mastery mastery = new Mastery(response, championEntries);
+                                masteryList.add(mastery);
+                            }
+
+                            masteries.postValue(masteryList);
+                            Log.d(LOG_TAG, "Masteries changed");
+                            return null;
+                        }
+                    }.execute();
                 } else {
-                    Log.d(LOG_TAG, "conversion issue! big problems :(");
+                    masteries.postValue(null);
                 }
+
+                return masteries;
             }
         });
-
-        return masteryMutableLiveData;
-    }
-
-    private void postMasteryValue(final MutableLiveData<List<Mastery>> masteryMutableLiveData, final List<MasteryResponse> masteryResponses) {
-
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... voids) {
-                final int[] championId = new int[masteryResponses.size()];
-                for (int i = 0; i < masteryResponses.size(); i++) {
-                    championId[i] = masteryResponses.get(i).getChampionId();
-                }
-
-                List<ChampionEntry> championEntries = getChampionEntries(championId);
-
-                List<Mastery> masteryList = new ArrayList<>();
-
-                for (int i = 0; i < masteryResponses.size(); i++) {
-                    MasteryResponse masteryResponse = masteryResponses.get(i);
-                    Mastery mastery = new Mastery(masteryResponse, championEntries);
-                    masteryList.add(mastery);
-                }
-
-                masteryMutableLiveData.postValue(masteryList);
-                Log.d(LOG_TAG, "Masteries changed");
-                return null;
-            }
-        }.execute();
     }
 
     public LiveData<List<Match>> getMatches(final String entryUrlString, long accountId, final long summonerId) {
         Log.d(LOG_TAG, "Getting matches");
 
-        final MutableLiveData<List<Match>> matchMutableLiveData = new MutableLiveData<>();
+        LiveData<List<MatchList>> matchList = mLeagueNetworkDataSource.fetchMatchList(entryUrlString, accountId);
 
-        Call<MatchListResponse> matchListCall = mService.getMatchList(RetrofitInstance.getMatchListUrl(entryUrlString, accountId));
-
-        matchListCall.enqueue(new Callback<MatchListResponse>() {
-
+        LiveData<List<MatchResponse>> matchResponse = Transformations.switchMap(matchList, new Function<List<MatchList>, LiveData<List<MatchResponse>>>() {
             @Override
-            public void onResponse(Call<MatchListResponse> call, Response<MatchListResponse> response) {
-
-                if (response.isSuccessful()) {
-
-                    MatchListResponse matchListResponse = response.body();
-
-                    List<MatchList> matchList = matchListResponse.getMatchList();
-
-                    getMatches(matchMutableLiveData, matchList, entryUrlString, summonerId);
-                } else {
-                    Log.d(LOG_TAG, "call failed against the url: " + call.request().url());
-                    Log.d(LOG_TAG, "matchList response not successful");
-                    matchMutableLiveData.postValue(null);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<MatchListResponse> call, Throwable t) {
-                Log.d(LOG_TAG, "call failed against the url: " + call.request().url());
-                Log.d(LOG_TAG, "Failed to fetch matchList");
-                Log.d(LOG_TAG, t.getMessage());
-                matchMutableLiveData.postValue(null);
+            public LiveData<List<MatchResponse>> apply(List<MatchList> matchList) {
+                return mLeagueNetworkDataSource.fetchMatches(entryUrlString, matchList, MATCH_COUNT);
             }
         });
 
-        return matchMutableLiveData;
-    }
-
-    private void getMatches(final MutableLiveData<List<Match>> matchMutableLiveData,
-                            final List<MatchList> matchList, final String entryUrlString,
-                            final long summonerId) {
-
-        new AsyncTask<Void, Void, Void>() {
+        return Transformations.switchMap(matchResponse, new Function<List<MatchResponse>, LiveData<List<Match>>>() {
             @Override
-            protected Void doInBackground(Void... voids) {
+            public LiveData<List<Match>> apply(final List<MatchResponse> matchResponseList) {
 
-                List<MatchResponse> matchResponseList = new ArrayList<>();
+                final MutableLiveData<List<Match>> matchMutableLiveData = new MutableLiveData<>();
 
-                for (int i = 0; i < MATCH_COUNT; i++) {
+                new AsyncTask<Void, Void, Void>() {
+                    @Override
+                    protected Void doInBackground(Void... voids) {
 
-                    Call<MatchResponse> call = mService.getMatch(RetrofitInstance.getMatchUrl(entryUrlString, matchList.get(i).getGameId()));
+                        List<Match> matchList = new ArrayList<>();
 
-                    try {
-                        Response<MatchResponse> response = call.execute();
-                        if (response.isSuccessful()) {
-                            MatchResponse matchResponse = response.body();
-                            matchResponseList.add(matchResponse);
-                            if (matchResponseList.size() == MATCH_COUNT) {
-                                // Get info from database and update liveData.
-                                setMatches(matchMutableLiveData, matchResponseList, summonerId);
+                        List<Integer> championIdList = getChampionIdList(matchResponseList);
+                        List<ChampionEntry> championEntries = getMatchListChampionEntry(championIdList);
+
+                        List<Integer> summonerSpell1IdList = getSummonerSpellIdList(matchResponseList, true);
+                        List<SummonerSpellEntry> summonerSpell1Entries = getMatchSummonerSpells(summonerSpell1IdList);
+
+                        List<Integer> summonerSpell2IdList = getSummonerSpellIdList(matchResponseList, false);
+                        List<SummonerSpellEntry> summonerSpell2Entries = getMatchSummonerSpells(summonerSpell2IdList);
+
+                        List<Integer> itemIdList = getItemIdList(matchResponseList);
+                        List<ItemEntry> itemEntries = getMatchListItemEntry(itemIdList);
+
+                        int index = 0;
+                        int itemIndex = 0;
+                        for (int i = 0; i < matchResponseList.size(); i++) {
+
+                            MatchResponse matchResponse = matchResponseList.get(i);
+
+                            int participantsSize = matchResponse.getParticipants().size();
+
+                            List<ChampionEntry> championEntryList = new ArrayList<>();
+                            List<SummonerSpellEntry> summonerSpellEntries = new ArrayList<>();
+                            List<SummonerSpellEntry> summonerSpell2List = new ArrayList<>();
+                            List<ItemEntry> itemEntryList = new ArrayList<>();
+
+                            for (int j = 0; j < participantsSize; j++) {
+
+                                championEntryList.add(championEntries.get(index));
+                                summonerSpellEntries.add(summonerSpell1Entries.get(index));
+                                summonerSpell2List.add(summonerSpell2Entries.get(index));
+
+                                index++;
                             }
-                        } else {
-                            Log.d(LOG_TAG, "Match response not successful");
-                            matchMutableLiveData.postValue(null);
+
+                            // There is always 7 items.
+                            for (int j = 0; j < 7 * participantsSize; j++) {
+
+                                itemEntryList.add(itemEntries.get(itemIndex));
+
+                                itemIndex++;
+                            }
+
+                            matchList.add(new Match(matchResponse, championEntryList, summonerSpellEntries,
+                                    summonerSpell2List, itemEntryList, summonerId));
                         }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        Log.d(LOG_TAG, "Failed to fetch match");
-                        Log.d(LOG_TAG, e.getMessage());
-                        matchMutableLiveData.postValue(null);
-                    }
-                }
 
-                return null;
+                        matchMutableLiveData.postValue(matchList);
+                        Log.d(LOG_TAG, "Matches changed");
+                        return null;
+                    }
+                }.execute();
+
+                return matchMutableLiveData;
             }
-        }.execute();
-
-        /*
-        final List<MatchResponse> matchResponseList = new ArrayList<>();
-
-        for (int i = 0; i < MATCH_COUNT; i++) {
-
-            Call<MatchResponse> call = mService.getMatch(RetrofitInstance.getMatchUrl(entryUrlString, matchList.get(i).getGameId()));
-
-            call.enqueue(new Callback<MatchResponse>() {
-                @Override
-                public void onResponse(Call<MatchResponse> call, Response<MatchResponse> response) {
-
-                    if (response.isSuccessful()) {
-                        matchResponseList.add(response.body());
-                        if (matchResponseList.size() == MATCH_COUNT) {
-                            setMatches(matchMutableLiveData, matchResponseList, summonerId);
-                        }
-                    } else {
-                        Log.d(LOG_TAG, "call failed against the url: " + call.request().url());
-                        Log.d(LOG_TAG, "match response not successful");
-                        matchMutableLiveData.postValue(null);
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<MatchResponse> call, Throwable t) {
-                    Log.d(LOG_TAG, "call failed against the url: " + call.request().url());
-                    Log.d(LOG_TAG, "Failed to fetch match");
-                    Log.d(LOG_TAG, t.getMessage());
-                    matchMutableLiveData.postValue(null);
-                }
-            });
-        }
-        */
-    }
-
-    private void setMatches(final MutableLiveData<List<Match>> matchMutableLiveData, final List<MatchResponse> matchResponseList, final long summonerId) {
-
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... voids) {
-
-                List<Match> matchList = new ArrayList<>();
-
-                List<Integer> championIdList = getChampionIdList(matchResponseList);
-                List<ChampionEntry> championEntries = getMatchListChampionEntry(championIdList);
-
-                List<Integer> summonerSpell1IdList = getSummonerSpellIdList(matchResponseList, true);
-                List<SummonerSpellEntry> summonerSpell1Entries = getMatchSummonerSpells(summonerSpell1IdList);
-
-                List<Integer> summonerSpell2IdList = getSummonerSpellIdList(matchResponseList, false);
-                List<SummonerSpellEntry> summonerSpell2Entries = getMatchSummonerSpells(summonerSpell2IdList);
-
-                List<Integer> itemIdList = getItemIdList(matchResponseList);
-                List<ItemEntry> itemEntries = getMatchListItemEntry(itemIdList);
-
-                int count = 0;
-                int itemCount = 0;
-                for (int i = 0; i < matchResponseList.size(); i++) {
-
-                    MatchResponse matchResponse = matchResponseList.get(i);
-
-                    int participantsSize = matchResponse.getParticipants().size();
-
-                    List<ChampionEntry> championEntryList = new ArrayList<>();
-                    List<SummonerSpellEntry> summonerSpellEntries = new ArrayList<>();
-                    List<SummonerSpellEntry> summonerSpell2List = new ArrayList<>();
-                    List<ItemEntry> itemEntryList = new ArrayList<>();
-
-                    for (int j = 0; j < participantsSize; j++) {
-
-                        championEntryList.add(championEntries.get(count));
-                        summonerSpellEntries.add(summonerSpell1Entries.get(count));
-                        summonerSpell2List.add(summonerSpell2Entries.get(count));
-
-                        count++;
-                    }
-
-                    // There is always 7 items.
-                    for (int j = 0; j < 7 * participantsSize; j++) {
-
-                        itemEntryList.add(itemEntries.get(itemCount));
-
-                        itemCount++;
-                    }
-
-                    matchList.add(new Match(matchResponse, championEntryList, summonerSpellEntries,
-                            summonerSpell2List, itemEntryList, summonerId));
-                }
-
-                matchMutableLiveData.postValue(matchList);
-                Log.d(LOG_TAG, "Matches changed");
-                return null;
-            }
-        }.execute();
+        });
     }
 
     private List<Integer> getChampionIdList(List<MatchResponse> matchResponseArray) {
