@@ -73,7 +73,7 @@ public class SplashArtAdapter extends RecyclerView.Adapter<SplashArtAdapter.Spla
         return mSplashArt.size();
     }
 
-    static class SplashArtViewHolder extends RecyclerView.ViewHolder {
+    class SplashArtViewHolder extends RecyclerView.ViewHolder {
         TextView mSplashArtNameTv;
         Target mTarget;
 

@@ -2,7 +2,6 @@ package com.example.android.leaguestats.ui;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -14,39 +13,37 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import com.example.android.leaguestats.R;
 import com.example.android.leaguestats.adapters.ItemAdapter;
-import com.example.android.leaguestats.data.database.models.ListItemEntry;
+import com.example.android.leaguestats.data.database.entity.ItemEntry;
 import com.example.android.leaguestats.interfaces.IdClickListener;
 import com.example.android.leaguestats.utilities.InjectorUtils;
 import com.example.android.leaguestats.utilities.LeaguePreferences;
-import com.example.android.leaguestats.viewmodels.ItemListModel;
-import com.example.android.leaguestats.viewmodels.ItemListModelFactory;
+import com.example.android.leaguestats.viewmodels.ItemModel;
+import com.example.android.leaguestats.viewmodels.ItemModelFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ItemListFragment extends Fragment implements IdClickListener {
 
-    public interface OnItemListSelected {
-        void onItemSelected(long id);
-    }
-
     private static final String LOG_TAG = ItemListFragment.class.getSimpleName();
-    private OnItemListSelected mCallback;
     private ItemAdapter mAdapter;
     private RecyclerView mRecyclerView;
-    private ItemListModel mViewModel;
+    private ItemModel mViewModel;
+    private ProgressBar mIndicator;
 
-    public ItemListFragment() {}
+    public ItemListFragment() {
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Log.d(LOG_TAG, "onCreateView");
-        View rootView = inflater.inflate(R.layout.fragment_item_list, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_list, container, false);
 
-        mRecyclerView = rootView.findViewById(R.id.item_recycler_view);
+        mRecyclerView = rootView.findViewById(R.id.recycler_view);
+        mIndicator = rootView.findViewById(R.id.indicator);
 
         return rootView;
     }
@@ -54,7 +51,6 @@ public class ItemListFragment extends Fragment implements IdClickListener {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Log.d(LOG_TAG, "onActivityCreated");
 
         int gridLayoutColumnCount;
         if (getContext().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -68,46 +64,29 @@ public class ItemListFragment extends Fragment implements IdClickListener {
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
         String patchVersion = LeaguePreferences.getPatchVersion(getContext());
-        mAdapter = new ItemAdapter(getContext(), new ArrayList<ListItemEntry>(), ItemListFragment.this, patchVersion);
+        mAdapter = new ItemAdapter(getContext(), new ArrayList<ItemEntry>(), ItemListFragment.this, patchVersion);
         mRecyclerView.setAdapter(mAdapter);
-
 
         setupViewModel();
     }
 
     private void setupViewModel() {
-        ItemListModelFactory factory =
-                InjectorUtils.provideItemListModelFactory(getActivity().getApplicationContext());
-        mViewModel = ViewModelProviders.of(this, factory).get(ItemListModel.class);
-        mViewModel.getItems().observe(this, new Observer<List<ListItemEntry>>() {
+        ItemModelFactory factory =
+                InjectorUtils.provideItemModelFactory(getActivity().getApplicationContext());
+        mViewModel = ViewModelProviders.of(getActivity(), factory).get(ItemModel.class);
+        mViewModel.getItems().observe(getActivity(), new Observer<List<ItemEntry>>() {
             @Override
-            public void onChanged(@Nullable List<ListItemEntry> listItemEntries) {
+            public void onChanged(@Nullable List<ItemEntry> listItemEntries) {
                 Log.d(LOG_TAG, "Receiving database update from LiveData");
                 mAdapter.setData(listItemEntries);
+                mIndicator.setVisibility(View.INVISIBLE);
             }
         });
     }
 
     @Override
-    public void onClickListener(long id) {
-        mCallback.onItemSelected(id);
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-
-        try {
-            mCallback = (OnItemListSelected) context;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(context.toString() + " must implement OnItemListSelected");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mCallback = null;
-        mRecyclerView.setAdapter(null);
+    public void onClickListener(int id) {
+        MasterFragment masterFragment = (MasterFragment) getParentFragment();
+        masterFragment.addItemDetailFragment(id);
     }
 }

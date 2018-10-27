@@ -1,134 +1,78 @@
 package com.example.android.leaguestats.ui;
 
-import android.app.SearchManager;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.SearchView;
-import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.Spinner;
 
 import com.example.android.leaguestats.R;
-import com.example.android.leaguestats.utilities.DataUtils;
+import com.example.android.leaguestats.adapters.MainPagerAdapter;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity
+        implements SummonerSearchFragment.OnSummonerListener,
+        ChampionListFragment.OnChampionSelected, MasterFragment.OnFragmentAdded {
 
-    private Button mChampionListButton;
-    private Button mSummonerButton;
-    private Button mItemsButton;
-    private Button mSummonerSpellButton;
-    private String mEntryUrlString;
+    private FragmentManager mFragmentManager;
+    private ViewPager mViewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        initViews();
+        mFragmentManager = getSupportFragmentManager();
+
+        setupViewPager();
     }
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.champion_list_button:
-                showChampions();
-                break;
-            case R.id.summoner_button:
-                showSummoner();
-                break;
-            case R.id.item_button:
-                showItems();
-                break;
-            case R.id.summoner_spell_button:
-                showSummonerSpells();
-                break;
-        }
-    }
+    private void setupViewPager() {
 
-    private void showChampions() {
-        Intent intent = new Intent(MainActivity.this, ChampionListActivity.class);
-        startActivity(intent);
-    }
+        mViewPager = findViewById(R.id.main_view_pager);
 
-    private void showSummoner() {
-        Intent intent = new Intent(MainActivity.this, SummonerActivity.class);
-        startActivity(intent);
-    }
+        MainPagerAdapter mainPagerAdapter =
+                new MainPagerAdapter(this, mFragmentManager);
 
-    private void showItems() {
-        Intent intent = new Intent(MainActivity.this, ItemListActivity.class);
-        startActivity(intent);
-    }
+        mViewPager.setAdapter(mainPagerAdapter);
 
-    private void showSummonerSpells() {
-        Intent intent = new Intent(MainActivity.this, SummonerSpellActivity.class);
-        startActivity(intent);
+        TabLayout tabLayout = findViewById(R.id.main_tab);
+        tabLayout.setupWithViewPager(mViewPager);
+
+        // TODO clearOnPageChangeListeners()?
+        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float v, int i1) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                Fragment fragment = getCurrentFragment();
+                if (fragment != null) {
+                    boolean canBack = fragment.getChildFragmentManager().getBackStackEntryCount() > 0;
+                    getSupportActionBar().setDisplayHomeAsUpEnabled(canBack);
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.search_summoner_menu, menu);
-
-        setupMenuSpinner(menu);
-        setupSearchView(menu);
+        inflater.inflate(R.menu.main_menu, menu);
 
         return true;
-    }
-
-    private void setupMenuSpinner(Menu menu) {
-        Spinner spinner = (Spinner) menu.findItem(R.id.action_region).getActionView();
-
-        ArrayAdapter regionSpinnerAdapter = ArrayAdapter.createFromResource(this,
-                R.array.string_region_array, android.R.layout.simple_spinner_item);
-
-        regionSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
-
-        spinner.setAdapter(regionSpinnerAdapter);
-
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String selection = (String) parent.getItemAtPosition(position);
-                if (!TextUtils.isEmpty(selection)) {
-                    mEntryUrlString = DataUtils.ENTRY_URL_SUMMONER_ARRAY[position];
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-    }
-
-    private void setupSearchView(Menu menu) {
-        SearchManager searchManager =
-                (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        final SearchView searchView =
-                (SearchView) menu.findItem(R.id.search_summoner).getActionView();
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, SummonerActivity.class)));
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                searchView.setQuery(mEntryUrlString, false);
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String s) {
-                return false;
-            }
-        });
     }
 
     @Override
@@ -140,20 +84,54 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.action_settings:
                 startActivity(new Intent(this, SettingsActivity.class));
                 return true;
+            case android.R.id.home:
+                onBackPressed();
+                onMasterBackStackChanged();
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    private void initViews() {
-        mChampionListButton = findViewById(R.id.champion_list_button);
-        mSummonerButton = findViewById(R.id.summoner_button);
-        mItemsButton = findViewById(R.id.item_button);
-        mSummonerSpellButton = findViewById(R.id.summoner_spell_button);
+    @Override
+    public void onSummonerSearch(String entryUrlString, String summonerName) {
+        Intent intent = new Intent(this, SummonerActivity.class)
+                .setAction(SummonerActivity.ACTION_SEARCH_SUMMONER)
+                .putExtra(SummonerActivity.ENTRY_URL_STRING_KEY, entryUrlString)
+                .putExtra(SummonerActivity.SUMMONER_NAME_KEY, summonerName);
+        startActivity(intent);
+    }
 
-        mChampionListButton.setOnClickListener(this);
-        mSummonerButton.setOnClickListener(this);
-        mItemsButton.setOnClickListener(this);
-        mSummonerSpellButton.setOnClickListener(this);
+    @Override
+    public void onChampionSelected(int id) {
+        Intent intent = new Intent(this, ChampionActivity.class);
+        intent.putExtra(ChampionActivity.CHAMPION_ID_KEY, id);
+        startActivity(intent);
+    }
+
+    @Override
+    public void onMasterBackStackChanged() {
+        Fragment fragment = getCurrentFragment();
+        boolean canBack = fragment.getChildFragmentManager().getBackStackEntryCount() > 0;
+        getSupportActionBar().setDisplayHomeAsUpEnabled(canBack);
+        Log.d("MainActivity", "true");
+    }
+
+    @Override
+    public void onBackPressed() {
+        Fragment fragment = getCurrentFragment();
+        if (fragment != null) {
+            if (fragment.getView() != null) {
+                // Pop the backstack on the ChildManager if there is any. If not, close this activity as normal.
+                if (!fragment.getChildFragmentManager().popBackStackImmediate()) {
+                    finish();
+                }
+            }
+        }
+    }
+
+    private Fragment getCurrentFragment() {
+        MainPagerAdapter mainPagerAdapter = (MainPagerAdapter) mViewPager.getAdapter();
+        return mainPagerAdapter.getFragment(mViewPager.getCurrentItem());
     }
 }

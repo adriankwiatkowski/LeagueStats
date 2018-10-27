@@ -4,10 +4,8 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
 import android.os.AsyncTask;
-import android.text.TextUtils;
 import android.util.Log;
 
-import com.example.android.leaguestats.AppExecutors;
 import com.example.android.leaguestats.data.network.api.models.MasteryResponse;
 import com.example.android.leaguestats.data.network.api.models.MatchListResponse;
 import com.example.android.leaguestats.data.network.api.RetrofitDataService;
@@ -19,9 +17,6 @@ import com.example.android.leaguestats.data.database.entity.ChampionEntry;
 import com.example.android.leaguestats.data.database.entity.IconEntry;
 import com.example.android.leaguestats.data.database.entity.ItemEntry;
 import com.example.android.leaguestats.data.database.entity.SummonerSpellEntry;
-import com.example.android.leaguestats.data.database.models.ListChampionEntry;
-import com.example.android.leaguestats.data.database.models.ListItemEntry;
-import com.example.android.leaguestats.data.database.models.ListSummonerSpellEntry;
 import com.example.android.leaguestats.data.network.LeagueNetworkDataSource;
 import com.example.android.leaguestats.models.Mastery;
 import com.example.android.leaguestats.models.Match;
@@ -45,61 +40,60 @@ public class LeagueRepository {
 
     private static final String LOG_TAG = LeagueRepository.class.getSimpleName();
 
-    private static final int MATCH_COUNT = 20;
+    private static final int MATCH_COUNT = 10;
 
     // For Singleton instantiation
     private static final Object LOCK = new Object();
     private static LeagueRepository sInstance;
     private LeagueDatabase mDb;
     private final LeagueNetworkDataSource mLeagueNetworkDataSource;
-    private final AppExecutors mExecutors;
     private boolean mInitialized = false;
 
     private RetrofitDataService mService;
 
-    private LeagueRepository(LeagueDatabase leagueDatabase,
+    private LeagueRepository(Context context, LeagueDatabase leagueDatabase,
                              LeagueNetworkDataSource leagueNetworkDataSource,
-                             AppExecutors executors, Retrofit retrofit) {
+                             Retrofit retrofit) {
         mService = retrofit.create(RetrofitDataService.class);
         mDb = leagueDatabase;
         mLeagueNetworkDataSource = leagueNetworkDataSource;
-        mExecutors = executors;
-        initializeData();
+        initializeData(context.getApplicationContext());
     }
 
-    public synchronized static LeagueRepository getInstance(LeagueDatabase leagueDatabase,
+    public synchronized static LeagueRepository getInstance(Context context, LeagueDatabase leagueDatabase,
                                                             LeagueNetworkDataSource leagueNetworkDataSource,
-                                                            AppExecutors executors,
                                                             Retrofit retrofit) {
         Log.d(LOG_TAG, "Getting the repository");
         if (sInstance == null) {
             synchronized (LOCK) {
-                sInstance = new LeagueRepository(leagueDatabase, leagueNetworkDataSource, executors, retrofit);
+                sInstance = new LeagueRepository(context.getApplicationContext(), leagueDatabase, leagueNetworkDataSource, retrofit);
                 Log.d(LOG_TAG, "Made new repository");
             }
         }
         return sInstance;
     }
 
-    private synchronized void initializeData() {
+    private synchronized void initializeData(final Context context) {
         if (mInitialized) return;
         Log.d(LOG_TAG, "Initializing data");
         mInitialized = true;
-
-        mLeagueNetworkDataSource.scheduleRecurringFetchDataSync();
-
-        startFetchDataService(false);
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                int championCount = mDb.championDao().countAllChampions();
+                int itemCount = mDb.itemDao().countAllItems();
+                int summonerSpellCount = mDb.summonerSpellDao().countAllSummonerSpells();
+                int iconCount = mDb.iconDao().countAllIcons();
+                if (championCount <= 0 || itemCount <= 0 || summonerSpellCount <= 0 || iconCount <= 0) {
+                  mLeagueNetworkDataSource.initializeData(context, true);
+                }
+                return null;
+            }
+        }.execute();
     }
 
-    public void fetchData(Context context, boolean fetchDataImmediately) {
+    public void fetchData(Context context) {
         Log.d(LOG_TAG, "Fetch data started");
-
-        if (!fetchDataImmediately) {
-            if (!isFetchNeeded(context)) {
-                Log.d(LOG_TAG, "Fetch no needed");
-                return;
-            }
-        }
 
         String patchVersion = LeaguePreferences.getPatchVersion(context);
         String language = LeaguePreferences.getLanguage(context);
@@ -109,41 +103,6 @@ public class LeagueRepository {
         fetchItemData(patchVersion, language, openDataJsonParser);
         fetchSummonerSpellData(patchVersion, language, openDataJsonParser);
         fetchIconData(patchVersion, language, openDataJsonParser);
-    }
-
-    private boolean isFetchNeeded(Context context) {
-        OpenDataJsonParser openDataJsonParser = new OpenDataJsonParser();
-
-        boolean isFetchNeeded = false;
-
-        Call<JsonElement> call = mService.getPatchVersion();
-
-        try {
-
-            Response<JsonElement> response = call.execute();
-
-            if (response.isSuccessful()) {
-
-                String jsonString = response.body().toString();
-                String responsePatch = openDataJsonParser.parsePatchResponse(jsonString);
-                String savedPatchVersion = LeaguePreferences.getPatchVersion(context);
-
-                if (!TextUtils.isEmpty(responsePatch)) {
-                    if (!responsePatch.equals(savedPatchVersion)) {
-                        LeaguePreferences.savePatchVersion(context, responsePatch);
-                        isFetchNeeded = true;
-                    }
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return isFetchNeeded;
-    }
-
-    public void startFetchDataService(boolean fetchDataImmediately) {
-        mLeagueNetworkDataSource.startFetchDataService(fetchDataImmediately);
     }
 
     private void fetchChampionData(final String patchVersion, final String language, final OpenDataJsonParser openDataJsonParser) {
@@ -262,6 +221,7 @@ public class LeagueRepository {
         return summonerMutableLiveData;
     }
 
+    // TODO switchMap to the rescue?
     public LiveData<List<Mastery>> getMasteries(String entryUrlString, long summonerId) {
         Log.d(LOG_TAG, "Getting masteries");
 
@@ -305,16 +265,15 @@ public class LeagueRepository {
 
     private void postMasteryValue(final MutableLiveData<List<Mastery>> masteryMutableLiveData, final List<MasteryResponse> masteryResponses) {
 
-        mExecutors.diskIO().execute(new Runnable() {
+        new AsyncTask<Void, Void, Void>() {
             @Override
-            public void run() {
-
+            protected Void doInBackground(Void... voids) {
                 final int[] championId = new int[masteryResponses.size()];
                 for (int i = 0; i < masteryResponses.size(); i++) {
                     championId[i] = masteryResponses.get(i).getChampionId();
                 }
 
-                List<ListChampionEntry> championEntries = getListChampionEntry(championId);
+                List<ChampionEntry> championEntries = getChampionEntries(championId);
 
                 List<Mastery> masteryList = new ArrayList<>();
 
@@ -326,8 +285,9 @@ public class LeagueRepository {
 
                 masteryMutableLiveData.postValue(masteryList);
                 Log.d(LOG_TAG, "Masteries changed");
+                return null;
             }
-        });
+        }.execute();
     }
 
     public LiveData<List<Match>> getMatches(final String entryUrlString, long accountId, final long summonerId) {
@@ -348,7 +308,7 @@ public class LeagueRepository {
 
                     List<MatchList> matchList = matchListResponse.getMatchList();
 
-                        getMatches(matchMutableLiveData, matchList, entryUrlString, summonerId);
+                    getMatches(matchMutableLiveData, matchList, entryUrlString, summonerId);
                 } else {
                     Log.d(LOG_TAG, "call failed against the url: " + call.request().url());
                     Log.d(LOG_TAG, "matchList response not successful");
@@ -444,42 +404,41 @@ public class LeagueRepository {
 
     private void setMatches(final MutableLiveData<List<Match>> matchMutableLiveData, final List<MatchResponse> matchResponseList, final long summonerId) {
 
-        mExecutors.diskIO().execute(new Runnable() {
+        new AsyncTask<Void, Void, Void>() {
             @Override
-            public void run() {
+            protected Void doInBackground(Void... voids) {
 
                 List<Match> matchList = new ArrayList<>();
 
                 List<Integer> championIdList = getChampionIdList(matchResponseList);
-                List<ListChampionEntry> championEntries = getMatchListChampionEntry(championIdList);
+                List<ChampionEntry> championEntries = getMatchListChampionEntry(championIdList);
 
                 List<Integer> summonerSpell1IdList = getSummonerSpellIdList(matchResponseList, true);
-                List<ListSummonerSpellEntry> summonerSpell1Entries = getMatchListSummonerSpell(summonerSpell1IdList);
+                List<SummonerSpellEntry> summonerSpell1Entries = getMatchSummonerSpells(summonerSpell1IdList);
 
                 List<Integer> summonerSpell2IdList = getSummonerSpellIdList(matchResponseList, false);
-                List<ListSummonerSpellEntry> summonerSpell2Entries = getMatchListSummonerSpell(summonerSpell2IdList);
+                List<SummonerSpellEntry> summonerSpell2Entries = getMatchSummonerSpells(summonerSpell2IdList);
 
                 List<Integer> itemIdList = getItemIdList(matchResponseList);
-                List<ListItemEntry> itemEntries = getMatchListItemEntry(itemIdList);
+                List<ItemEntry> itemEntries = getMatchListItemEntry(itemIdList);
 
                 int count = 0;
                 int itemCount = 0;
                 for (int i = 0; i < matchResponseList.size(); i++) {
 
-
                     MatchResponse matchResponse = matchResponseList.get(i);
 
                     int participantsSize = matchResponse.getParticipants().size();
 
-                    List<ListChampionEntry> championEntryList = new ArrayList<>();
-                    List<ListSummonerSpellEntry> summonerSpell1List = new ArrayList<>();
-                    List<ListSummonerSpellEntry> summonerSpell2List = new ArrayList<>();
-                    List<ListItemEntry> itemEntryList = new ArrayList<>();
+                    List<ChampionEntry> championEntryList = new ArrayList<>();
+                    List<SummonerSpellEntry> summonerSpellEntries = new ArrayList<>();
+                    List<SummonerSpellEntry> summonerSpell2List = new ArrayList<>();
+                    List<ItemEntry> itemEntryList = new ArrayList<>();
 
                     for (int j = 0; j < participantsSize; j++) {
 
                         championEntryList.add(championEntries.get(count));
-                        summonerSpell1List.add(summonerSpell1Entries.get(count));
+                        summonerSpellEntries.add(summonerSpell1Entries.get(count));
                         summonerSpell2List.add(summonerSpell2Entries.get(count));
 
                         count++;
@@ -493,14 +452,15 @@ public class LeagueRepository {
                         itemCount++;
                     }
 
-                    matchList.add(new Match(matchResponse, championEntryList, summonerSpell1List,
+                    matchList.add(new Match(matchResponse, championEntryList, summonerSpellEntries,
                             summonerSpell2List, itemEntryList, summonerId));
                 }
 
                 matchMutableLiveData.postValue(matchList);
                 Log.d(LOG_TAG, "Matches changed");
+                return null;
             }
-        });
+        }.execute();
     }
 
     private List<Integer> getChampionIdList(List<MatchResponse> matchResponseArray) {
@@ -555,90 +515,67 @@ public class LeagueRepository {
         return itemIdList;
     }
 
-    private List<ListChampionEntry> getMatchListChampionEntry(List<Integer> championIdList) {
+    private List<ChampionEntry> getMatchListChampionEntry(List<Integer> championIdList) {
 
         int[] id = getIdArrayWithNoDuplicate(championIdList);
 
-        List<ListChampionEntry> championEntries = getListChampionEntry(id);
+        List<ChampionEntry> championEntries = getChampionEntries(id);
 
-        List<ListChampionEntry> championList = new ArrayList<>();
+        List<ChampionEntry> championList = new ArrayList<>();
 
         for (int i = 0; i < championIdList.size(); i++) {
-            int championId = 0;
-            String championKey = "";
-            String championName = "";
-            String championTitle = "";
-            String championThumbnail = "";
-
             // Find champion for given id.
             for (int j = 0; j < championEntries.size(); j++) {
                 if (championIdList.get(i) == championEntries.get(j).getId()) {
-                    championId = championEntries.get(j).getId();
-                    championKey = championEntries.get(j).getKey();
-                    championName = championEntries.get(j).getName();
-                    championTitle = championEntries.get(j).getTitle();
-                    championThumbnail = championEntries.get(j).getImage();
+                    championList.add(championEntries.get(j));
                 }
             }
-            championList.add(new ListChampionEntry(championId, championKey,
-                    championName, championTitle, championThumbnail));
         }
         return championList;
     }
 
-    private List<ListSummonerSpellEntry> getMatchListSummonerSpell(List<Integer> summonerSpellIdList) {
+    private List<SummonerSpellEntry> getMatchSummonerSpells(List<Integer> summonerSpellIdList) {
 
         int[] id = getIdArrayWithNoDuplicate(summonerSpellIdList);
 
-        List<ListSummonerSpellEntry> summonerSpellEntries = getSummonerSpells(id);
+        List<SummonerSpellEntry> summonerSpellEntries = getSummonerSpells(id);
 
-        List<ListSummonerSpellEntry> summonerSpellList = new ArrayList<>();
+        List<SummonerSpellEntry> summonerSpellList = new ArrayList<>();
 
         for (int i = 0; i < summonerSpellIdList.size(); i++) {
-            int spellId = 0;
-            String spellKey = "";
-            String spellName = "";
-            int spellCooldown = 0;
-            String spellImage = "";
-
             for (int j = 0; j < summonerSpellEntries.size(); j++) {
                 if (summonerSpellIdList.get(i) == summonerSpellEntries.get(j).getId()) {
-                    spellId = summonerSpellEntries.get(j).getId();
-                    spellKey = summonerSpellEntries.get(j).getKey();
-                    spellName = summonerSpellEntries.get(j).getName();
-                    spellCooldown = summonerSpellEntries.get(j).getCooldown();
-                    spellImage = summonerSpellEntries.get(j).getImage();
+                    summonerSpellList.add(summonerSpellEntries.get(j));
                 }
             }
-            summonerSpellList.add(new ListSummonerSpellEntry(spellId, spellKey, spellName, spellCooldown, spellImage));
         }
+
         return summonerSpellList;
     }
 
-    private List<ListItemEntry> getMatchListItemEntry(List<Integer> matchItemIdList) {
+    private List<ItemEntry> getMatchListItemEntry(List<Integer> matchItemIdList) {
 
         int[] id = getIdArrayWithNoDuplicate(matchItemIdList);
 
-        List<ListItemEntry> itemEntries = getListItemEntry(id);
+        List<ItemEntry> itemEntries = getItemEntries(id);
 
-        List<ListItemEntry> itemList = new ArrayList<>();
+        List<ItemEntry> itemList = new ArrayList<>();
 
         for (int i = 0; i < matchItemIdList.size(); i++) {
-            int itemId = 0;
-            String itemName = "";
-            String itemImage = "";
-            int totalGold = 0;
-
+            // Need to check if item doesnt exist in database e.g. null item.
+            boolean isAdded = false;
             for (int j = 0; j < itemEntries.size(); j++) {
                 if (matchItemIdList.get(i) == itemEntries.get(j).getId()) {
-                    itemId = itemEntries.get(j).getId();
-                    itemName = itemEntries.get(j).getName();
-                    itemImage = itemEntries.get(j).getImage();
-                    totalGold = itemEntries.get(j).getTotalGold();
+                    itemList.add(itemEntries.get(j));
+                    isAdded = true;
                 }
             }
-            itemList.add(new ListItemEntry(itemId, itemName, itemImage, totalGold));
+            if (!isAdded) {
+                itemList.add(new ItemEntry(0, "", "", "", 0, "", null, null, 0, 0, 0, "", 0, 0, 0,
+                        0, 0, 0, 0, 0, 0, 0, 0, 0));
+            }
         }
+
         return itemList;
     }
 
@@ -661,7 +598,7 @@ public class LeagueRepository {
         return idArray;
     }
 
-    public LiveData<List<ListChampionEntry>> getListChampionEntry() {
+    public LiveData<List<ChampionEntry>> getChampionEntries() {
         return mDb.championDao().getChampionList();
     }
 
@@ -673,11 +610,11 @@ public class LeagueRepository {
         return mDb.championDao().getChampion(name);
     }
 
-    public List<ListChampionEntry> getListChampionEntry(int[] id) {
+    public List<ChampionEntry> getChampionEntries(int[] id) {
         return mDb.championDao().getChampionList(id);
     }
 
-    public LiveData<List<ListItemEntry>> getListItemEntry() {
+    public LiveData<List<ItemEntry>> getItemEntries() {
         return mDb.itemDao().loadListItem();
     }
 
@@ -689,23 +626,23 @@ public class LeagueRepository {
         return mDb.itemDao().loadItem(name);
     }
 
-    public LiveData<List<ListItemEntry>> getListItemEntry(String[] id) {
+    public LiveData<List<ItemEntry>> getItemEntries(String[] id) {
         return mDb.itemDao().loadItemsWithId(id);
     }
 
-    public List<ListItemEntry> getListItemEntry(int[] id) {
+    public List<ItemEntry> getItemEntries(int[] id) {
         return mDb.itemDao().loadItemsWithId(id);
     }
 
-    public LiveData<List<ListSummonerSpellEntry>> getSummonerSpells() {
+    public LiveData<List<SummonerSpellEntry>> getSummonerSpells() {
         return mDb.summonerSpellDao().loadSpellList();
     }
 
-    public LiveData<SummonerSpellEntry> getSummonerSpell(int id) {
+    public LiveData<SummonerSpellEntry> getSummonerSpell(long id) {
         return mDb.summonerSpellDao().loadSpellById(id);
     }
 
-    public List<ListSummonerSpellEntry> getSummonerSpells(int[] id) {
+    public List<SummonerSpellEntry> getSummonerSpells(int[] id) {
         return mDb.summonerSpellDao().loadSpellsWithId(id);
     }
 }

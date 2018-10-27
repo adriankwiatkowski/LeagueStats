@@ -17,10 +17,4 @@
         app:showAsAction="always"
         app:actionViewClass="android.support.v7.widget.AppCompatSpinner" />
 
-    <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="3"
-        android:title="@string/action_settings"
-        app:showAsAction="never" />
-
 </menu>

@@ -11,7 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.android.leaguestats.R;
-import com.example.android.leaguestats.data.database.models.ListItemEntry;
+import com.example.android.leaguestats.data.database.entity.ItemEntry;
 import com.example.android.leaguestats.interfaces.IdClickListener;
 import com.example.android.leaguestats.utilities.PicassoUtils;
 
@@ -20,12 +20,12 @@ import java.util.List;
 public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder> {
 
     private Context mContext;
-    private List<ListItemEntry> mList;
+    private List<ItemEntry> mList;
     private IdClickListener mListener;
     private final String PATCH_VERSION;
     private long mLastClickTime = 0;
 
-    public ItemAdapter(Context context, List<ListItemEntry> list, IdClickListener listener, String patchVersion) {
+    public ItemAdapter(Context context, List<ItemEntry> list, IdClickListener listener, String patchVersion) {
         mContext = context;
         mList = list;
         mListener = listener;
@@ -51,7 +51,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
                 R.dimen.item_thumbnail_width, R.dimen.item_thumbnail_height);
     }
 
-    public void add(ListItemEntry itemEntry) {
+    public void add(ItemEntry itemEntry) {
         mList.add(itemEntry);
         notifyDataSetChanged();
     }
@@ -61,7 +61,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
         notifyDataSetChanged();
     }
 
-    public void setData(List<ListItemEntry> list) {
+    public void setData(List<ItemEntry> list) {
         clear();
         mList.addAll(list);
         notifyDataSetChanged();
@@ -72,7 +72,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
         return mList.size();
     }
 
-    public class ItemViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    class ItemViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView mNameTv;
         TextView mCostTv;
         ImageView mImage;

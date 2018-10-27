@@ -12,9 +12,6 @@ public class LeagueSyncIntentService extends IntentService {
 
     private static final String LOG_TAG = LeagueSyncIntentService.class.getSimpleName();
 
-    public static final String ACTION_FETCH_DATA = "action-fetch-data";
-    public static final String ACTION_FETCH_DATA_IMMEDIATELY = "action-fetch-data-immediately";
-
     public LeagueSyncIntentService() {
         super("LeagueSyncIntentService");
     }
@@ -22,29 +19,7 @@ public class LeagueSyncIntentService extends IntentService {
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
         Log.d(LOG_TAG, "Intent service started");
-
-        String action;
-        if (intent != null) {
-            action = intent.getAction();
-        } else throw new NullPointerException("Intent action can't be null");
-
-        LeagueRepository repository =
-                InjectorUtils.provideRepository(this.getApplicationContext());
-
-        switch (action) {
-            case ACTION_FETCH_DATA:
-                repository.fetchData(this, false);
-                break;
-            case ACTION_FETCH_DATA_IMMEDIATELY:
-                repository.fetchData(this, true);
-                break;
-            default:
-                try {
-                    throw new Exception("Unknown action " + action);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                break;
-        }
+        LeagueRepository repository = InjectorUtils.provideRepository(getApplicationContext());
+        repository.fetchData(getApplicationContext());
     }
 }

@@ -16,7 +16,6 @@
     <TextView
         android:id="@+id/summoner_spell_detail_name"
         style="@style/LabelText"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/summoner_spell_detail_image"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Cleanse" />
@@ -25,7 +24,7 @@
         android:id="@+id/summoner_spell_detail_description"
         style="@style/BoldText"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/summoner_spell_detail_name"
+        app:layout_constraintStart_toEndOf="@+id/summoner_spell_detail_image"
         app:layout_constraintTop_toBottomOf="@+id/summoner_spell_detail_name"
         tools:text="Makes you cleaner." />
 
@@ -33,7 +32,7 @@
         android:id="@+id/summoner_spell_detail_cooldown"
         style="@style/BoldText"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/summoner_spell_detail_description"
+        app:layout_constraintStart_toEndOf="@+id/summoner_spell_detail_image"
         app:layout_constraintTop_toBottomOf="@+id/summoner_spell_detail_description"
         tools:text="25325" />
 </android.support.constraint.ConstraintLayout>

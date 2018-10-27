@@ -22,6 +22,6 @@ public class SettingsActivity extends AppCompatActivity {
             onBackPressed();
             return true;
         }
-         return super.onOptionsItemSelected(item);
+        return super.onOptionsItemSelected(item);
     }
 }

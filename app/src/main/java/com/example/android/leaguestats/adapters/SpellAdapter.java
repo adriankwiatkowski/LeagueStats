@@ -72,7 +72,7 @@ public class SpellAdapter extends RecyclerView.Adapter<SpellAdapter.SpellViewHol
         return mSpell.size();
     }
 
-    public static class SpellViewHolder extends RecyclerView.ViewHolder {
+    public class SpellViewHolder extends RecyclerView.ViewHolder {
         ConstraintLayout mLayout;
         TextView mSpellNameTv;
         TextView mSpellDescriptionTv;

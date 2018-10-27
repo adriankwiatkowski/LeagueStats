@@ -2,20 +2,14 @@ package com.example.android.leaguestats.utilities;
 
 import android.content.Context;
 
-import com.example.android.leaguestats.AppExecutors;
 import com.example.android.leaguestats.data.database.LeagueDatabase;
 import com.example.android.leaguestats.data.network.LeagueNetworkDataSource;
 import com.example.android.leaguestats.data.LeagueRepository;
 import com.example.android.leaguestats.data.network.api.RetrofitInstance;
-import com.example.android.leaguestats.viewmodels.ChampionDetailModelFactory;
-import com.example.android.leaguestats.viewmodels.ChampionListModelFactory;
-import com.example.android.leaguestats.viewmodels.HistoryModelFactory;
-import com.example.android.leaguestats.viewmodels.ItemDetailModelFactory;
-import com.example.android.leaguestats.viewmodels.ItemListModelFactory;
-import com.example.android.leaguestats.viewmodels.MasteryModelFactory;
+import com.example.android.leaguestats.viewmodels.ChampionModelFactory;
+import com.example.android.leaguestats.viewmodels.ItemModelFactory;
 import com.example.android.leaguestats.viewmodels.SummonerModelFactory;
-import com.example.android.leaguestats.viewmodels.SummonerSpellDetailModelFactory;
-import com.example.android.leaguestats.viewmodels.SummonerSpellListModelFactory;
+import com.example.android.leaguestats.viewmodels.SummonerSpellModelFactory;
 
 import retrofit2.Retrofit;
 
@@ -23,42 +17,27 @@ public class InjectorUtils {
 
     public static LeagueRepository provideRepository(Context context) {
         LeagueDatabase database = LeagueDatabase.getInstance(context.getApplicationContext());
-        AppExecutors executors = AppExecutors.getInstance();
-        LeagueNetworkDataSource networkDataSource  =
-                LeagueNetworkDataSource.getInstance(context.getApplicationContext());
         Retrofit retrofit = RetrofitInstance.getRetrofitInstance(context.getApplicationContext());
+        LeagueNetworkDataSource networkDataSource  =
+                LeagueNetworkDataSource.getInstance(context.getApplicationContext(), retrofit);
 
-        return LeagueRepository.getInstance(database, networkDataSource, executors, retrofit);
+        return LeagueRepository.getInstance(context.getApplicationContext(), database, networkDataSource, retrofit);
     }
 
     public static LeagueNetworkDataSource provideNetworkDataSource(Context context) {
         provideRepository(context.getApplicationContext());
-        return LeagueNetworkDataSource.getInstance(context.getApplicationContext());
+        Retrofit retrofit = RetrofitInstance.getRetrofitInstance(context.getApplicationContext());
+        return LeagueNetworkDataSource.getInstance(context.getApplicationContext(), retrofit);
     }
 
-    public static ChampionListModelFactory provideChampionListModelFactory(Context context) {
+    public static ChampionModelFactory provideChampionModelFactory(Context context) {
         LeagueRepository repository = provideRepository(context.getApplicationContext());
-        return new ChampionListModelFactory(repository);
+        return new ChampionModelFactory(repository);
     }
 
-    public static ChampionDetailModelFactory provideChampionDetailModelFactory(Context context) {
+    public static ItemModelFactory provideItemModelFactory(Context context) {
         LeagueRepository repository = provideRepository(context.getApplicationContext());
-        return new ChampionDetailModelFactory(repository);
-    }
-
-    public static ItemDetailModelFactory provideItemDetailModelFactory(Context context) {
-        LeagueRepository repository = provideRepository(context.getApplicationContext());
-        return new ItemDetailModelFactory(repository);
-    }
-
-    public static ItemListModelFactory provideItemListModelFactory(Context context) {
-        LeagueRepository repository = provideRepository(context.getApplicationContext());
-        return new ItemListModelFactory(repository);
-    }
-
-    public static MasteryModelFactory provideMasteryModelFactory(Context context) {
-        LeagueRepository repository = provideRepository(context.getApplicationContext());
-        return new MasteryModelFactory(repository);
+        return new ItemModelFactory(repository);
     }
 
     public static SummonerModelFactory provideSummonerModelFactory(Context context) {
@@ -66,18 +45,8 @@ public class InjectorUtils {
         return new SummonerModelFactory(repository);
     }
 
-    public static HistoryModelFactory provideHistoryModelFactory(Context context) {
+    public static SummonerSpellModelFactory provideSummonerSpellModelFactory(Context context) {
         LeagueRepository repository = provideRepository(context.getApplicationContext());
-        return new HistoryModelFactory(repository);
-    }
-
-    public static SummonerSpellDetailModelFactory provideSummonerSpellDetailModelFactory(Context context, int id) {
-        LeagueRepository repository = provideRepository(context.getApplicationContext());
-        return new SummonerSpellDetailModelFactory(repository, id);
-    }
-
-    public static SummonerSpellListModelFactory provideSummonerSpellListModelFactory(Context context) {
-        LeagueRepository repository = provideRepository(context.getApplicationContext());
-        return new SummonerSpellListModelFactory(repository);
+        return new SummonerSpellModelFactory(repository);
     }
 }

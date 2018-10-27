@@ -12,7 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.android.leaguestats.R;
-import com.example.android.leaguestats.data.database.models.ListItemEntry;
+import com.example.android.leaguestats.data.database.entity.ItemEntry;
 import com.example.android.leaguestats.models.Match;
 import com.example.android.leaguestats.utilities.PicassoUtils;
 
@@ -178,7 +178,7 @@ public class MatchAdapter extends BaseExpandableListAdapter {
     private void setItemData(ImageView[] imageViews, Match match, int childPosition,
                              int widthResId, int heightResId) {
 
-        List<ListItemEntry> itemEntries = match.getItemEntries();
+        List<ItemEntry> itemEntries = match.getItemEntries();
 
         String[] itemPaths = new String[7];
         for (int i = 0; i < itemPaths.length; i++) {

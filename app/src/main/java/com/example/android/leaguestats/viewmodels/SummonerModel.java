@@ -8,19 +8,27 @@ import android.arch.lifecycle.ViewModel;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.example.android.leaguestats.models.Mastery;
+import com.example.android.leaguestats.models.Match;
 import com.example.android.leaguestats.models.Summoner;
 import com.example.android.leaguestats.data.LeagueRepository;
-import com.example.android.leaguestats.viewmodels.querymodels.SummonerQuery;
+
+import java.util.List;
 
 public class SummonerModel extends ViewModel {
 
     private final String LOG_TAG = SummonerModel.class.getSimpleName();
-    private final MutableLiveData<SummonerQuery> mSummonerQuery;
+
+    private final MutableLiveData<SummonerQuery> mSummonerQuery = new MutableLiveData<>();
     private LiveData<Summoner> mSummoner;
+
+    private LiveData<List<Mastery>> mMasteries;
+
+    private LiveData<List<Match>> mMatches;
 
     public SummonerModel(final LeagueRepository repository) {
         Log.d(LOG_TAG, "Getting SummonerModel");
-        mSummonerQuery = new MutableLiveData<>();
+
         mSummoner = Transformations.switchMap(mSummonerQuery, new Function<SummonerQuery, LiveData<Summoner>>() {
             @Override
             public LiveData<Summoner> apply(SummonerQuery summonerQuery) {
@@ -28,9 +36,26 @@ public class SummonerModel extends ViewModel {
                 return repository.getSummoner(summonerQuery.getEntryUrlString(), summonerQuery.getSummonerName());
             }
         });
+
+        mMasteries = Transformations.switchMap(mSummoner, new Function<Summoner, LiveData<List<Mastery>>>() {
+            @Override
+            public LiveData<List<Mastery>> apply(Summoner input) {
+                Log.d(LOG_TAG, "Getting new masteries");
+                return repository.getMasteries(input.getEntryUrl(), input.getSummonerId());
+            }
+        });
+
+        mMatches = Transformations.switchMap(mSummoner, new Function<Summoner, LiveData<List<Match>>>() {
+            @Override
+            public LiveData<List<Match>> apply(Summoner input) {
+                Log.d(LOG_TAG, "Getting matches");
+                return repository.getMatches(input.getEntryUrl(), input.getAccountId(), input.getSummonerId());
+            }
+        });
     }
 
-    public void searchSummoner(SummonerQuery newSummonerQuery) {
+    public void searchSummoner(String entryUrlString, String summonerName) {
+        SummonerQuery newSummonerQuery = new SummonerQuery(entryUrlString, summonerName);
         if (mSummonerQuery.getValue() != null) {
             SummonerQuery summonerQuery = mSummonerQuery.getValue();
             if (isSameSummoner(summonerQuery, newSummonerQuery)) {
@@ -42,6 +67,14 @@ public class SummonerModel extends ViewModel {
 
     public LiveData<Summoner> getSummoner() {
         return mSummoner;
+    }
+
+    public LiveData<List<Mastery>> getMasteries() {
+        return mMasteries;
+    }
+
+    public LiveData<List<Match>> getMatches() {
+        return mMatches;
     }
 
     private boolean isSameSummoner(SummonerQuery cachedSummonerQuery, SummonerQuery newSummonerQuery) {
@@ -70,5 +103,30 @@ public class SummonerModel extends ViewModel {
             }
         }
         return builder.toString().toLowerCase();
+    }
+
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        // TODO cancel AsyncTask?
+    }
+
+    class SummonerQuery {
+
+        String entryUrlString;
+        String summonerName;
+
+        SummonerQuery(String entryUrlString, String summonerName) {
+            this.entryUrlString = entryUrlString;
+            this.summonerName = summonerName;
+        }
+
+        String getEntryUrlString() {
+            return entryUrlString;
+        }
+
+        String getSummonerName() {
+            return summonerName;
+        }
     }
 }

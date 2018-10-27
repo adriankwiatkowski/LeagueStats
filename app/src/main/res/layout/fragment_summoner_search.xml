@@ -1,29 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+    android:layout_height="match_parent"
+    android:focusableInTouchMode="true">
 
     <EditText
-        android:id="@+id/user_name_edit"
+        android:id="@+id/summoner_name_edit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:hint="@string/summoner_name"
         android:inputType="text"
-        app:layout_constraintBottom_toTopOf="@+id/region_spinner"
+        app:layout_constraintBottom_toTopOf="@+id/summoner_region_spinner"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-        <requestFocus />
-    </EditText>
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Spinner
-        android:id="@+id/region_spinner"
+        android:id="@+id/summoner_region_spinner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:spinnerMode="dropdown"
-        app:layout_constraintBottom_toTopOf="@+id/user_name_edit"
-        app:layout_constraintEnd_toEndOf="@+id/user_name_edit"
-        app:layout_constraintStart_toStartOf="@+id/user_name_edit" />
+        app:layout_constraintBottom_toTopOf="@+id/summoner_search_button"
+        app:layout_constraintEnd_toEndOf="@+id/summoner_name_edit"
+        app:layout_constraintStart_toStartOf="@+id/summoner_name_edit" />
+
+    <Button
+        android:id="@+id/summoner_search_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/search_summoner"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/summoner_name_edit"
+        app:layout_constraintStart_toStartOf="@+id/summoner_name_edit"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </android.support.constraint.ConstraintLayout>

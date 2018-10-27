@@ -11,7 +11,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -22,8 +21,8 @@ import com.example.android.leaguestats.models.Match;
 import com.example.android.leaguestats.utilities.DataUtils;
 import com.example.android.leaguestats.utilities.InjectorUtils;
 import com.example.android.leaguestats.utilities.LeaguePreferences;
-import com.example.android.leaguestats.viewmodels.HistoryModel;
-import com.example.android.leaguestats.viewmodels.HistoryModelFactory;
+import com.example.android.leaguestats.viewmodels.SummonerModel;
+import com.example.android.leaguestats.viewmodels.SummonerModelFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,10 +42,9 @@ public class SummonerHistoryFragment extends Fragment {
     private TextView mEmptyViewTv;
     private ProgressBar mRecyclerIndicator;
     private String mPatchVersion;
-    private HistoryModel mHistoryModel;
+    private SummonerModel mSummonerModel;
     private final int DEFAULT_POSITION = -1;
     private int mLastExpandablePosition = DEFAULT_POSITION;
-    private String LAYOUT_MANAGER_STATE_KEY = "layoutManagerStateKey";
 
     public SummonerHistoryFragment() {
     }
@@ -55,7 +53,6 @@ public class SummonerHistoryFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_summoner_history, container, false);
-        Log.d(LOG_TAG, "onCreateView");
 
         mExpandableListView = rootView.findViewById(R.id.summoner_expandable_list);
         mEmptyViewTv = rootView.findViewById(R.id.summoner_empty_view_tv);
@@ -67,20 +64,12 @@ public class SummonerHistoryFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Log.d(LOG_TAG, "onActivityCreated");
 
         mPatchVersion = LeaguePreferences.getPatchVersion(getContext());
 
         mAdapter = new MatchAdapter(getContext(), new ArrayList<Match>(), mPatchVersion);
         mExpandableListView.setAdapter(mAdapter);
         mExpandableListView.setDividerHeight(8);
-
-        if (savedInstanceState != null) {
-            if (savedInstanceState.containsKey(LAYOUT_MANAGER_STATE_KEY)) {
-                mExpandableListView.onRestoreInstanceState(
-                        savedInstanceState.getParcelable(LAYOUT_MANAGER_STATE_KEY));
-            }
-        }
 
         mExpandableListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
             @Override
@@ -101,6 +90,7 @@ public class SummonerHistoryFragment extends Fragment {
                     String summonerName = match.getSummonerName().get(childPosition);
                     String entryUrlString = DataUtils.getEntryUrl(match.getPlatformId());
                     mCallback.onHistorySummonerListener(entryUrlString, summonerName);
+                    // TODO return true ? doesnt work rn
                 }
                 return false;
             }
@@ -110,12 +100,13 @@ public class SummonerHistoryFragment extends Fragment {
     }
 
     private void setupViewModel() {
-        HistoryModelFactory factory =
-                InjectorUtils.provideHistoryModelFactory(getActivity().getApplicationContext());
-        mHistoryModel = ViewModelProviders.of(getActivity(), factory).get(HistoryModel.class);
-        mHistoryModel.getMatches().observe(getActivity(), new Observer<List<Match>>() {
+        SummonerModelFactory factory =
+                InjectorUtils.provideSummonerModelFactory(getActivity().getApplicationContext());
+        mSummonerModel = ViewModelProviders.of(getActivity(), factory).get(SummonerModel.class);
+        mSummonerModel.getMatches().observe(getActivity(), new Observer<List<Match>>() {
             @Override
             public void onChanged(@Nullable List<Match> matches) {
+                Log.d(LOG_TAG, "Retrieving matches from ViewModel");
                 updateUi(matches);
             }
         });
@@ -136,8 +127,6 @@ public class SummonerHistoryFragment extends Fragment {
 
     // Called from SummonerActivity.
     public void showHistoryIndicator() {
-        Log.d(LOG_TAG, "showHistoryIndicator");
-
         mRecyclerIndicator.setVisibility(View.VISIBLE);
         mEmptyViewTv.setVisibility(View.INVISIBLE);
         mExpandableListView.setVisibility(View.INVISIBLE);
@@ -157,16 +146,6 @@ public class SummonerHistoryFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-
-        mExpandableListView.setAdapter((ExpandableListAdapter) null);
-        //mExpandableListView.setAdapter(null);
         mCallback = null;
-    }
-
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-        outState.putParcelable(LAYOUT_MANAGER_STATE_KEY, mExpandableListView.onSaveInstanceState());
     }
 }

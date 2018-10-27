@@ -31,4 +31,7 @@ public interface IconDao {
 
     @Query("DELETE FROM icon")
     void deleteIcons();
+
+    @Query("SELECT COUNT(id) FROM icon")
+    int countAllIcons();
 }

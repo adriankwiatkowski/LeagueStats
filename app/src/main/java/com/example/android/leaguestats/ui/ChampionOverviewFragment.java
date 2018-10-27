@@ -18,8 +18,8 @@ import android.widget.TextView;
 
 import com.example.android.leaguestats.R;
 import com.example.android.leaguestats.utilities.InjectorUtils;
-import com.example.android.leaguestats.viewmodels.ChampionDetailModel;
-import com.example.android.leaguestats.viewmodels.ChampionDetailModelFactory;
+import com.example.android.leaguestats.viewmodels.ChampionModel;
+import com.example.android.leaguestats.viewmodels.ChampionModelFactory;
 import com.example.android.leaguestats.adapters.SplashArtAdapter;
 import com.example.android.leaguestats.data.database.entity.ChampionEntry;
 
@@ -36,7 +36,6 @@ public class ChampionOverviewFragment extends Fragment {
     private ProgressBar mAttackProgressBar;
     private ProgressBar mDefenseProgressBar;
     private ProgressBar mMagicProgressBar;
-    private String SPLASH_ART_LAYOUT_MANAGER_STATE_KEY = "splashArtLayoutManagerStateKey";
 
     public ChampionOverviewFragment() {}
 
@@ -44,7 +43,6 @@ public class ChampionOverviewFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_champion_overview, container, false);
-        Log.d(LOG_TAG, "onCreateView");
 
         mSplashArtRecyclerView = rootView.findViewById(R.id.splash_art_recycler_view);
 
@@ -66,13 +64,6 @@ public class ChampionOverviewFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Log.d(LOG_TAG, "onActivityCreated");
-
-        if (savedInstanceState != null) {
-            if (savedInstanceState.containsKey(SPLASH_ART_LAYOUT_MANAGER_STATE_KEY)) {
-                mSplashArtRecyclerView.getLayoutManager().onRestoreInstanceState(savedInstanceState.getParcelable(SPLASH_ART_LAYOUT_MANAGER_STATE_KEY));
-            }
-        }
 
         mSplashArtRecyclerView.setNestedScrollingEnabled(false);
 
@@ -80,10 +71,10 @@ public class ChampionOverviewFragment extends Fragment {
     }
 
     private void setupViewModel() {
-        ChampionDetailModelFactory factory =
-                InjectorUtils.provideChampionDetailModelFactory(getActivity().getApplicationContext());
-        final ChampionDetailModel viewModel =
-                ViewModelProviders.of(getActivity(), factory).get(ChampionDetailModel.class);
+        ChampionModelFactory factory =
+                InjectorUtils.provideChampionModelFactory(getActivity().getApplicationContext());
+        final ChampionModel viewModel =
+                ViewModelProviders.of(getActivity(), factory).get(ChampionModel.class);
         viewModel.getChampion().observe(getActivity(), new Observer<ChampionEntry>() {
             @Override
             public void onChanged(@Nullable ChampionEntry championEntry) {
@@ -107,12 +98,5 @@ public class ChampionOverviewFragment extends Fragment {
             mDefenseProgressBar.setProgress(championEntry.getDefense());
             mMagicProgressBar.setProgress(championEntry.getMagic());
         }
-    }
-
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-        outState.putParcelable(SPLASH_ART_LAYOUT_MANAGER_STATE_KEY, mSplashArtRecyclerView.getLayoutManager().onSaveInstanceState());
     }
 }

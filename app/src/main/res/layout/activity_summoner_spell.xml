@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/summoner_spell_container"
+<fragment xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/fragment_summoner_spell_detail"
+    android:name="com.example.android.leaguestats.ui.SummonerSpellDetailFragment"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/summoner_background"/>
+    android:layout_height="match_parent"/>

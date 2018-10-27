@@ -20,8 +20,8 @@ import com.example.android.leaguestats.R;
 import com.example.android.leaguestats.utilities.InjectorUtils;
 import com.example.android.leaguestats.utilities.PicassoUtils;
 import com.example.android.leaguestats.utilities.LeaguePreferences;
-import com.example.android.leaguestats.viewmodels.ChampionDetailModel;
-import com.example.android.leaguestats.viewmodels.ChampionDetailModelFactory;
+import com.example.android.leaguestats.viewmodels.ChampionModel;
+import com.example.android.leaguestats.viewmodels.ChampionModelFactory;
 import com.example.android.leaguestats.adapters.SpellAdapter;
 import com.example.android.leaguestats.models.Spell;
 import com.example.android.leaguestats.data.database.entity.ChampionEntry;
@@ -38,7 +38,6 @@ public class ChampionInfoFragment extends Fragment {
     private SpellAdapter mSpellAdapter;
     private TextView mHealthTv, mHealthRegenTv, mManaTv, mRangeTv, mArmorTv, mManaRegenTv, mMoveSpeedTv,
             mAttackDamageTv, mMagicResistTv, mAttackSpeedTv;
-    private String SPELL_LAYOUT_MANAGER_STATE_KEY = "spellLayoutManagerStateKey";
     private static final int SPELL_COUNT = 4;
     private String mPatchVersion;
 
@@ -49,11 +48,14 @@ public class ChampionInfoFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_champion_info, container, false);
-        Log.d(LOG_TAG, "onCreateView");
 
         mSpellRecyclerView = rootView.findViewById(R.id.spell_recycler_view);
 
-        mSplashArtImage = rootView.findViewById(R.id.splash_art_info_image);
+        if (rootView.findViewById(R.id.splash_art_info_image) != null) {
+            mSplashArtImage = rootView.findViewById(R.id.splash_art_info_image);
+        } else {
+            mSplashArtImage = null;
+        }
 
         mHealthTv = rootView.findViewById(R.id.health_tv);
         mHealthRegenTv = rootView.findViewById(R.id.health_regen_tv);
@@ -72,7 +74,6 @@ public class ChampionInfoFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Log.d(LOG_TAG, "onActivityCreated");
 
         mPatchVersion = LeaguePreferences.getPatchVersion(getContext());
 
@@ -82,22 +83,16 @@ public class ChampionInfoFragment extends Fragment {
         mSpellAdapter = new SpellAdapter(getActivity(), new ArrayList<Spell>(), mPatchVersion);
         mSpellRecyclerView.setAdapter(mSpellAdapter);
 
-        if (savedInstanceState != null) {
-            if (savedInstanceState.containsKey(SPELL_LAYOUT_MANAGER_STATE_KEY)) {
-                mSpellRecyclerView.getLayoutManager().onRestoreInstanceState(savedInstanceState.getParcelable(SPELL_LAYOUT_MANAGER_STATE_KEY));
-            }
-        }
-
         mSpellRecyclerView.setNestedScrollingEnabled(false);
 
         setupViewModel();
     }
 
     private void setupViewModel() {
-        ChampionDetailModelFactory factory =
-                InjectorUtils.provideChampionDetailModelFactory(getActivity().getApplicationContext());
-        final ChampionDetailModel viewModel =
-                ViewModelProviders.of(getActivity(), factory).get(ChampionDetailModel.class);
+        ChampionModelFactory factory =
+                InjectorUtils.provideChampionModelFactory(getActivity().getApplicationContext());
+        final ChampionModel viewModel =
+                ViewModelProviders.of(getActivity(), factory).get(ChampionModel.class);
         viewModel.getChampion().observe(getActivity(), new Observer<ChampionEntry>() {
             @Override
             public void onChanged(@Nullable ChampionEntry championEntry) {
@@ -109,10 +104,14 @@ public class ChampionInfoFragment extends Fragment {
 
     private void updateUi(ChampionEntry championEntry) {
         if (championEntry != null) {
-            // Get Default Splash Art.
-            String splashArt = championEntry.getSplashArt().get(0);
 
-            PicassoUtils.setSplashArt(mSplashArtImage, getContext(), splashArt);
+            // In two pane there isnt image.
+            if (mSplashArtImage != null) {
+                // Get Default Splash Art.
+                String splashArt = championEntry.getSplashArt().get(0);
+
+                PicassoUtils.setSplashArt(mSplashArtImage, getContext(), splashArt);
+            }
 
             double attackSpeedDouble = 0.625 / (1 + championEntry.getAttackSpeedOffset());
             DecimalFormat decimalFormat = new DecimalFormat("#.###");
@@ -158,14 +157,6 @@ public class ChampionInfoFragment extends Fragment {
 
             mSpellAdapter.setData(spellList);
         }
-    }
-
-
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-        outState.putParcelable(SPELL_LAYOUT_MANAGER_STATE_KEY, mSpellRecyclerView.getLayoutManager().onSaveInstanceState());
     }
 
     private String getSpellString(List<Double> costList, List<Integer> maxRankList, int iteratorCount) {

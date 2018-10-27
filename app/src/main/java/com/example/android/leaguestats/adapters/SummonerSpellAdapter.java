@@ -10,21 +10,24 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.android.leaguestats.R;
-import com.example.android.leaguestats.data.database.models.ListSummonerSpellEntry;
-import com.example.android.leaguestats.interfaces.IdClickListener;
+import com.example.android.leaguestats.data.database.entity.SummonerSpellEntry;
 import com.example.android.leaguestats.utilities.PicassoUtils;
 
 import java.util.List;
 
 public class SummonerSpellAdapter extends RecyclerView.Adapter<SummonerSpellAdapter.SummonerSpellViewHolder> {
 
+    public interface SummonerSpellListener {
+        void onSummonerSpellClick(SummonerSpellEntry summonerSpellEntry);
+    }
+
     private Context mContext;
-    private static List<ListSummonerSpellEntry> mList;
-    private static IdClickListener mListener;
+    private List<SummonerSpellEntry> mList;
+    private SummonerSpellListener mListener;
     private final String PATCH_VERSION;
 
-    public SummonerSpellAdapter(Context context, List<ListSummonerSpellEntry> list,
-                                IdClickListener listener, String patchVersion) {
+    public SummonerSpellAdapter(Context context, List<SummonerSpellEntry> list,
+                                SummonerSpellListener listener, String patchVersion) {
         mContext = context;
         mList = list;
         mListener = listener;
@@ -49,7 +52,7 @@ public class SummonerSpellAdapter extends RecyclerView.Adapter<SummonerSpellAdap
                 R.dimen.summoner_spell_width, R.dimen.summoner_spell_height);
     }
 
-    public void add(ListSummonerSpellEntry summonerSpellEntry) {
+    public void add(SummonerSpellEntry summonerSpellEntry) {
         mList.add(summonerSpellEntry);
         notifyDataSetChanged();
     }
@@ -59,7 +62,7 @@ public class SummonerSpellAdapter extends RecyclerView.Adapter<SummonerSpellAdap
         notifyDataSetChanged();
     }
 
-    public void setData(List<ListSummonerSpellEntry> list) {
+    public void setData(List<SummonerSpellEntry> list) {
         clear();
         mList.addAll(list);
         notifyDataSetChanged();
@@ -70,7 +73,7 @@ public class SummonerSpellAdapter extends RecyclerView.Adapter<SummonerSpellAdap
         return mList.size();
     }
 
-    public static class SummonerSpellViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    class SummonerSpellViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView mNameTv;
         TextView mCooldownTv;
         ImageView mImage;
@@ -87,7 +90,7 @@ public class SummonerSpellAdapter extends RecyclerView.Adapter<SummonerSpellAdap
 
         @Override
         public void onClick(View v) {
-            mListener.onClickListener(mList.get(getAdapterPosition()).getId());
+            mListener.onSummonerSpellClick(mList.get(getAdapterPosition()));
         }
     }
 }

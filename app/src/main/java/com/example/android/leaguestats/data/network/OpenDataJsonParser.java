@@ -127,26 +127,26 @@ public final class OpenDataJsonParser {
 
             // Get Champion stats. data type double.
             JSONObject statsObject = championObject.getJSONObject("stats");
-            double armorPerLevel = statsObject.getDouble("armorperlevel");
-            double attackDamage = statsObject.getDouble("attackdamage");
-            double manaPerLevel = statsObject.getDouble("mpperlevel");
-            double attackSpeedOffset = statsObject.getDouble("attackspeedoffset");
-            double mana = statsObject.getDouble("mp");
-            double armor = statsObject.getDouble("armor");
-            double health = statsObject.getDouble("hp");
-            double healthRegenPerLevel = statsObject.getDouble("hpregenperlevel");
-            double attackSpeedPerLevel = statsObject.getDouble("attackspeedperlevel");
-            double attackRange = statsObject.getDouble("attackrange");
-            double moveSpeed = statsObject.getDouble("movespeed");
-            double attackDamagePerLevel = statsObject.getDouble("attackdamageperlevel");
-            double manaRegenPerLevel = statsObject.getDouble("mpregenperlevel");
-            double critPerLevel = statsObject.getDouble("critperlevel");
-            double magicResistPerLevel = statsObject.getDouble("spellblockperlevel");
-            double crit = statsObject.getDouble("crit");
-            double manaRegen = statsObject.getDouble("mpregen");
-            double magicResist = statsObject.getDouble("spellblock");
-            double healthRegen = statsObject.getDouble("hpregen");
-            double healthPerLevel = statsObject.getDouble("hpperlevel");
+            double armorPerLevel = statsObject.optDouble("armorperlevel", 0.0);
+            double attackDamage = statsObject.optDouble("attackdamage", 0.0);
+            double manaPerLevel = statsObject.optDouble("mpperlevel", 0.0);
+            double attackSpeedOffset = statsObject.optDouble("attackspeedoffset", 0.0);
+            double mana = statsObject.optDouble("mp", 0.0);
+            double armor = statsObject.optDouble("armor", 0.0);
+            double health = statsObject.optDouble("hp", 0.0);
+            double healthRegenPerLevel = statsObject.optDouble("hpregenperlevel", 0.0);
+            double attackSpeedPerLevel = statsObject.optDouble("attackspeedperlevel", 0.0);
+            double attackRange = statsObject.optDouble("attackrange", 0.0);
+            double moveSpeed = statsObject.optDouble("movespeed", 0.0);
+            double attackDamagePerLevel = statsObject.optDouble("attackdamageperlevel", 0.0);
+            double manaRegenPerLevel = statsObject.optDouble("mpregenperlevel", 0.0);
+            double critPerLevel = statsObject.optDouble("critperlevel", 0.0);
+            double magicResistPerLevel = statsObject.optDouble("spellblockperlevel", 0.0);
+            double crit = statsObject.optDouble("crit", 0.0);
+            double manaRegen = statsObject.optDouble("mpregen", 0.0);
+            double magicResist = statsObject.optDouble("spellblock", 0.0);
+            double healthRegen = statsObject.optDouble("hpregen", 0.0);
+            double healthPerLevel = statsObject.optDouble("hpperlevel", 0.0);
 
             // Add champion to List.
             return new ChampionEntry(championId, championName, championKey, championTitle,

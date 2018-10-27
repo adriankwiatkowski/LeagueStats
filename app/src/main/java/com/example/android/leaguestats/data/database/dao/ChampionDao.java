@@ -8,15 +8,14 @@ import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
 import com.example.android.leaguestats.data.database.entity.ChampionEntry;
-import com.example.android.leaguestats.data.database.models.ListChampionEntry;
 
 import java.util.List;
 
 @Dao
 public interface ChampionDao {
 
-    @Query("SELECT id, champion_key, name, title, image FROM champion ORDER BY name")
-    LiveData<List<ListChampionEntry>> getChampionList();
+    @Query("SELECT * FROM champion ORDER BY name")
+    LiveData<List<ChampionEntry>> getChampionList();
 
     @Query("SELECT * FROM champion WHERE id = :id")
     LiveData<ChampionEntry> getChampion(long id);
@@ -24,8 +23,8 @@ public interface ChampionDao {
     @Query("SELECT * FROM champion WHERE name LIKE + :name")
     LiveData<ChampionEntry> getChampion(String name);
 
-    @Query("SELECT id, champion_key, name, title, image FROM champion WHERE id IN (:id)")
-    List<ListChampionEntry> getChampionList(int[] id);
+    @Query("SELECT * FROM champion WHERE id IN (:id)")
+    List<ChampionEntry> getChampionList(int[] id);
 
     @Query("SELECT COUNT(id) FROM champion")
     int countAllChampions();

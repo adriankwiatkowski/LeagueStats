@@ -39,6 +39,6 @@ public class LeaguePreferences {
         Log.d("LeaguePreferences", "fetchNewData");
         LeagueNetworkDataSource networkDataSource =
                 InjectorUtils.provideNetworkDataSource(context.getApplicationContext());
-        networkDataSource.startFetchDataService(true);
+        networkDataSource.initializeData(context, true);
     }
 }

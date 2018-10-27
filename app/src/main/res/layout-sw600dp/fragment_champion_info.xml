@@ -11,14 +11,6 @@
         android:focusableInTouchMode="true"
         tools:context=".ChampionStatsActivity">
 
-        <ImageView
-            android:id="@+id/splash_art_info_image"
-            style="@style/TipsSplashArt"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:src="@drawable/ic_launcher_foreground" />
-
         <android.support.v7.widget.RecyclerView
             android:id="@+id/spell_recycler_view"
             style="@style/RecyclerViewStyle"
@@ -32,14 +24,14 @@
             style="@style/LabelText"
             android:text="@string/health_label"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/splash_art_info_image" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/attack_damage_label_tv"
             style="@style/LabelText"
             android:text="@string/attack_damage_label"
             app:layout_constraintStart_toStartOf="@+id/guideline3"
-            app:layout_constraintTop_toBottomOf="@+id/splash_art_info_image" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/health_regen_label_tv"

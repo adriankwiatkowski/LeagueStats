@@ -11,19 +11,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <ImageView
-            android:id="@+id/splash_art_tips_image"
-            style="@style/TipsSplashArt"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:src="@drawable/ic_launcher_foreground" />
-
         <TextView
             android:id="@+id/playing_as_label_tv"
             style="@style/LabelText"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/splash_art_tips_image"
+            app:layout_constraintTop_toTopOf="parent"
             tools:text="Playing As Riven" />
 
         <TextView

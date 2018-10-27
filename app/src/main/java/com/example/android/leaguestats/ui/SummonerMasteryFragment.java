@@ -23,8 +23,8 @@ import com.example.android.leaguestats.interfaces.IdClickListener;
 import com.example.android.leaguestats.models.Mastery;
 import com.example.android.leaguestats.utilities.InjectorUtils;
 import com.example.android.leaguestats.utilities.LeaguePreferences;
-import com.example.android.leaguestats.viewmodels.MasteryModel;
-import com.example.android.leaguestats.viewmodels.MasteryModelFactory;
+import com.example.android.leaguestats.viewmodels.SummonerModel;
+import com.example.android.leaguestats.viewmodels.SummonerModelFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,17 +34,16 @@ public class SummonerMasteryFragment extends Fragment implements IdClickListener
     private MasteryListener mCallback;
 
     public interface MasteryListener {
-        void onMasteryChampionListener(long championId);
+        void onMasteryChampionListener(int championId);
     }
 
     private static final String LOG_TAG = SummonerMasteryFragment.class.getSimpleName();
     private RecyclerView mRecyclerView;
     private MasteryAdapter mAdapter;
-    private MasteryModel mMasteryModel;
+    private SummonerModel mSummonerModel;
     private String mPatchVersion;
     private TextView mEmptyViewTv;
     private ProgressBar mRecyclerIndicator;
-    private String LAYOUT_MANAGER_STATE_KEY = "layoutManagerStateKey";
 
     public SummonerMasteryFragment() {}
 
@@ -52,7 +51,6 @@ public class SummonerMasteryFragment extends Fragment implements IdClickListener
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_summoner_mastery, container, false);
-        Log.d(LOG_TAG, "onCreateView");
 
         mRecyclerView = rootView.findViewById(R.id.summoner_recycler_view);
         mEmptyViewTv = rootView.findViewById(R.id.summoner_empty_view_tv);
@@ -64,7 +62,6 @@ public class SummonerMasteryFragment extends Fragment implements IdClickListener
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Log.d(LOG_TAG, "onActivityCreated");
 
         mPatchVersion = LeaguePreferences.getPatchVersion(getContext());
 
@@ -73,23 +70,17 @@ public class SummonerMasteryFragment extends Fragment implements IdClickListener
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        if (savedInstanceState != null) {
-            if (savedInstanceState.containsKey(LAYOUT_MANAGER_STATE_KEY)) {
-                mRecyclerView.getLayoutManager().onRestoreInstanceState(
-                        savedInstanceState.getParcelable(LAYOUT_MANAGER_STATE_KEY));
-            }
-        }
-
         setupViewModel();
     }
 
     private void setupViewModel() {
-        MasteryModelFactory factory =
-                InjectorUtils.provideMasteryModelFactory(getActivity().getApplicationContext());
-        mMasteryModel = ViewModelProviders.of(getActivity(), factory).get(MasteryModel.class);
-        mMasteryModel.getMasteries().observe(getActivity(), new Observer<List<Mastery>>() {
+        SummonerModelFactory factory =
+                InjectorUtils.provideSummonerModelFactory(getActivity().getApplicationContext());
+        mSummonerModel = ViewModelProviders.of(getActivity(), factory).get(SummonerModel.class);
+        mSummonerModel.getMasteries().observe(getActivity(), new Observer<List<Mastery>>() {
             @Override
             public void onChanged(@Nullable List<Mastery> masteries) {
+                Log.d(LOG_TAG, "Getting masteries");
                 updateUi(masteries);
             }
         });
@@ -106,15 +97,12 @@ public class SummonerMasteryFragment extends Fragment implements IdClickListener
     }
 
     @Override
-    public void onClickListener(long id) {
-        Log.d(LOG_TAG, "onClickListener");
+    public void onClickListener(int id) {
         mCallback.onMasteryChampionListener(id);
     }
 
     // Called from SummonerActivity.
     public void showMasteryIndicator() {
-        Log.d(LOG_TAG, "showMasteryIndicator");
-
         mRecyclerIndicator.setVisibility(View.VISIBLE);
         mEmptyViewTv.setVisibility(View.INVISIBLE);
     }
@@ -133,15 +121,6 @@ public class SummonerMasteryFragment extends Fragment implements IdClickListener
     @Override
     public void onDetach() {
         super.onDetach();
-        Log.d(LOG_TAG, "onDetach");
-        mRecyclerView.setAdapter(null);
         mCallback = null;
-    }
-
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-        outState.putParcelable(LAYOUT_MANAGER_STATE_KEY, mRecyclerView.getLayoutManager().onSaveInstanceState());
     }
 }

@@ -6,9 +6,6 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-    </style>
-
-    <style name="ActivityPagerTheme" parent="AppTheme" >
         <item name="actionBarStyle">@style/PagerBarStyle</item>
     </style>
 
@@ -53,6 +50,11 @@
         <item name="android:textSize">12sp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">@color/lightWhiteColor</item>
+    </style>
+
+    <style name="FragmentTitleText" parent="LabelText">
+        <item name="android:gravity">center</item>
+        <item name="android:textAllCaps">true</item>
     </style>
 
     <style name="MatchGroupText" parent="BoldText" >
@@ -107,6 +109,7 @@
         <item name="android:layout_height">wrap_content</item>
     </style>
 
+    <!-- TODO check layout_height -->
     <style name="RecyclerViewStyle" >
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">wrap_content</item>

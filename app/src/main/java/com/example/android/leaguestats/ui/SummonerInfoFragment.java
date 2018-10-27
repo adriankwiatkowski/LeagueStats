@@ -25,7 +25,6 @@ import com.example.android.leaguestats.viewmodels.SummonerModelFactory;
 public class SummonerInfoFragment extends Fragment {
 
     private static final String LOG_TAG = SummonerInfoFragment.class.getSimpleName();
-    public static final String TAG = "summoner-info-fragment";
     private ImageView mProfileIcon;
     private TextView mSummonerNameTv;
     private TextView mSummonerLevelTv;
@@ -38,7 +37,6 @@ public class SummonerInfoFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_summoner_info, container, false);
-        Log.d(LOG_TAG, "onCreateView");
 
         mProfileIcon = rootView.findViewById(R.id.summoner_info_profile);
         mSummonerNameTv = rootView.findViewById(R.id.summoner_info_name_tv);
@@ -52,7 +50,6 @@ public class SummonerInfoFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Log.d(LOG_TAG, "onActivityCreated");
 
         mPatchVersion = LeaguePreferences.getPatchVersion(getContext());
 

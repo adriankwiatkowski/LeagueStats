@@ -1,11 +1,11 @@
 package com.example.android.leaguestats.models;
 
+import com.example.android.leaguestats.data.database.entity.ChampionEntry;
+import com.example.android.leaguestats.data.database.entity.ItemEntry;
+import com.example.android.leaguestats.data.database.entity.SummonerSpellEntry;
 import com.example.android.leaguestats.data.network.api.models.match.MatchResponse;
 import com.example.android.leaguestats.data.network.api.models.match.Participant;
 import com.example.android.leaguestats.data.network.api.models.match.ParticipantIdentity;
-import com.example.android.leaguestats.data.database.models.ListChampionEntry;
-import com.example.android.leaguestats.data.database.models.ListItemEntry;
-import com.example.android.leaguestats.data.database.models.ListSummonerSpellEntry;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,10 +25,10 @@ public class Match {
     private List<Integer> mTotalMinionsKilled;
     private List<Integer> mGoldEarned;
 
-    private List<ListChampionEntry> mChampionEntries;
-    private List<ListSummonerSpellEntry> mSpellEntries1;
-    private List<ListSummonerSpellEntry> mSpellEntries2;
-    private List<ListItemEntry> mItemEntries;
+    private List<ChampionEntry> mChampionEntries;
+    private List<SummonerSpellEntry> mSpellEntries1;
+    private List<SummonerSpellEntry> mSpellEntries2;
+    private List<ItemEntry> mItemEntries;
 
     private long mGameDuration;
     private long mGameCreation;
@@ -38,9 +38,9 @@ public class Match {
 
     public Match(List<Integer> mParticipantId, List<Long> mAccountId, List<Long> mSummonerId,
                  List<String> mSummonerName, List<Integer> mTeamId, long mGameDuration,
-                 long mGameCreation, List<ListChampionEntry> mChampionEntries,
-                 List<ListSummonerSpellEntry> mSpellEntries1, List<ListSummonerSpellEntry> mSpellEntries2,
-                 List<Boolean> win, List<ListItemEntry> itemList, List<Integer> killList,
+                 long mGameCreation, List<ChampionEntry> mChampionEntries,
+                 List<SummonerSpellEntry> mSpellEntries1, List<SummonerSpellEntry> mSpellEntries2,
+                 List<Boolean> win, List<ItemEntry> itemList, List<Integer> killList,
                  List<Integer> deathList, List<Integer> assistList,
                  List<Long> totalDamageToChampions, long currentSummonerId) {
         this.mParticipantId = mParticipantId;
@@ -63,10 +63,10 @@ public class Match {
     }
 
     public Match(MatchResponse matchResponse,
-                 List<ListChampionEntry> championEntries,
-                 List<ListSummonerSpellEntry> summonerSpell1Entries,
-                 List<ListSummonerSpellEntry> summonerSpell2Entries,
-                 List<ListItemEntry> itemEntries,
+                 List<ChampionEntry> championEntries,
+                 List<SummonerSpellEntry> summonerSpell1Entries,
+                 List<SummonerSpellEntry> summonerSpell2Entries,
+                 List<ItemEntry> itemEntries,
                  long currentSummonerId) {
 
         List<Integer> participantId = new ArrayList<>();
@@ -187,27 +187,27 @@ public class Match {
         this.mSummonerId = summonerId;
     }
 
-    public List<ListSummonerSpellEntry> getSpellEntries2() {
+    public List<SummonerSpellEntry> getSpellEntries2() {
         return mSpellEntries2;
     }
 
-    public void setSpellEntries2(List<ListSummonerSpellEntry> spellEntries2) {
+    public void setSpellEntries2(List<SummonerSpellEntry> spellEntries2) {
         this.mSpellEntries2 = spellEntries2;
     }
 
-    public List<ListSummonerSpellEntry> getSpellEntries1() {
+    public List<SummonerSpellEntry> getSpellEntries1() {
         return mSpellEntries1;
     }
 
-    public void setSpellEntries1(List<ListSummonerSpellEntry> spellEntries1) {
+    public void setSpellEntries1(List<SummonerSpellEntry> spellEntries1) {
         this.mSpellEntries1 = spellEntries1;
     }
 
-    public List<ListChampionEntry> getChampionEntries() {
+    public List<ChampionEntry> getChampionEntries() {
         return mChampionEntries;
     }
 
-    public void setChampionEntries(List<ListChampionEntry> championEntries) {
+    public void setChampionEntries(List<ChampionEntry> championEntries) {
         this.mChampionEntries = championEntries;
     }
 
@@ -251,11 +251,11 @@ public class Match {
         this.mKills = kills;
     }
 
-    public List<ListItemEntry> getItemEntries() {
+    public List<ItemEntry> getItemEntries() {
         return mItemEntries;
     }
 
-    public void setItemEntries(List<ListItemEntry> mItemEntries) {
+    public void setItemEntries(List<ItemEntry> mItemEntries) {
         this.mItemEntries = mItemEntries;
     }
 

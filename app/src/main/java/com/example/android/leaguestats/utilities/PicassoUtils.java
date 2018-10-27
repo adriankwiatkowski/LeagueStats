@@ -59,7 +59,6 @@ public final class PicassoUtils {
                 .into(imageView);
     }
 
-    // TODO Check .fit() :).
     public static void setChampionThumbnail(ImageView imageView, String path, String patchVersion,
                                             int widthResId, int heightResId) {
         Picasso.get()

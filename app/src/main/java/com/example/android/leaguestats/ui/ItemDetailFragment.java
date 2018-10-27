@@ -2,7 +2,6 @@ package com.example.android.leaguestats.ui;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -20,27 +19,21 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.android.leaguestats.R;
-import com.example.android.leaguestats.data.database.models.ListItemEntry;
 import com.example.android.leaguestats.interfaces.IdClickListener;
 import com.example.android.leaguestats.utilities.InjectorUtils;
 import com.example.android.leaguestats.utilities.PicassoUtils;
-import com.example.android.leaguestats.viewmodels.ItemDetailModel;
-import com.example.android.leaguestats.viewmodels.ItemDetailModelFactory;
 import com.example.android.leaguestats.adapters.ItemAdapter;
 import com.example.android.leaguestats.data.database.entity.ItemEntry;
 import com.example.android.leaguestats.utilities.LeaguePreferences;
+import com.example.android.leaguestats.viewmodels.ItemModel;
+import com.example.android.leaguestats.viewmodels.ItemModelFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ItemDetailFragment extends Fragment implements IdClickListener {
 
-    public interface OnItemDetailSelected {
-        void onItemDetailSelected(long id);
-    }
-
     private static final String LOG_TAG = ItemDetailFragment.class.getSimpleName();
-    private OnItemDetailSelected mCallback;
     private String mPatchVersion;
     private TextView mBaseGoldLabel, mTotalGoldLabel, mSellGoldLabel, mDescriptionLabel,
             mPlainTextLabel, mFromLabel, mIntoLabel;
@@ -51,17 +44,23 @@ public class ItemDetailFragment extends Fragment implements IdClickListener {
     private ItemAdapter mItemIntoAdapter;
     private RecyclerView mFromRecycler;
     private RecyclerView mIntoRecycler;
-    private String FROM_LAYOUT_MANAGER_STATE_KEY = "fromLayoutManagerStateKey";
-    private String INTO_LAYOUT_MANAGER_STATE_KEY = "intoLayoutManagerStateKey";
-    private ItemDetailModel mViewModel;
+    private static final String ID_KEY = "id-key";
+    private ItemModel mViewModel;
 
     public ItemDetailFragment() {}
+
+    public static ItemDetailFragment newInstance(int itemId) {
+        ItemDetailFragment fragment = new ItemDetailFragment();
+        Bundle args = new Bundle();
+        args.putInt(ID_KEY, itemId);
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_item_detail, container, false);
-        Log.d(LOG_TAG, "onCreateView");
 
         mBaseGoldLabel = rootView.findViewById(R.id.base_gold_label);
         mTotalGoldLabel = rootView.findViewById(R.id.total_gold_label);
@@ -88,7 +87,6 @@ public class ItemDetailFragment extends Fragment implements IdClickListener {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Log.d(LOG_TAG, "onActivityCreated");
 
         mPatchVersion = LeaguePreferences.getPatchVersion(getContext());
 
@@ -102,35 +100,28 @@ public class ItemDetailFragment extends Fragment implements IdClickListener {
         mFromRecycler.setLayoutManager(new GridLayoutManager(getContext(), gridLayoutColumnCount));
         mFromRecycler.setHasFixedSize(true);
         mFromRecycler.setItemAnimator(new DefaultItemAnimator());
-        mItemFromAdapter = new ItemAdapter(getContext(), new ArrayList<ListItemEntry>(), this, mPatchVersion);
+        mItemFromAdapter = new ItemAdapter(getContext(), new ArrayList<ItemEntry>(), this, mPatchVersion);
         mFromRecycler.setAdapter(mItemFromAdapter);
 
         mIntoRecycler.setLayoutManager(new GridLayoutManager(getContext(), gridLayoutColumnCount));
         mIntoRecycler.setHasFixedSize(true);
         mIntoRecycler.setItemAnimator(new DefaultItemAnimator());
-        mItemIntoAdapter = new ItemAdapter(getContext(), new ArrayList<ListItemEntry>(), this, mPatchVersion);
+        mItemIntoAdapter = new ItemAdapter(getContext(), new ArrayList<ItemEntry>(), this, mPatchVersion);
         mIntoRecycler.setAdapter(mItemIntoAdapter);
-
-        if (savedInstanceState != null) {
-            if (savedInstanceState.containsKey(FROM_LAYOUT_MANAGER_STATE_KEY)) {
-                mFromRecycler.getLayoutManager().onRestoreInstanceState(savedInstanceState.getParcelable(FROM_LAYOUT_MANAGER_STATE_KEY));
-            }
-            if (savedInstanceState.containsKey(INTO_LAYOUT_MANAGER_STATE_KEY)) {
-                mIntoRecycler.getLayoutManager().onRestoreInstanceState(savedInstanceState.getParcelable(INTO_LAYOUT_MANAGER_STATE_KEY));
-            }
-        }
 
         mFromRecycler.setNestedScrollingEnabled(false);
         mIntoRecycler.setNestedScrollingEnabled(false);
 
         setupViewModel();
+
+        initItem(getArguments().getInt(ID_KEY));
     }
 
     private void setupViewModel() {
 
-        ItemDetailModelFactory factory =
-                InjectorUtils.provideItemDetailModelFactory(getActivity().getApplicationContext());
-        mViewModel = ViewModelProviders.of(getActivity(), factory).get(ItemDetailModel.class);
+        ItemModelFactory factory =
+                InjectorUtils.provideItemModelFactory(getActivity().getApplicationContext());
+        mViewModel = ViewModelProviders.of(getActivity(), factory).get(ItemModel.class);
 
         mViewModel.getItem().observe(getActivity(), new Observer<ItemEntry>() {
             @Override
@@ -140,23 +131,22 @@ public class ItemDetailFragment extends Fragment implements IdClickListener {
             }
         });
 
-        mViewModel.getItemFrom().observe(getActivity(), new Observer<List<ListItemEntry>>() {
+        mViewModel.getItemFrom().observe(getActivity(), new Observer<List<ItemEntry>>() {
             @Override
-            public void onChanged(@Nullable List<ListItemEntry> listItemEntries) {
+            public void onChanged(@Nullable List<ItemEntry> listItemEntries) {
                 updateFromUi(listItemEntries);
             }
         });
 
-        mViewModel.getItemInto().observe(getActivity(), new Observer<List<ListItemEntry>>() {
+        mViewModel.getItemInto().observe(getActivity(), new Observer<List<ItemEntry>>() {
             @Override
-            public void onChanged(@Nullable List<ListItemEntry> listItemEntries) {
+            public void onChanged(@Nullable List<ItemEntry> listItemEntries) {
                 updateIntoUi(listItemEntries);
             }
         });
     }
 
     private void updateUi(@Nullable ItemEntry itemEntry) {
-        Log.d(LOG_TAG, "updating Ui");
         String image = itemEntry.getImage();
 
         PicassoUtils.setItemImage(mImage, image, mPatchVersion,
@@ -182,7 +172,7 @@ public class ItemDetailFragment extends Fragment implements IdClickListener {
         mIntoRecycler.setVisibility(View.INVISIBLE);
     }
 
-    private void updateFromUi(List<ListItemEntry> listItemEntries) {
+    private void updateFromUi(List<ItemEntry> listItemEntries) {
         mItemFromAdapter.setData(listItemEntries);
         if (listItemEntries != null && !listItemEntries.isEmpty()) {
             mFromLabel.setVisibility(View.VISIBLE);
@@ -193,7 +183,7 @@ public class ItemDetailFragment extends Fragment implements IdClickListener {
         }
     }
 
-    private void updateIntoUi(@Nullable List<ListItemEntry> listItemEntries) {
+    private void updateIntoUi(@Nullable List<ItemEntry> listItemEntries) {
         mItemIntoAdapter.setData(listItemEntries);
         if (listItemEntries != null && !listItemEntries.isEmpty()) {
             mIntoLabel.setVisibility(View.VISIBLE);
@@ -223,34 +213,16 @@ public class ItemDetailFragment extends Fragment implements IdClickListener {
     }
 
     @Override
-    public void onClickListener(long id) {
-        mCallback.onItemDetailSelected(id);
+    public void onClickListener(int id) {
+
+        Bundle args = new Bundle();
+        args.putInt(ID_KEY, id);
+        setArguments(args);
+
+        initItem(id);
     }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-
-        try {
-            mCallback = (OnItemDetailSelected) context;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(context.toString() + " must implement OnItemDetailSelected");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mFromRecycler.setAdapter(null);
-        mCallback = null;
-    }
-
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        Log.d(LOG_TAG, "onSaveInstanceState");
-
-        outState.putParcelable(FROM_LAYOUT_MANAGER_STATE_KEY, mFromRecycler.getLayoutManager().onSaveInstanceState());
-        outState.putParcelable(INTO_LAYOUT_MANAGER_STATE_KEY, mIntoRecycler.getLayoutManager().onSaveInstanceState());
+    public void initItem(long id) {
+        mViewModel.initItem(id);
     }
 }

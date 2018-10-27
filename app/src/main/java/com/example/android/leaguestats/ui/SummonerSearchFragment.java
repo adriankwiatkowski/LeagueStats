@@ -1,9 +1,7 @@
-package com.example.android.leaguestats;
+package com.example.android.leaguestats.ui;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -13,7 +11,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -21,13 +18,20 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.example.android.leaguestats.R;
 import com.example.android.leaguestats.utilities.DataUtils;
 
 public class SummonerSearchFragment extends Fragment {
 
-    // TODO USE THIS FRAGMENT!
-    private EditText mUserNameEdit;
+
+    public interface OnSummonerListener {
+        void onSummonerSearch(String entryUrlString, String summonerName);
+    }
+
+    private OnSummonerListener mCallback;
+    private EditText mSummonerEdit;
     private Spinner mRegionSpinner;
+    private Button mSubmitButton;
     private String mEntryRegion;
 
     public SummonerSearchFragment() {}
@@ -37,26 +41,40 @@ public class SummonerSearchFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_summoner_search, container, false);
 
-        mUserNameEdit = rootView.findViewById(R.id.user_name_edit);
-        mRegionSpinner = rootView.findViewById(R.id.region_spinner);
+        mSummonerEdit = rootView.findViewById(R.id.summoner_name_edit);
+        mRegionSpinner = rootView.findViewById(R.id.summoner_region_spinner);
+        mSubmitButton = rootView.findViewById(R.id.summoner_search_button);
 
         setupSpinner();
 
-        // Show keyboard.
-        getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-
-        mUserNameEdit.setOnKeyListener(new View.OnKeyListener() {
+        mSummonerEdit.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
-                    //showMastery();
+                    searchSummoner();
                     return true;
                 }
                 return false;
             }
         });
 
+        mSubmitButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                searchSummoner();
+            }
+        });
+
         return rootView;
+    }
+
+    private void searchSummoner() {
+        String summonerName = mSummonerEdit.getText().toString().trim();
+        if (!(summonerName.isEmpty())) {
+            mCallback.onSummonerSearch(mEntryRegion, summonerName);
+        } else {
+            Toast.makeText(getContext(), R.string.enter_summoner_name, Toast.LENGTH_LONG).show();
+        }
     }
 
     private void setupSpinner() {
@@ -83,9 +101,20 @@ public class SummonerSearchFragment extends Fragment {
         });
     }
 
-    private void hideKeyboard(Context context) {
-        InputMethodManager imm = (InputMethodManager) context.getSystemService(Activity.INPUT_METHOD_SERVICE);
-        IBinder iBinder = getView().getRootView().getWindowToken();
-        imm.hideSoftInputFromWindow(iBinder, 0);
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        try {
+            mCallback = (OnSummonerListener) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString() + " must implement OnSummonerListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mCallback = null;
     }
 }

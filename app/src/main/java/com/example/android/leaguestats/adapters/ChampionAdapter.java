@@ -9,7 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.android.leaguestats.R;
-import com.example.android.leaguestats.data.database.models.ListChampionEntry;
+import com.example.android.leaguestats.data.database.entity.ChampionEntry;
 import com.example.android.leaguestats.interfaces.IdClickListener;
 import com.example.android.leaguestats.utilities.PicassoUtils;
 
@@ -17,14 +17,18 @@ import java.util.List;
 
 public class ChampionAdapter extends RecyclerView.Adapter<ChampionAdapter.ChampionViewHolder> {
 
-    private static IdClickListener mListener;
+    public interface ChampionListener {
+        void onChampionClick(ChampionEntry championEntry);
+    }
+
+    private ChampionListener mListener;
 
     private Context mContext;
-    private static List<ListChampionEntry> mList;
+    private List<ChampionEntry> mList;
     private final String PATCH_VERSION;
 
-    public ChampionAdapter(Context context, List<ListChampionEntry> championEntries,
-                           IdClickListener listener, String patchVersion) {
+    public ChampionAdapter(Context context, List<ChampionEntry> championEntries,
+                           ChampionListener listener, String patchVersion) {
         mContext = context;
         mList = championEntries;
         mListener = listener;
@@ -47,7 +51,7 @@ public class ChampionAdapter extends RecyclerView.Adapter<ChampionAdapter.Champi
         PicassoUtils.setChampionThumbnail(holder.mImage, imagePath, PATCH_VERSION);
     }
 
-    public void add(ListChampionEntry championEntry) {
+    public void add(ChampionEntry championEntry) {
         mList.add(championEntry);
         notifyDataSetChanged();
     }
@@ -57,7 +61,7 @@ public class ChampionAdapter extends RecyclerView.Adapter<ChampionAdapter.Champi
         notifyDataSetChanged();
     }
 
-    public void setData(List<ListChampionEntry> list) {
+    public void setData(List<ChampionEntry> list) {
         clear();
         mList.addAll(list);
         notifyDataSetChanged();
@@ -68,7 +72,7 @@ public class ChampionAdapter extends RecyclerView.Adapter<ChampionAdapter.Champi
         return mList.size();
     }
 
-    static class ChampionViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    class ChampionViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView mNameTv;
         TextView mTitleTv;
         ImageView mImage;
@@ -85,7 +89,7 @@ public class ChampionAdapter extends RecyclerView.Adapter<ChampionAdapter.Champi
 
         @Override
         public void onClick(View v) {
-            mListener.onClickListener(mList.get(getAdapterPosition()).getId());
+            mListener.onChampionClick(mList.get(getAdapterPosition()));
         }
     }
 }

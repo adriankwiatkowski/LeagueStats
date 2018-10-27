@@ -3,6 +3,7 @@ package com.example.android.leaguestats.adapters;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,9 +21,9 @@ import java.util.List;
 
 public class MasteryAdapter extends RecyclerView.Adapter<MasteryAdapter.MasteryViewHolder> {
 
-    static private IdClickListener mListener;
+    private IdClickListener mListener;
 
-    private static List<Mastery> mMastery;
+    private List<Mastery> mMastery;
     private final Context mContext;
     private final String PATCH_VERSION;
 
@@ -84,7 +85,7 @@ public class MasteryAdapter extends RecyclerView.Adapter<MasteryAdapter.MasteryV
         notifyDataSetChanged();
     }
 
-    static class MasteryViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    class MasteryViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         ImageView mChampionImage;
         TextView mChampionNameTv;

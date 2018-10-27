@@ -16,8 +16,8 @@ import android.widget.TextView;
 import com.example.android.leaguestats.R;
 import com.example.android.leaguestats.utilities.InjectorUtils;
 import com.example.android.leaguestats.utilities.PicassoUtils;
-import com.example.android.leaguestats.viewmodels.ChampionDetailModel;
-import com.example.android.leaguestats.viewmodels.ChampionDetailModelFactory;
+import com.example.android.leaguestats.viewmodels.ChampionModel;
+import com.example.android.leaguestats.viewmodels.ChampionModelFactory;
 import com.example.android.leaguestats.data.database.entity.ChampionEntry;
 
 import java.util.List;
@@ -38,13 +38,17 @@ public class ChampionTipsFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_champion_tips, container, false);
-        Log.d(LOG_TAG, "onCreateView");
 
         mPlayingAsTv = rootView.findViewById(R.id.playing_as_tv);
         mPlayingAgainstTv = rootView.findViewById(R.id.playing_against_tv);
         mPlayingAsLabelTv = rootView.findViewById(R.id.playing_as_label_tv);
         mPlayingAgainstLabelTv = rootView.findViewById(R.id.playing_against_label_tv);
-        mSplashArtImage = rootView.findViewById(R.id.splash_art_tips_image);
+
+        if (rootView.findViewById(R.id.splash_art_tips_image) != null) {
+            mSplashArtImage = rootView.findViewById(R.id.splash_art_tips_image);
+        } else {
+            mSplashArtImage = null;
+        }
 
         return rootView;
     }
@@ -52,16 +56,15 @@ public class ChampionTipsFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Log.d(LOG_TAG, "onActivityCreated");
 
         setupViewModel();
     }
 
     private void setupViewModel() {
-        ChampionDetailModelFactory factory =
-                InjectorUtils.provideChampionDetailModelFactory(getActivity().getApplicationContext());
-        final ChampionDetailModel viewModel =
-                ViewModelProviders.of(getActivity(), factory).get(ChampionDetailModel.class);
+        ChampionModelFactory factory =
+                InjectorUtils.provideChampionModelFactory(getActivity().getApplicationContext());
+        final ChampionModel viewModel =
+                ViewModelProviders.of(getActivity(), factory).get(ChampionModel.class);
         viewModel.getChampion().observe(getActivity(), new Observer<ChampionEntry>() {
             @Override
             public void onChanged(@Nullable ChampionEntry championEntry) {
@@ -73,10 +76,14 @@ public class ChampionTipsFragment extends Fragment {
 
     private void updateUi(ChampionEntry championEntry) {
         if (championEntry != null) {
-            // Get Default Splash Art.
-            String splashArt = championEntry.getSplashArt().get(0);
 
-            PicassoUtils.setSplashArt(mSplashArtImage, getContext(), splashArt);
+            // In two pane there isnt image.
+            if (mSplashArtImage != null) {
+                // Get Default Splash Art.
+                String splashArt = championEntry.getSplashArt().get(0);
+
+                PicassoUtils.setSplashArt(mSplashArtImage, getContext(), splashArt);
+            }
 
             mPlayingAgainstLabelTv.setText(getString(R.string.playing_vs) + " " + championEntry.getName());
 

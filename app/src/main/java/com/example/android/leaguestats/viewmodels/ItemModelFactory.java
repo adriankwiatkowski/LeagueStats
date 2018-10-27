@@ -6,17 +6,17 @@ import android.support.annotation.NonNull;
 
 import com.example.android.leaguestats.data.LeagueRepository;
 
-public class SummonerSpellListModelFactory extends ViewModelProvider.NewInstanceFactory {
+public class ItemModelFactory extends ViewModelProvider.NewInstanceFactory {
 
     private final LeagueRepository mRepository;
 
-    public SummonerSpellListModelFactory(LeagueRepository repository) {
+    public ItemModelFactory(LeagueRepository repository) {
         mRepository = repository;
     }
 
     @NonNull
     @Override
     public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
-        return (T) new SummonerSpellListModel(mRepository);
+        return (T) new ItemModel(mRepository);
     }
 }

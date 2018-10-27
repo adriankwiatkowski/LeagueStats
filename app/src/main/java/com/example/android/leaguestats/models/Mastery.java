@@ -1,7 +1,7 @@
 package com.example.android.leaguestats.models;
 
+import com.example.android.leaguestats.data.database.entity.ChampionEntry;
 import com.example.android.leaguestats.data.network.api.models.MasteryResponse;
-import com.example.android.leaguestats.data.database.models.ListChampionEntry;
 
 import java.util.List;
 
@@ -15,18 +15,7 @@ public class Mastery {
     private String mChampionName;
     private String mChampionImage;
 
-    public Mastery(String name, String image, int championId, int championLevel,
-                   int championPoints, long lastPlayTime, boolean chestGranted) {
-        mChampionName = name;
-        mChampionImage = image;
-        mChampionId = championId;
-        mChampionLevel = championLevel;
-        mChampionPoints = championPoints;
-        mLastPlayTime = lastPlayTime;
-        mIsChestGranted = chestGranted;
-    }
-
-    public Mastery(MasteryResponse masteries, List<ListChampionEntry> championEntries) {
+    public Mastery(MasteryResponse masteries, List<ChampionEntry> championEntries) {
 
         String championName = "";
         String championThumbnail = "";

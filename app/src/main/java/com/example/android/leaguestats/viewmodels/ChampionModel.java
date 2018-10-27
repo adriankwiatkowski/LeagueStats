@@ -13,17 +13,22 @@ import android.util.Log;
 import com.example.android.leaguestats.data.database.entity.ChampionEntry;
 import com.example.android.leaguestats.data.LeagueRepository;
 
-public class ChampionDetailModel extends ViewModel {
+import java.util.List;
 
-    private static final String LOG_TAG = ChampionDetailModel.class.getSimpleName();
-    private final MutableLiveData<String> mNameQuery;
-    private final MutableLiveData<Long> mIdQuery;
+public class ChampionModel extends ViewModel {
+
+    private static final String LOG_TAG = ChampionModel.class.getSimpleName();
+
     private LiveData<ChampionEntry> mChampion;
+    private LiveData<List<ChampionEntry>> mChampions;
 
-    public ChampionDetailModel(final LeagueRepository repository) {
-        Log.d(LOG_TAG, "Getting ChampionDetailModel");
-        mNameQuery = new MutableLiveData<>();
-        mIdQuery = new MutableLiveData<>();
+    private final MutableLiveData<ChampionEntry> mChampionQuery = new MutableLiveData<>();
+    private final MutableLiveData<String> mNameQuery = new MutableLiveData<>();
+    private final MutableLiveData<Long> mIdQuery = new MutableLiveData<>();
+
+    public ChampionModel(final LeagueRepository repository) {
+        Log.d(LOG_TAG, "Getting ChampionModel");
+        mChampions = repository.getChampionEntries();
 
         final MediatorLiveData mediatorLiveData = new MediatorLiveData();
         mediatorLiveData.addSource(mNameQuery, new Observer() {
@@ -33,6 +38,12 @@ public class ChampionDetailModel extends ViewModel {
             }
         });
         mediatorLiveData.addSource(mIdQuery, new Observer() {
+            @Override
+            public void onChanged(@Nullable Object o) {
+                mediatorLiveData.setValue(o);
+            }
+        });
+        mediatorLiveData.addSource(mChampionQuery, new Observer() {
             @Override
             public void onChanged(@Nullable Object o) {
                 mediatorLiveData.setValue(o);
@@ -49,11 +60,21 @@ public class ChampionDetailModel extends ViewModel {
                 } else if (input instanceof String) {
                     String championName = (String) input;
                     return repository.getChampionEntry(championName);
+                } else if (input instanceof ChampionEntry){
+                    return input;
                 } else {
                     return null;
                 }
             }
         });
+    }
+
+    public LiveData<List<ChampionEntry>> getChampions() {
+        return mChampions;
+    }
+
+    public void initChampion(ChampionEntry championEntry) {
+        mChampionQuery.setValue(championEntry);
     }
 
     public void initChampion(long id) {
