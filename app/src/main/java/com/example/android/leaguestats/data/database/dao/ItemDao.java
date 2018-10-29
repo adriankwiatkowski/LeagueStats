@@ -15,19 +15,22 @@ import java.util.List;
 public interface ItemDao {
 
     @Query("SELECT * FROM item WHERE purchasable = 'true' AND total_gold > 0 ORDER BY total_gold")
-    LiveData<List<ItemEntry>> loadListItem();
+    LiveData<List<ItemEntry>> getItems();
 
     @Query("SELECT * FROM item WHERE id IN (:id)")
-    LiveData<ItemEntry> loadItem(long id);
+    LiveData<ItemEntry> getItem(long id);
 
     @Query("SELECT * FROM item WHERE name LIKE + :name")
-    LiveData<ItemEntry> loadItem(String name);
+    LiveData<ItemEntry> getItem(String name);
 
     @Query("SELECT * FROM item WHERE id IN (:id) ORDER BY total_gold")
-    LiveData<List<ItemEntry>> loadItemsWithId(String[] id);
+    LiveData<List<ItemEntry>> getItems(String[] id);
 
     @Query("SELECT * FROM item WHERE id IN (:id) ORDER BY total_gold")
-    List<ItemEntry> loadItemsWithId(int[] id);
+    LiveData<List<ItemEntry>> getItems(int[] id);
+
+    @Query("SELECT COUNT(id) FROM item")
+    int countAllItems();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void bulkInsert(ItemEntry... itemEntries);
@@ -37,7 +40,4 @@ public interface ItemDao {
 
     @Query("DELETE FROM item")
     void deleteItems();
-
-    @Query("SELECT COUNT(id) FROM item")
-    int countAllItems();
 }

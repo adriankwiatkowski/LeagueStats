@@ -34,7 +34,7 @@ public class ItemModel extends ViewModel {
 
     public ItemModel(final LeagueRepository repository) {
         Log.d(LOG_TAG, "Retrieving items from database");
-        mItems = repository.getItemEntries();
+        mItems = repository.getItems();
 
         final MediatorLiveData mediatorLiveData = new MediatorLiveData();
         mediatorLiveData.addSource(mNameQuery, new Observer() {
@@ -63,7 +63,7 @@ public class ItemModel extends ViewModel {
                 if (input instanceof Long || input instanceof Integer) {
                     long itemId = (long) input;
 
-                    LiveData<ItemEntry> itemEntry = repository.getItemEntry(itemId);
+                    LiveData<ItemEntry> itemEntry = repository.getItem(itemId);
 
                     updateItem(itemEntry);
 
@@ -72,11 +72,11 @@ public class ItemModel extends ViewModel {
                 } else if (input instanceof String) {
                     String itemName = (String) input;
 
-                    LiveData<ItemEntry> itemEntry = repository.getItemEntry(itemName);
+                    LiveData<ItemEntry> itemEntry = repository.getItem(itemName);
 
                     updateItem(itemEntry);
 
-                    return repository.getItemEntry(itemName);
+                    return repository.getItem(itemName);
                 } else if (input instanceof ItemEntry){
                     return input;
                 } else {
@@ -88,14 +88,14 @@ public class ItemModel extends ViewModel {
         mItemFrom = Transformations.switchMap(mFromQuery, new Function<String[], LiveData<List<ItemEntry>>>() {
             @Override
             public LiveData<List<ItemEntry>> apply(String[] input) {
-                return repository.getItemEntries(input);
+                return repository.getItems(input);
             }
         });
 
         mItemInto = Transformations.switchMap(mIntoQuery, new Function<String[], LiveData<List<ItemEntry>>>() {
             @Override
             public LiveData<List<ItemEntry>> apply(String[] input) {
-                return repository.getItemEntries(input);
+                return repository.getItems(input);
             }
         });
     }

@@ -125,68 +125,76 @@ public class LeagueNetworkDataSource {
         });
     }
 
-    public LiveData<ChampionEntry[]> fetchChampionData(String patchVersion, String language) {
+    public LiveData<ChampionEntry[]> fetchChampionData(final String patchVersion, final String language) {
 
-        OpenDataJsonParser openDataJsonParser = new OpenDataJsonParser();
+        final OpenDataJsonParser openDataJsonParser = new OpenDataJsonParser();
 
         final MutableLiveData<ChampionEntry[]> mutableLiveData = new MutableLiveData<>();
 
         Call<JsonElement> call = mService.getChampions(patchVersion, language);
 
-        try {
+        call.enqueue(new Callback<JsonElement>() {
+            @Override
+            public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+                if (response.isSuccessful()) {
+                    Log.d(LOG_TAG, "Champions response successful");
 
-            String jsonChampionsResponse = call.execute().body().toString();
+                    String championsJsonResponse = response.body().toString();
 
-            String[] championId = openDataJsonParser.parseChampions(jsonChampionsResponse);
+                    final String[] championId = openDataJsonParser.parseChampions(championsJsonResponse);
 
-            ChampionEntry[] championEntries = new ChampionEntry[championId.length];
+                    final List<ChampionEntry> championEntries = new ArrayList<>();
 
-            for (int i = 0; i < championEntries.length; i++) {
+                    for (int i = 0; i < championId.length; i++) {
 
-                Call<JsonElement> championCall = mService.getChampion(patchVersion, language, championId[i]);
+                        Call<JsonElement> championCall = mService.getChampion(patchVersion, language, championId[i]);
 
-                String jsonChampionResponse = championCall.execute().body().toString();
+                        championCall.enqueue(new Callback<JsonElement>() {
+                            @Override
+                            public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+                                if (response.isSuccessful()) {
 
-                ChampionEntry championEntry = openDataJsonParser.parseChampionResponse(jsonChampionResponse);
+                                    String championJsonResponse = response.body().toString();
 
-                championEntries[i] = championEntry;
-                Log.d(LOG_TAG, "champion fetched " + String.valueOf(i));
+                                    ChampionEntry championEntry = openDataJsonParser.parseChampionResponse(championJsonResponse);
+
+                                    championEntries.add(championEntry);
+                                    Log.d(LOG_TAG, "champion fetched " + championEntries.size());
+
+                                    if (championEntries.size() >= championId.length) {
+                                        mutableLiveData.setValue(championEntries.toArray(new ChampionEntry[championEntries.size()]));
+                                    }
+                                } else {
+                                    Log.d(LOG_TAG, "call failed against the url: " + call.request().url());
+                                    Log.d(LOG_TAG, "Champion response not successful");
+                                    mutableLiveData.postValue(null);
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call<JsonElement> call, Throwable t) {
+                                Log.d(LOG_TAG, "call failed against the url: " + call.request().url());
+                                Log.d(LOG_TAG, "Failed to fetch champion data");
+                                Log.d(LOG_TAG, t.getMessage());
+                                mutableLiveData.postValue(null);
+                            }
+                        });
+                    }
+                } else {
+                    Log.d(LOG_TAG, "call failed against the url: " + call.request().url());
+                    Log.d(LOG_TAG, "Champions response not successful");
+                    mutableLiveData.postValue(null);
+                }
             }
 
-            mutableLiveData.postValue(championEntries);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        /*
-        Call<JsonElement> championListCall = mService.getChampions(patchVersion, language);
-
-        try {
-
-            String jsonChampionsResponse = championListCall.execute().body().toString();
-
-            String[] championId = openDataJsonParser.parseChampions(jsonChampionsResponse);
-
-            ChampionEntry[] championEntries = new ChampionEntry[championId.length];
-
-            for (int i = 0; i < championEntries.length; i++) {
-
-                Call<JsonElement> championCall = mService.getChampion(patchVersion, language, championId[i]);
-
-                String jsonChampionResponse = championCall.execute().body().toString();
-
-                ChampionEntry championEntry = openDataJsonParser.parseChampionResponse(jsonChampionResponse);
-
-                championEntries[i] = championEntry;
-                Log.d(LOG_TAG, "champion fetched " + String.valueOf(i));
+            @Override
+            public void onFailure(Call<JsonElement> call, Throwable t) {
+                Log.d(LOG_TAG, "call failed against the url: " + call.request().url());
+                Log.d(LOG_TAG, "Failed to fetch champions data");
+                Log.d(LOG_TAG, t.getMessage());
+                mutableLiveData.postValue(null);
             }
-
-            mDb.championDao().deleteChampions();
-            mDb.championDao().bulkInsert(championEntries);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-         */
+        });
 
         return mutableLiveData;
     }

@@ -28,7 +28,7 @@ public class ChampionModel extends ViewModel {
 
     public ChampionModel(final LeagueRepository repository) {
         Log.d(LOG_TAG, "Getting ChampionModel");
-        mChampions = repository.getChampionEntries();
+        mChampions = repository.getChampions();
 
         final MediatorLiveData mediatorLiveData = new MediatorLiveData();
         mediatorLiveData.addSource(mNameQuery, new Observer() {
@@ -56,10 +56,10 @@ public class ChampionModel extends ViewModel {
                 Log.d(LOG_TAG, "Getting new champion");
                 if (input instanceof Long || input instanceof Integer) {
                     long championId = (long) input;
-                    return repository.getChampionEntry(championId);
+                    return repository.getChampion(championId);
                 } else if (input instanceof String) {
                     String championName = (String) input;
-                    return repository.getChampionEntry(championName);
+                    return repository.getChampion(championName);
                 } else if (input instanceof ChampionEntry){
                     return input;
                 } else {

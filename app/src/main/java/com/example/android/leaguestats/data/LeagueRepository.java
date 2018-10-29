@@ -2,7 +2,7 @@ package com.example.android.leaguestats.data;
 
 import android.arch.core.util.Function;
 import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
+import android.arch.lifecycle.MediatorLiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.Transformations;
 import android.content.Context;
@@ -73,7 +73,7 @@ public class LeagueRepository {
                 int summonerSpellCount = mDb.summonerSpellDao().countAllSummonerSpells();
                 int iconCount = mDb.iconDao().countAllIcons();
                 if (championCount <= 0 || itemCount <= 0 || summonerSpellCount <= 0 || iconCount <= 0) {
-                  mLeagueNetworkDataSource.initializeData(context, true);
+                    mLeagueNetworkDataSource.initializeData(context, true);
                 }
                 return null;
             }
@@ -89,13 +89,20 @@ public class LeagueRepository {
         final LiveData<ChampionEntry[]> championEntryData =
                 mLeagueNetworkDataSource.fetchChampionData(patchVersion, language);
 
+        // TODO Check if response is null.
         championEntryData.observeForever(new Observer<ChampionEntry[]>() {
             @Override
-            public void onChanged(@Nullable ChampionEntry[] championEntries) {
+            public void onChanged(@Nullable final ChampionEntry[] championEntries) {
                 // TODO cant remove observer on background thread e.g. IntentService.
                 //championEntriesData.removeObserver(this);
-                mDb.championDao().deleteChampions();
-                mDb.championDao().bulkInsert(championEntries);
+                new AsyncTask<Void, Void, Void>() {
+                    @Override
+                    protected Void doInBackground(Void... voids) {
+                        mDb.championDao().deleteChampions();
+                        mDb.championDao().bulkInsert(championEntries);
+                        return null;
+                    }
+                }.execute();
             }
         });
 
@@ -104,9 +111,15 @@ public class LeagueRepository {
 
         itemEntryData.observeForever(new Observer<ItemEntry[]>() {
             @Override
-            public void onChanged(@Nullable ItemEntry[] itemEntries) {
-                mDb.itemDao().deleteItems();
-                mDb.itemDao().bulkInsert(itemEntries);
+            public void onChanged(@Nullable final ItemEntry[] itemEntries) {
+                new AsyncTask<Void, Void, Void>() {
+                    @Override
+                    protected Void doInBackground(Void... voids) {
+                        mDb.itemDao().deleteItems();
+                        mDb.itemDao().bulkInsert(itemEntries);
+                        return null;
+                    }
+                }.execute();
             }
         });
 
@@ -115,9 +128,15 @@ public class LeagueRepository {
 
         summonerSpellEntryData.observeForever(new Observer<SummonerSpellEntry[]>() {
             @Override
-            public void onChanged(@Nullable SummonerSpellEntry[] summonerSpellEntries) {
-                mDb.summonerSpellDao().deleteSpells();
-                mDb.summonerSpellDao().bulkInsert(summonerSpellEntries);
+            public void onChanged(@Nullable final SummonerSpellEntry[] summonerSpellEntries) {
+                new AsyncTask<Void, Void, Void>() {
+                    @Override
+                    protected Void doInBackground(Void... voids) {
+                        mDb.summonerSpellDao().deleteSpells();
+                        mDb.summonerSpellDao().bulkInsert(summonerSpellEntries);
+                        return null;
+                    }
+                }.execute();
             }
         });
 
@@ -126,9 +145,15 @@ public class LeagueRepository {
 
         iconEntryData.observeForever(new Observer<IconEntry[]>() {
             @Override
-            public void onChanged(@Nullable IconEntry[] iconEntries) {
-                mDb.iconDao().deleteIcons();
-                mDb.iconDao().bulkInsert(iconEntries);
+            public void onChanged(@Nullable final IconEntry[] iconEntries) {
+                new AsyncTask<Void, Void, Void>() {
+                    @Override
+                    protected Void doInBackground(Void... voids) {
+                        mDb.iconDao().deleteIcons();
+                        mDb.iconDao().bulkInsert(iconEntries);
+                        return null;
+                    }
+                }.execute();
             }
         });
     }
@@ -141,134 +166,189 @@ public class LeagueRepository {
     public LiveData<List<Mastery>> getMasteries(String entryUrlString, long summonerId) {
         Log.d(LOG_TAG, "Getting masteries");
 
-        LiveData<List<MasteryResponse>> masteryNetworkResponse =
-                mLeagueNetworkDataSource.fetchMasteries(entryUrlString, summonerId);
+        final LiveData<List<MasteryResponse>> masteryNetworkResponse = mLeagueNetworkDataSource.fetchMasteries(entryUrlString, summonerId);
 
-        return Transformations.switchMap(masteryNetworkResponse, new Function<List<MasteryResponse>, LiveData<List<Mastery>>>() {
+        final MediatorLiveData<List<Mastery>> masteries = new MediatorLiveData<>();
+
+        masteries.addSource(masteryNetworkResponse, new Observer<List<MasteryResponse>>() {
             @Override
-            public LiveData<List<Mastery>> apply(final List<MasteryResponse> masteryResponse) {
+            public void onChanged(@Nullable final List<MasteryResponse> masteryResponses) {
 
-                final MutableLiveData<List<Mastery>> masteries = new MutableLiveData<>();
+                masteries.removeSource(masteryNetworkResponse);
 
-                if (masteryResponse != null) {
-                    new AsyncTask<Void, Void, Void>() {
-                        @Override
-                        protected Void doInBackground(Void... voids) {
-                            final int[] championId = new int[masteryResponse.size()];
-                            for (int i = 0; i < masteryResponse.size(); i++) {
-                                championId[i] = masteryResponse.get(i).getChampionId();
-                            }
-
-                            List<ChampionEntry> championEntries = getChampionEntries(championId);
-
-                            List<Mastery> masteryList = new ArrayList<>();
-
-                            for (int i = 0; i < masteryResponse.size(); i++) {
-                                MasteryResponse response = masteryResponse.get(i);
-                                Mastery mastery = new Mastery(response, championEntries);
-                                masteryList.add(mastery);
-                            }
-
-                            masteries.postValue(masteryList);
-                            Log.d(LOG_TAG, "Masteries changed");
-                            return null;
-                        }
-                    }.execute();
-                } else {
-                    masteries.postValue(null);
+                final int[] championId = new int[masteryResponses.size()];
+                for (int i = 0; i < masteryResponses.size(); i++) {
+                    championId[i] = masteryResponses.get(i).getChampionId();
                 }
 
-                return masteries;
+                final LiveData<List<ChampionEntry>> liveChampionEntries = getChampions(championId);
+
+                masteries.addSource(liveChampionEntries, new Observer<List<ChampionEntry>>() {
+                    @Override
+                    public void onChanged(@Nullable List<ChampionEntry> championEntries) {
+
+                        masteries.removeSource(liveChampionEntries);
+
+                        List<Mastery> masteryList = new ArrayList<>();
+
+                        for (int i = 0; i < masteryResponses.size(); i++) {
+                            MasteryResponse response = masteryResponses.get(i);
+                            Mastery mastery = new Mastery(response, championEntries);
+                            masteryList.add(mastery);
+                        }
+
+                        masteries.setValue(masteryList);
+                    }
+                });
             }
         });
+
+        return masteries;
+    }
+
+    private MediatorLiveData<MatchMergedData> getLiveDataForMatches(List<MatchResponse> matchResponses) {
+
+        final MatchMergedData mergedData = new MatchMergedData();
+        final MediatorLiveData<MatchMergedData> liveDataMerger = new  MediatorLiveData<>();
+
+        final List<Integer> championIdList = getChampionIdList(matchResponses);
+        int[] championId = getIdArrayWithNoDuplicate(championIdList);
+        final LiveData<List<ChampionEntry>> liveChampionEntries = getChampions(championId);
+
+        final List<Integer> summonerSpell1IdList = getSummonerSpellIdList(matchResponses, true);
+        int[] summonerSpell1Id = getIdArrayWithNoDuplicate(summonerSpell1IdList);
+        final LiveData<List<SummonerSpellEntry>> liveSummonerSpell1Entries = getSummonerSpells(summonerSpell1Id);
+
+        final List<Integer> summonerSpell2IdList = getSummonerSpellIdList(matchResponses, false);
+        int[] summonerSpell2Id = getIdArrayWithNoDuplicate(summonerSpell2IdList);
+        final LiveData<List<SummonerSpellEntry>> liveSummonerSpell2Entries = getSummonerSpells(summonerSpell2Id);
+
+        final List<Integer> itemIdList = getItemIdList(matchResponses);
+        int[] itemId = getIdArrayWithNoDuplicate(itemIdList);
+        final LiveData<List<ItemEntry>> liveItemEntries = getItems(itemId);
+
+        liveDataMerger.addSource(liveChampionEntries, new Observer<List<ChampionEntry>>() {
+            @Override
+            public void onChanged(@Nullable List<ChampionEntry> championEntries) {
+                liveDataMerger.removeSource(liveChampionEntries);
+                mergedData.setChampionEntries(getMatchListChampionEntry(championIdList, championEntries));
+                liveDataMerger.setValue(mergedData);
+            }
+        });
+
+        liveDataMerger.addSource(liveSummonerSpell1Entries, new Observer<List<SummonerSpellEntry>>() {
+            @Override
+            public void onChanged(@Nullable List<SummonerSpellEntry> summonerSpell1Entries) {
+                liveDataMerger.removeSource(liveSummonerSpell1Entries);
+                mergedData.setSummonerSpell1Entries(getMatchSummonerSpells(summonerSpell1IdList, summonerSpell1Entries));
+                liveDataMerger.setValue(mergedData);
+            }
+        });
+
+        liveDataMerger.addSource(liveSummonerSpell2Entries, new Observer<List<SummonerSpellEntry>>() {
+            @Override
+            public void onChanged(@Nullable List<SummonerSpellEntry> summonerSpell2Entries) {
+                liveDataMerger.removeSource(liveSummonerSpell2Entries);
+                mergedData.setSummonerSpell2Entries(getMatchSummonerSpells(summonerSpell2IdList, summonerSpell2Entries));
+                liveDataMerger.setValue(mergedData);
+            }
+        });
+
+        liveDataMerger.addSource(liveItemEntries, new Observer<List<ItemEntry>>() {
+            @Override
+            public void onChanged(@Nullable List<ItemEntry> itemEntries) {
+                liveDataMerger.removeSource(liveItemEntries);
+                mergedData.setItemEntries(getMatchListItemEntry(itemIdList, itemEntries));
+                liveDataMerger.setValue(mergedData);
+            }
+        });
+
+        return liveDataMerger;
     }
 
     public LiveData<List<Match>> getMatches(final String entryUrlString, long accountId, final long summonerId) {
         Log.d(LOG_TAG, "Getting matches");
 
-        LiveData<List<MatchList>> matchList = mLeagueNetworkDataSource.fetchMatchList(entryUrlString, accountId);
+        final LiveData<List<MatchList>> matchList = mLeagueNetworkDataSource.fetchMatchList(entryUrlString, accountId);
 
-        LiveData<List<MatchResponse>> matchResponse = Transformations.switchMap(matchList, new Function<List<MatchList>, LiveData<List<MatchResponse>>>() {
+        final LiveData<List<MatchResponse>> matchResponse = Transformations.switchMap(matchList, new Function<List<MatchList>, LiveData<List<MatchResponse>>>() {
             @Override
             public LiveData<List<MatchResponse>> apply(List<MatchList> matchList) {
                 return mLeagueNetworkDataSource.fetchMatches(entryUrlString, matchList, MATCH_COUNT);
             }
         });
 
-        return Transformations.switchMap(matchResponse, new Function<List<MatchResponse>, LiveData<List<Match>>>() {
+        final MediatorLiveData<List<Match>> mediatorLiveData = new MediatorLiveData<>();
+        mediatorLiveData.addSource(matchResponse, new Observer<List<MatchResponse>>() {
             @Override
-            public LiveData<List<Match>> apply(final List<MatchResponse> matchResponseList) {
+            public void onChanged(@Nullable final List<MatchResponse> matchResponses) {
+                mediatorLiveData.removeSource(matchResponse);
 
-                final MutableLiveData<List<Match>> matchMutableLiveData = new MutableLiveData<>();
-
-                new AsyncTask<Void, Void, Void>() {
+                mediatorLiveData.addSource(getLiveDataForMatches(matchResponses), new Observer<MatchMergedData>() {
                     @Override
-                    protected Void doInBackground(Void... voids) {
+                    public void onChanged(@Nullable MatchMergedData matchMergedData) {
+                        if (matchMergedData.getChampionEntries() != null &&
+                                matchMergedData.getSummonerSpell1Entries() != null &&
+                                matchMergedData.getSummonerSpell2Entries() != null &&
+                                matchMergedData.getItemEntries() != null) {
 
-                        List<Match> matchList = new ArrayList<>();
+                            List<Match> matches = new ArrayList<>();
 
-                        List<Integer> championIdList = getChampionIdList(matchResponseList);
-                        List<ChampionEntry> championEntries = getMatchListChampionEntry(championIdList);
+                            List<ChampionEntry> championEntries = matchMergedData.getChampionEntries();
+                            List<SummonerSpellEntry> summonerSpell1Entries = matchMergedData.getSummonerSpell1Entries();
+                            List<SummonerSpellEntry> summonerSpell2Entries = matchMergedData.getSummonerSpell2Entries();
+                            List<ItemEntry> itemEntries = matchMergedData.getItemEntries();
 
-                        List<Integer> summonerSpell1IdList = getSummonerSpellIdList(matchResponseList, true);
-                        List<SummonerSpellEntry> summonerSpell1Entries = getMatchSummonerSpells(summonerSpell1IdList);
+                            int index = 0;
+                            int itemIndex = 0;
+                            for (int i = 0; i < matchResponses.size(); i++) {
 
-                        List<Integer> summonerSpell2IdList = getSummonerSpellIdList(matchResponseList, false);
-                        List<SummonerSpellEntry> summonerSpell2Entries = getMatchSummonerSpells(summonerSpell2IdList);
+                                MatchResponse matchResponse = matchResponses.get(i);
 
-                        List<Integer> itemIdList = getItemIdList(matchResponseList);
-                        List<ItemEntry> itemEntries = getMatchListItemEntry(itemIdList);
+                                int participantsSize = matchResponse.getParticipants().size();
 
-                        int index = 0;
-                        int itemIndex = 0;
-                        for (int i = 0; i < matchResponseList.size(); i++) {
+                                List<ChampionEntry> championEntryList = new ArrayList<>();
+                                List<SummonerSpellEntry> summonerSpellEntries = new ArrayList<>();
+                                List<SummonerSpellEntry> summonerSpell2List = new ArrayList<>();
+                                List<ItemEntry> itemEntryList = new ArrayList<>();
 
-                            MatchResponse matchResponse = matchResponseList.get(i);
+                                for (int j = 0; j < participantsSize; j++) {
 
-                            int participantsSize = matchResponse.getParticipants().size();
+                                    championEntryList.add(championEntries.get(index));
+                                    summonerSpellEntries.add(summonerSpell1Entries.get(index));
+                                    summonerSpell2List.add(summonerSpell2Entries.get(index));
 
-                            List<ChampionEntry> championEntryList = new ArrayList<>();
-                            List<SummonerSpellEntry> summonerSpellEntries = new ArrayList<>();
-                            List<SummonerSpellEntry> summonerSpell2List = new ArrayList<>();
-                            List<ItemEntry> itemEntryList = new ArrayList<>();
+                                    index++;
+                                }
 
-                            for (int j = 0; j < participantsSize; j++) {
+                                // There is always 7 items.
+                                for (int j = 0; j < 7 * participantsSize; j++) {
 
-                                championEntryList.add(championEntries.get(index));
-                                summonerSpellEntries.add(summonerSpell1Entries.get(index));
-                                summonerSpell2List.add(summonerSpell2Entries.get(index));
+                                    itemEntryList.add(itemEntries.get(itemIndex));
 
-                                index++;
+                                    itemIndex++;
+                                }
+
+                                matches.add(new Match(matchResponse, championEntryList, summonerSpellEntries,
+                                        summonerSpell2List, itemEntryList, summonerId));
                             }
 
-                            // There is always 7 items.
-                            for (int j = 0; j < 7 * participantsSize; j++) {
-
-                                itemEntryList.add(itemEntries.get(itemIndex));
-
-                                itemIndex++;
-                            }
-
-                            matchList.add(new Match(matchResponse, championEntryList, summonerSpellEntries,
-                                    summonerSpell2List, itemEntryList, summonerId));
+                            mediatorLiveData.setValue(matches);
+                            Log.d(LOG_TAG, "Matches changed");
                         }
-
-                        matchMutableLiveData.postValue(matchList);
-                        Log.d(LOG_TAG, "Matches changed");
-                        return null;
                     }
-                }.execute();
-
-                return matchMutableLiveData;
+                });
             }
         });
+
+        return mediatorLiveData;
     }
 
-    private List<Integer> getChampionIdList(List<MatchResponse> matchResponseArray) {
+    private List<Integer> getChampionIdList(List<MatchResponse> matchResponses) {
 
         List<Integer> championIdList = new ArrayList<>();
 
-        for (MatchResponse matchResponse : matchResponseArray) {
+        for (MatchResponse matchResponse : matchResponses) {
             List<Participant> participants = matchResponse.getParticipants();
             for (Participant participant : participants) {
                 championIdList.add(participant.getChampionId());
@@ -278,11 +358,11 @@ public class LeagueRepository {
         return championIdList;
     }
 
-    private List<Integer> getSummonerSpellIdList(List<MatchResponse> matchResponseList, boolean isFirst) {
+    private List<Integer> getSummonerSpellIdList(List<MatchResponse> matchResponses, boolean isFirst) {
 
         List<Integer> summonerSpellIdList = new ArrayList<>();
 
-        for (MatchResponse matchResponse : matchResponseList) {
+        for (MatchResponse matchResponse : matchResponses) {
             List<Participant> participants = matchResponse.getParticipants();
             for (Participant participant : participants) {
                 if (isFirst) {
@@ -296,11 +376,11 @@ public class LeagueRepository {
         return summonerSpellIdList;
     }
 
-    private List<Integer> getItemIdList(List<MatchResponse> matchResponseList) {
+    private List<Integer> getItemIdList(List<MatchResponse> matchResponses) {
 
         List<Integer> itemIdList = new ArrayList<>();
 
-        for (MatchResponse matchResponse : matchResponseList) {
+        for (MatchResponse matchResponse : matchResponses) {
             List<Participant> participants = matchResponse.getParticipants();
             for (Participant participant : participants) {
                 itemIdList.add(participant.getStats().getItem0());
@@ -316,11 +396,7 @@ public class LeagueRepository {
         return itemIdList;
     }
 
-    private List<ChampionEntry> getMatchListChampionEntry(List<Integer> championIdList) {
-
-        int[] id = getIdArrayWithNoDuplicate(championIdList);
-
-        List<ChampionEntry> championEntries = getChampionEntries(id);
+    private List<ChampionEntry> getMatchListChampionEntry(List<Integer> championIdList, List<ChampionEntry> championEntries) {
 
         List<ChampionEntry> championList = new ArrayList<>();
 
@@ -335,11 +411,7 @@ public class LeagueRepository {
         return championList;
     }
 
-    private List<SummonerSpellEntry> getMatchSummonerSpells(List<Integer> summonerSpellIdList) {
-
-        int[] id = getIdArrayWithNoDuplicate(summonerSpellIdList);
-
-        List<SummonerSpellEntry> summonerSpellEntries = getSummonerSpells(id);
+    private List<SummonerSpellEntry> getMatchSummonerSpells(List<Integer> summonerSpellIdList, List<SummonerSpellEntry> summonerSpellEntries) {
 
         List<SummonerSpellEntry> summonerSpellList = new ArrayList<>();
 
@@ -354,11 +426,7 @@ public class LeagueRepository {
         return summonerSpellList;
     }
 
-    private List<ItemEntry> getMatchListItemEntry(List<Integer> matchItemIdList) {
-
-        int[] id = getIdArrayWithNoDuplicate(matchItemIdList);
-
-        List<ItemEntry> itemEntries = getItemEntries(id);
+    private List<ItemEntry> getMatchListItemEntry(List<Integer> matchItemIdList, List<ItemEntry> itemEntries) {
 
         List<ItemEntry> itemList = new ArrayList<>();
 
@@ -399,51 +467,51 @@ public class LeagueRepository {
         return idArray;
     }
 
-    public LiveData<List<ChampionEntry>> getChampionEntries() {
-        return mDb.championDao().getChampionList();
+    public LiveData<List<ChampionEntry>> getChampions() {
+        return mDb.championDao().getChampions();
     }
 
-    public LiveData<ChampionEntry> getChampionEntry(long id) {
+    public LiveData<ChampionEntry> getChampion(long id) {
         return mDb.championDao().getChampion(id);
     }
 
-    public LiveData<ChampionEntry> getChampionEntry(String name) {
+    public LiveData<ChampionEntry> getChampion(String name) {
         return mDb.championDao().getChampion(name);
     }
 
-    public List<ChampionEntry> getChampionEntries(int[] id) {
-        return mDb.championDao().getChampionList(id);
+    public LiveData<List<ChampionEntry>> getChampions(int[] id) {
+        return mDb.championDao().getChampions(id);
     }
 
-    public LiveData<List<ItemEntry>> getItemEntries() {
-        return mDb.itemDao().loadListItem();
+    public LiveData<List<ItemEntry>> getItems() {
+        return mDb.itemDao().getItems();
     }
 
-    public LiveData<ItemEntry> getItemEntry(long id) {
-        return mDb.itemDao().loadItem(id);
+    public LiveData<ItemEntry> getItem(long id) {
+        return mDb.itemDao().getItem(id);
     }
 
-    public LiveData<ItemEntry> getItemEntry(String name) {
-        return mDb.itemDao().loadItem(name);
+    public LiveData<ItemEntry> getItem(String name) {
+        return mDb.itemDao().getItem(name);
     }
 
-    public LiveData<List<ItemEntry>> getItemEntries(String[] id) {
-        return mDb.itemDao().loadItemsWithId(id);
+    private LiveData<List<ItemEntry>> getItems(int[] itemId) {
+        return mDb.itemDao().getItems(itemId);
     }
 
-    public List<ItemEntry> getItemEntries(int[] id) {
-        return mDb.itemDao().loadItemsWithId(id);
+    public LiveData<List<ItemEntry>> getItems(String[] id) {
+        return mDb.itemDao().getItems(id);
     }
 
     public LiveData<List<SummonerSpellEntry>> getSummonerSpells() {
-        return mDb.summonerSpellDao().loadSpellList();
+        return mDb.summonerSpellDao().getSummonerSpells();
     }
 
     public LiveData<SummonerSpellEntry> getSummonerSpell(long id) {
-        return mDb.summonerSpellDao().loadSpellById(id);
+        return mDb.summonerSpellDao().getSummonerSpells(id);
     }
 
-    public List<SummonerSpellEntry> getSummonerSpells(int[] id) {
-        return mDb.summonerSpellDao().loadSpellsWithId(id);
+    public LiveData<List<SummonerSpellEntry>> getSummonerSpells(int[] id) {
+        return mDb.summonerSpellDao().getSummonerSpells(id);
     }
 }

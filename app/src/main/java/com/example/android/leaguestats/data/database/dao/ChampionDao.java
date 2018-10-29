@@ -15,7 +15,7 @@ import java.util.List;
 public interface ChampionDao {
 
     @Query("SELECT * FROM champion ORDER BY name")
-    LiveData<List<ChampionEntry>> getChampionList();
+    LiveData<List<ChampionEntry>> getChampions();
 
     @Query("SELECT * FROM champion WHERE id = :id")
     LiveData<ChampionEntry> getChampion(long id);
@@ -24,7 +24,7 @@ public interface ChampionDao {
     LiveData<ChampionEntry> getChampion(String name);
 
     @Query("SELECT * FROM champion WHERE id IN (:id)")
-    List<ChampionEntry> getChampionList(int[] id);
+    LiveData<List<ChampionEntry>> getChampions(int[] id);
 
     @Query("SELECT COUNT(id) FROM champion")
     int countAllChampions();

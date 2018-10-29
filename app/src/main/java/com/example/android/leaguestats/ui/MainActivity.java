@@ -30,7 +30,6 @@ public class MainActivity extends AppCompatActivity
         mFragmentManager = getSupportFragmentManager();
 
         setupViewPager();
-        setupUpButton();
     }
 
     private void setupViewPager() {
@@ -44,12 +43,15 @@ public class MainActivity extends AppCompatActivity
 
         TabLayout tabLayout = findViewById(R.id.main_tab);
         tabLayout.setupWithViewPager(mViewPager);
+    }
 
-        // TODO clearOnPageChangeListeners()?
+    @Override
+    protected void onStart() {
+        super.onStart();
+
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float v, int i1) {
-
             }
 
             @Override
@@ -64,12 +66,10 @@ public class MainActivity extends AppCompatActivity
         });
     }
 
-    private void setupUpButton() {
-        Fragment fragment = getCurrentFragment();
-        if (fragment != null) {
-            boolean canBack = fragment.getChildFragmentManager().getBackStackEntryCount() > 0;
-            getSupportActionBar().setDisplayHomeAsUpEnabled(canBack);
-        }
+    @Override
+    protected void onStop() {
+        mViewPager.clearOnPageChangeListeners();
+        super.onStop();
     }
 
     @Override
@@ -116,10 +116,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onMasterBackStackChanged() {
-        Fragment fragment = getCurrentFragment();
-        boolean canBack = fragment.getChildFragmentManager().getBackStackEntryCount() > 0;
-        getSupportActionBar().setDisplayHomeAsUpEnabled(canBack);
-        Log.d("MainActivity", "true");
+        setupUpButton();
     }
 
     @Override
@@ -132,6 +129,14 @@ public class MainActivity extends AppCompatActivity
                     finish();
                 }
             }
+        }
+    }
+
+    private void setupUpButton() {
+        Fragment fragment = getCurrentFragment();
+        if (fragment != null) {
+            boolean canBack = fragment.getChildFragmentManager().getBackStackEntryCount() > 0;
+            getSupportActionBar().setDisplayHomeAsUpEnabled(canBack);
         }
     }
 
