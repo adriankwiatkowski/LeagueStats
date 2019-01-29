@@ -1,160 +1,118 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    style="@style/RootCardView">
 
-    <TextView
-        android:id="@+id/match_result_group_tv"
-        style="@style/MatchGroupText"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="Victory" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/match_timestamp_group_tv"
-        style="@style/MatchGroupText"
-        app:layout_constraintEnd_toEndOf="@+id/match_item_7_group_image"
-        app:layout_constraintStart_toEndOf="@+id/match_result_group_tv"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="9/11/1939   21;36" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
-    <TextView
-        android:id="@+id/match_summoner_stats_group_tv"
-        style="@style/MatchGroupText"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/match_item_1_group_image"
-        app:layout_constraintTop_toBottomOf="@+id/match_item_1_group_image"
-        tools:text="12/12/12" />
+            <TextView
+                android:id="@+id/match_result_group_tv"
+                style="@style/BoldText"
+                tools:text="Victory" />
 
-    <TextView
-        android:id="@+id/match_minions_group_tv"
-        style="@style/MatchGroupText"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/match_gold_group_tv"
-        app:layout_constraintStart_toEndOf="@+id/match_summoner_stats_group_tv"
-        app:layout_constraintTop_toBottomOf="@+id/match_item_1_group_image"
-        tools:text="255" />
+            <TextView
+                android:id="@+id/match_timestamp_group_tv"
+                style="@style/BoldText"
+                tools:text="9/11/1939   21;36" />
 
-    <TextView
-        android:id="@+id/match_gold_group_tv"
-        style="@style/MatchGroupText"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/match_item_7_group_image"
-        app:layout_constraintTop_toBottomOf="@+id/match_item_1_group_image"
-        tools:text="21341" />
+        </LinearLayout>
 
-    <ImageView
-        android:id="@+id/match_champion_group_image"
-        android:layout_width="@dimen/champion_match_group_width"
-        android:layout_height="@dimen/champion_match_group_height"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginTop="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/match_result_group_tv"
-        app:layout_constraintVertical_bias="0.0"
-        tools:srcCompat="@drawable/ic_launcher_foreground" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
-    <ImageView
-        android:id="@+id/match_summoner_spell_1_group_image"
-        android:layout_width="@dimen/summoner_spell_match_group_width"
-        android:layout_height="@dimen/summoner_spell_match_group_height"
-        android:layout_marginLeft="8dp"
-        android:layout_marginStart="8dp"
-        app:layout_constraintStart_toEndOf="@+id/match_champion_group_image"
-        app:layout_constraintTop_toTopOf="@+id/match_champion_group_image"
-        tools:srcCompat="@drawable/ic_launcher_foreground" />
+            <ImageView
+                android:id="@+id/match_champion_group_image"
+                style="@style/MatchGroupImage"
+                tools:srcCompat="@drawable/ic_launcher_foreground" />
 
-    <ImageView
-        android:id="@+id/match_summoner_spell_2_group_image"
-        android:layout_width="@dimen/summoner_spell_match_group_width"
-        android:layout_height="@dimen/summoner_spell_match_group_height"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        app:layout_constraintBottom_toBottomOf="@+id/match_champion_group_image"
-        app:layout_constraintStart_toEndOf="@+id/match_champion_group_image"
-        app:layout_constraintTop_toBottomOf="@+id/match_summoner_spell_1_group_image"
-        tools:srcCompat="@drawable/ic_launcher_foreground" />
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
-    <ImageView
-        android:id="@+id/match_item_1_group_image"
-        android:layout_width="@dimen/summoner_spell_match_group_width"
-        android:layout_height="@dimen/summoner_spell_match_group_height"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        app:layout_constraintBottom_toBottomOf="@+id/match_summoner_spell_2_group_image"
-        app:layout_constraintStart_toEndOf="@+id/match_summoner_spell_2_group_image"
-        app:layout_constraintTop_toTopOf="@+id/match_summoner_spell_1_group_image"
-        tools:srcCompat="@drawable/ic_launcher_foreground" />
+                <ImageView
+                    android:id="@+id/match_summoner_spell_1_group_image"
+                    style="@style/MatchGroupSummonerSpell"
+                    tools:srcCompat="@drawable/ic_launcher_foreground" />
 
-    <ImageView
-        android:id="@+id/match_item_2_group_image"
-        android:layout_width="@dimen/summoner_spell_match_group_width"
-        android:layout_height="@dimen/summoner_spell_match_group_height"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        app:layout_constraintBottom_toBottomOf="@+id/match_summoner_spell_2_group_image"
-        app:layout_constraintStart_toEndOf="@+id/match_item_1_group_image"
-        app:layout_constraintTop_toTopOf="@+id/match_summoner_spell_1_group_image"
-        tools:srcCompat="@drawable/ic_launcher_foreground" />
+                <ImageView
+                    android:id="@+id/match_summoner_spell_2_group_image"
+                    style="@style/MatchGroupSummonerSpell"
+                    tools:srcCompat="@drawable/ic_launcher_foreground" />
 
-    <ImageView
-        android:id="@+id/match_item_3_group_image"
-        android:layout_width="@dimen/summoner_spell_match_group_width"
-        android:layout_height="@dimen/summoner_spell_match_group_height"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        app:layout_constraintBottom_toBottomOf="@+id/match_summoner_spell_2_group_image"
-        app:layout_constraintStart_toEndOf="@+id/match_item_2_group_image"
-        app:layout_constraintTop_toTopOf="@+id/match_summoner_spell_1_group_image"
-        tools:srcCompat="@drawable/ic_launcher_foreground" />
+            </LinearLayout>
 
-    <ImageView
-        android:id="@+id/match_item_4_group_image"
-        android:layout_width="@dimen/summoner_spell_match_group_width"
-        android:layout_height="@dimen/summoner_spell_match_group_height"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        app:layout_constraintBottom_toBottomOf="@+id/match_summoner_spell_2_group_image"
-        app:layout_constraintStart_toEndOf="@+id/match_item_3_group_image"
-        app:layout_constraintTop_toTopOf="@+id/match_summoner_spell_1_group_image"
-        tools:srcCompat="@drawable/ic_launcher_foreground" />
+            <TextView
+                android:id="@+id/match_summoner_stats_group_tv"
+                style="@style/BoldText"
+                android:layout_marginStart="8dp"
+                android:layout_marginLeft="8dp"
+                tools:text="12/12/12" />
 
-    <ImageView
-        android:id="@+id/match_item_5_group_image"
-        android:layout_width="@dimen/summoner_spell_match_group_width"
-        android:layout_height="@dimen/summoner_spell_match_group_height"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        app:layout_constraintBottom_toBottomOf="@+id/match_summoner_spell_2_group_image"
-        app:layout_constraintStart_toEndOf="@+id/match_item_4_group_image"
-        app:layout_constraintTop_toTopOf="@+id/match_summoner_spell_1_group_image"
-        tools:srcCompat="@drawable/ic_launcher_foreground" />
+            <TextView
+                android:id="@+id/match_minions_group_tv"
+                style="@style/BoldText"
+                tools:text="255" />
 
-    <ImageView
-        android:id="@+id/match_item_6_group_image"
-        android:layout_width="@dimen/summoner_spell_match_group_width"
-        android:layout_height="@dimen/summoner_spell_match_group_height"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        app:layout_constraintBottom_toBottomOf="@+id/match_summoner_spell_2_group_image"
-        app:layout_constraintStart_toEndOf="@+id/match_item_5_group_image"
-        app:layout_constraintTop_toTopOf="@+id/match_summoner_spell_1_group_image"
-        tools:srcCompat="@drawable/ic_launcher_foreground" />
+            <TextView
+                android:id="@+id/match_gold_group_tv"
+                style="@style/BoldText"
+                tools:text="21341" />
 
-    <ImageView
-        android:id="@+id/match_item_7_group_image"
-        android:layout_width="@dimen/summoner_spell_match_group_width"
-        android:layout_height="@dimen/summoner_spell_match_group_height"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        app:layout_constraintBottom_toBottomOf="@+id/match_summoner_spell_2_group_image"
-        app:layout_constraintStart_toEndOf="@+id/match_item_6_group_image"
-        app:layout_constraintTop_toTopOf="@+id/match_summoner_spell_1_group_image"
-        tools:srcCompat="@drawable/ic_launcher_foreground" />
+        </LinearLayout>
 
-</android.support.constraint.ConstraintLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/match_item_1_group_image"
+                style="@style/MatchGroupImage"
+                tools:srcCompat="@drawable/ic_launcher_foreground" />
+
+            <ImageView
+                android:id="@+id/match_item_2_group_image"
+                style="@style/MatchGroupImage"
+                tools:srcCompat="@drawable/ic_launcher_foreground" />
+
+            <ImageView
+                android:id="@+id/match_item_3_group_image"
+                style="@style/MatchGroupImage"
+                tools:srcCompat="@drawable/ic_launcher_foreground" />
+
+            <ImageView
+                android:id="@+id/match_item_4_group_image"
+                style="@style/MatchGroupImage"
+                tools:srcCompat="@drawable/ic_launcher_foreground" />
+
+            <ImageView
+                android:id="@+id/match_item_5_group_image"
+                style="@style/MatchGroupImage"
+                tools:srcCompat="@drawable/ic_launcher_foreground" />
+
+            <ImageView
+                android:id="@+id/match_item_6_group_image"
+                style="@style/MatchGroupImage"
+                tools:srcCompat="@drawable/ic_launcher_foreground" />
+
+            <ImageView
+                android:id="@+id/match_item_7_group_image"
+                style="@style/MatchGroupImage"
+                tools:srcCompat="@drawable/ic_launcher_foreground" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</android.support.v7.widget.CardView>

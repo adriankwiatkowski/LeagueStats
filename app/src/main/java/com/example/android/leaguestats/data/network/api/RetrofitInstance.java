@@ -3,6 +3,7 @@ package com.example.android.leaguestats.data.network.api;
 import android.content.Context;
 
 import com.example.android.leaguestats.BuildConfig;
+import com.example.android.leaguestats.data.network.api.adapters.LiveDataCallAdapterFactory;
 
 import okhttp3.Cache;
 import okhttp3.OkHttpClient;
@@ -35,6 +36,7 @@ public class RetrofitInstance {
             retrofit = new retrofit2.Retrofit.Builder()
                     .baseUrl(BASE_DDRAGON_URL)
                     .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(new LiveDataCallAdapterFactory())
                     .client(client)
                     .build();
         }

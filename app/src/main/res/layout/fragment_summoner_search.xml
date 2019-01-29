@@ -1,39 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:focusableInTouchMode="true">
+    android:background="@drawable/lol_promoart"
+    android:fillViewport="true">
 
-    <EditText
-        android:id="@+id/summoner_name_edit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:hint="@string/summoner_name"
-        android:inputType="text"
-        app:layout_constraintBottom_toTopOf="@+id/summoner_region_spinner"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-    <Spinner
-        android:id="@+id/summoner_region_spinner"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:spinnerMode="dropdown"
-        app:layout_constraintBottom_toTopOf="@+id/summoner_search_button"
-        app:layout_constraintEnd_toEndOf="@+id/summoner_name_edit"
-        app:layout_constraintStart_toStartOf="@+id/summoner_name_edit" />
+        <EditText
+            android:id="@+id/summoner_name_edit"
+            style="@style/SummonerEditText"
+            android:layout_above="@+id/summoner_region_spinner"
+            android:layout_centerHorizontal="true"
+            android:hint="@string/summoner_name" />
 
-    <Button
-        android:id="@+id/summoner_search_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/search_summoner"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/summoner_name_edit"
-        app:layout_constraintStart_toStartOf="@+id/summoner_name_edit"
-        app:layout_constraintTop_toTopOf="parent" />
+        <Spinner
+            android:id="@+id/summoner_region_spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/summoner_search_button"
+            android:layout_centerHorizontal="true"
+            android:spinnerMode="dropdown" />
 
-</android.support.constraint.ConstraintLayout>
+        <Button
+            android:id="@+id/summoner_search_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="@string/search_summoner" />
+
+    </RelativeLayout>
+
+</android.support.v4.widget.NestedScrollView>

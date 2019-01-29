@@ -68,11 +68,6 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
         }
         if (key.equals(getString(R.string.pref_language_key))) {
             LeaguePreferences.fetchNewData(activity);
-            // TODO
-//          private void saveUserLanguage(String language) {
-//              LocaleUtils.setLocale(getBaseContext(), language);
-//              LeaguePreferences.saveUserLanguage(getBaseContext(), language);
-//          }
         }
     }
 }

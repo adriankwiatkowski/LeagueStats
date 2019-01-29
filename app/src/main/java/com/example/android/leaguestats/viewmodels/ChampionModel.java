@@ -10,8 +10,9 @@ import android.arch.lifecycle.ViewModel;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.example.android.leaguestats.data.LeagueDataRepository;
 import com.example.android.leaguestats.data.database.entity.ChampionEntry;
-import com.example.android.leaguestats.data.LeagueRepository;
+import com.example.android.leaguestats.models.Champion;
 
 import java.util.List;
 
@@ -20,13 +21,12 @@ public class ChampionModel extends ViewModel {
     private static final String LOG_TAG = ChampionModel.class.getSimpleName();
 
     private LiveData<ChampionEntry> mChampion;
-    private LiveData<List<ChampionEntry>> mChampions;
+    private LiveData<List<Champion>> mChampions;
 
-    private final MutableLiveData<ChampionEntry> mChampionQuery = new MutableLiveData<>();
     private final MutableLiveData<String> mNameQuery = new MutableLiveData<>();
     private final MutableLiveData<Long> mIdQuery = new MutableLiveData<>();
 
-    public ChampionModel(final LeagueRepository repository) {
+    public ChampionModel(final LeagueDataRepository repository) {
         Log.d(LOG_TAG, "Getting ChampionModel");
         mChampions = repository.getChampions();
 
@@ -43,12 +43,6 @@ public class ChampionModel extends ViewModel {
                 mediatorLiveData.setValue(o);
             }
         });
-        mediatorLiveData.addSource(mChampionQuery, new Observer() {
-            @Override
-            public void onChanged(@Nullable Object o) {
-                mediatorLiveData.setValue(o);
-            }
-        });
 
         mChampion = Transformations.switchMap(mediatorLiveData, new Function() {
             @Override
@@ -60,21 +54,14 @@ public class ChampionModel extends ViewModel {
                 } else if (input instanceof String) {
                     String championName = (String) input;
                     return repository.getChampion(championName);
-                } else if (input instanceof ChampionEntry){
-                    return input;
-                } else {
-                    return null;
                 }
+                return null;
             }
         });
     }
 
-    public LiveData<List<ChampionEntry>> getChampions() {
+    public LiveData<List<Champion>> getChampions() {
         return mChampions;
-    }
-
-    public void initChampion(ChampionEntry championEntry) {
-        mChampionQuery.setValue(championEntry);
     }
 
     public void initChampion(long id) {

@@ -1,5 +1,9 @@
 package com.example.android.leaguestats.data.network.api.models.match;
 
+import android.support.annotation.Nullable;
+
+import com.example.android.leaguestats.models.Champion;
+import com.example.android.leaguestats.models.SummonerSpell;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -14,12 +18,18 @@ public class Participant {
     @SerializedName("championId")
     @Expose
     private int championId;
+    @Nullable
+    private Champion champion;
     @SerializedName("spell1Id")
     @Expose
     private int spell1Id;
+    @Nullable
+    private SummonerSpell summonerSpell1;
     @SerializedName("spell2Id")
     @Expose
     private int spell2Id;
+    @Nullable
+    private SummonerSpell summonerSpell2;
     @SerializedName("highestAchievedSeasonTier")
     @Expose
     private String highestAchievedSeasonTier;
@@ -124,4 +134,30 @@ public class Participant {
         this.timeline = timeline;
     }
 
+    @Nullable
+    public SummonerSpell getSummonerSpell1() {
+        return summonerSpell1;
+    }
+
+    public void setSummonerSpell1(@Nullable SummonerSpell summonerSpell1) {
+        this.summonerSpell1 = summonerSpell1;
+    }
+
+    @Nullable
+    public SummonerSpell getSummonerSpell2() {
+        return summonerSpell2;
+    }
+
+    public void setSummonerSpell2(@Nullable SummonerSpell summonerSpell2) {
+        this.summonerSpell2 = summonerSpell2;
+    }
+
+    @Nullable
+    public Champion getChampion() {
+        return champion;
+    }
+
+    public void setChampion(@Nullable Champion champion) {
+        this.champion = champion;
+    }
 }

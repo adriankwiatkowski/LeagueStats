@@ -2,8 +2,9 @@ package com.example.android.leaguestats.adapters;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,26 +12,26 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.android.leaguestats.R;
+import com.example.android.leaguestats.data.glide.GlideApp;
+import com.example.android.leaguestats.data.glide.GlideUtils;
 import com.example.android.leaguestats.interfaces.IdClickListener;
 import com.example.android.leaguestats.models.Mastery;
-import com.example.android.leaguestats.utilities.PicassoUtils;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 public class MasteryAdapter extends RecyclerView.Adapter<MasteryAdapter.MasteryViewHolder> {
 
     private IdClickListener mListener;
-
-    private List<Mastery> mMastery;
+    private List<Mastery> mMasteryList;
     private final Context mContext;
     private final String PATCH_VERSION;
 
-    public MasteryAdapter(Context context, List<Mastery> mastery, IdClickListener listener,
-                          String patchVersion) {
+    public MasteryAdapter(Context context, IdClickListener listener, String patchVersion) {
         mContext = context;
-        mMastery = mastery;
+        mMasteryList = new ArrayList<>();
         mListener = listener;
         PATCH_VERSION = patchVersion;
     }
@@ -39,78 +40,114 @@ public class MasteryAdapter extends RecyclerView.Adapter<MasteryAdapter.MasteryV
     @Override
     public MasteryViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(mContext).inflate(R.layout.mastery_item, parent, false);
-
         return new MasteryViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull MasteryViewHolder holder, int position) {
-        String name = mMastery.get(position).getChampionName();
-        int level = mMastery.get(position).getChampionLevel();
-        int points = mMastery.get(position).getChampionPoints();
-        long timestamp = mMastery.get(position).getLastPlayTime();
+        Mastery mastery = mMasteryList.get(position);
+        String name = mastery.getChampionName();
+        int level = mastery.getChampionLevel();
+        int points = mastery.getChampionPoints();
+        long timestamp = mastery.getLastPlayTime();
 
-        String imagePath = mMastery.get(position).getChampionImage();
+        GlideApp.with(mContext)
+                .load(GlideUtils.getChampionUrl(PATCH_VERSION, mastery.getChampionImageId()))
+                .roundedImage()
+                .into(holder.image);
 
-        PicassoUtils.setChampionThumbnail(holder.mChampionImage, imagePath, PATCH_VERSION,
-                R.dimen.mastery_champion_width, R.dimen.mastery_champion_height);
-
-        holder.mChampionNameTv.setText(name);
-        holder.mChampionLevelTv.setText(String.valueOf(level));
-        holder.mChampionPointsTv.setText(String.valueOf(points));
+        holder.nameTv.setText(name);
+        holder.levelTv.setText(String.valueOf(level));
+        holder.pointsTv.setText(String.valueOf(points));
 
         Date dateObject = new Date(timestamp);
         SimpleDateFormat dateFormat = new SimpleDateFormat("LLL dd, yyyy");
         String date = dateFormat.format(dateObject);
-        holder.mLastPlayTimeTv.setText(date);
+        holder.lastPlayTimeTv.setText(date);
 
-        boolean chestGranted = mMastery.get(position).isChestGranted();
+        boolean chestGranted = mastery.isChestGranted();
         String isGrantedString;
         if (chestGranted) {
             isGrantedString = mContext.getString(R.string.yes);
         } else {
             isGrantedString = mContext.getString(R.string.no);
         }
-        holder.mIsChestGrantedTv.setText(isGrantedString);
+        holder.isChestGrantedTv.setText(isGrantedString);
     }
 
     @Override
     public int getItemCount() {
-        return mMastery.size();
+        return mMasteryList.size();
     }
 
-    public void swapData(List<Mastery> masteries) {
-        mMastery.clear();
-        mMastery.addAll(masteries);
-        notifyDataSetChanged();
+    public void setData(final List<Mastery> newList) {
+        if (mMasteryList.isEmpty()) {
+            mMasteryList = newList;
+            notifyDataSetChanged();
+        } else {
+            DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffUtil.Callback() {
+                @Override
+                public int getOldListSize() {
+                    return mMasteryList.size();
+                }
+
+                @Override
+                public int getNewListSize() {
+                    return newList.size();
+                }
+
+                @Override
+                public boolean areItemsTheSame(int oldPosition, int newPosition) {
+                    return mMasteryList.get(oldPosition).getPlayerId() == newList.get(newPosition).getPlayerId();
+                }
+
+                @Override
+                public boolean areContentsTheSame(int oldPosition, int newPosition) {
+                    String oldChampionName = mMasteryList.get(oldPosition).getChampionName();
+                    String newChampionName = newList.get(newPosition).getChampionName();
+                    if (oldChampionName != null && newChampionName != null) {
+                        return oldChampionName.equals(newChampionName);
+                    } else {
+                        return false;
+                    }
+                }
+
+                @Nullable
+                @Override
+                public Object getChangePayload(int oldItemPosition, int newItemPosition) {
+                    // You can return particular field for changed item.
+                    return super.getChangePayload(oldItemPosition, newItemPosition);
+                }
+            });
+            mMasteryList = newList;
+            diffResult.dispatchUpdatesTo(this);
+        }
     }
 
     class MasteryViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        ImageView mChampionImage;
-        TextView mChampionNameTv;
-        TextView mChampionLevelTv;
-        TextView mChampionPointsTv;
-        TextView mLastPlayTimeTv;
-        TextView mIsChestGrantedTv;
+        ImageView image;
+        TextView nameTv;
+        TextView levelTv;
+        TextView pointsTv;
+        TextView lastPlayTimeTv;
+        TextView isChestGrantedTv;
 
-        public MasteryViewHolder(final View itemView) {
+        MasteryViewHolder(final View itemView) {
             super(itemView);
-
             itemView.setOnClickListener(this);
-
-            mChampionImage = itemView.findViewById(R.id.champion_thumbnail);
-            mChampionNameTv = itemView.findViewById(R.id.champion_name_tv);
-            mChampionLevelTv = itemView.findViewById(R.id.champion_level_tv);
-            mChampionPointsTv = itemView.findViewById(R.id.champion_points_tv);
-            mLastPlayTimeTv = itemView.findViewById(R.id.last_played_tv);
-            mIsChestGrantedTv = itemView.findViewById(R.id.chest_granted_tv);
+            image = itemView.findViewById(R.id.champion_thumbnail);
+            nameTv = itemView.findViewById(R.id.champion_name_tv);
+            levelTv = itemView.findViewById(R.id.champion_level_tv);
+            pointsTv = itemView.findViewById(R.id.champion_points_tv);
+            lastPlayTimeTv = itemView.findViewById(R.id.last_played_tv);
+            isChestGrantedTv = itemView.findViewById(R.id.chest_granted_tv);
         }
 
         @Override
         public void onClick(View v) {
-            int championId = mMastery.get(getAdapterPosition()).getChampionId();
-            mListener.onClickListener(championId);
+            int championId = mMasteryList.get(getAdapterPosition()).getChampionId();
+            mListener.onClick(championId);
         }
     }
 }

@@ -10,6 +10,7 @@ import android.util.Log;
 import com.example.android.leaguestats.data.database.dao.ChampionDao;
 import com.example.android.leaguestats.data.database.dao.IconDao;
 import com.example.android.leaguestats.data.database.dao.ItemDao;
+import com.example.android.leaguestats.data.database.dao.SummonerDao;
 import com.example.android.leaguestats.data.database.dao.SummonerSpellDao;
 import com.example.android.leaguestats.data.database.entity.ChampionEntry;
 import com.example.android.leaguestats.data.database.entity.IconEntry;
@@ -38,8 +39,9 @@ public abstract class LeagueDatabase extends RoomDatabase {
         return sInstance;
     }
 
-    public abstract SummonerSpellDao summonerSpellDao();
-    public abstract ItemDao itemDao();
+    public abstract SummonerDao summonerDao();
     public abstract ChampionDao championDao();
+    public abstract ItemDao itemDao();
+    public abstract SummonerSpellDao summonerSpellDao();
     public abstract IconDao iconDao();
 }

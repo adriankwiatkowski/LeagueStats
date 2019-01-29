@@ -1,140 +1,196 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nested_scroll_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <android.support.constraint.ConstraintLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <ImageView
-            android:id="@+id/item_detail_image"
-            style="@style/ImageThumbnail"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:background="#ffc72d"
-            tools:layout_height="100dp"
-            tools:layout_width="100dp" />
-
         <TextView
-            android:id="@+id/base_gold_label"
-            style="@style/LabelText"
-            android:text="@string/recipe_cost"
-            app:layout_constraintEnd_toStartOf="@+id/base_gold_tv"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:id="@+id/empty_view_tv"
+            style="@style/EmptyText"
+            android:layout_centerInParent="true"
+            android:text="@string/item_not_found" />
 
-        <TextView
-            android:id="@+id/total_gold_label"
-            style="@style/LabelText"
-            android:text="@string/total_cost"
-            app:layout_constraintEnd_toStartOf="@+id/total_gold_tv"
-            app:layout_constraintTop_toBottomOf="@+id/base_gold_label" />
-
-        <TextView
-            android:id="@+id/sell_gold_label"
-            style="@style/LabelText"
-            android:text="@string/gold_for_sale"
-            app:layout_constraintEnd_toStartOf="@+id/sell_gold_tv"
-            app:layout_constraintTop_toBottomOf="@+id/total_gold_label" />
-
-        <TextView
-            android:id="@+id/base_gold_tv"
-            style="@style/BoldText"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/base_gold_label"
-            tools:text="400" />
-
-        <TextView
-            android:id="@+id/total_gold_tv"
-            style="@style/BoldText"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/total_gold_label"
-            tools:text="1000" />
-
-        <TextView
-            android:id="@+id/sell_gold_tv"
-            style="@style/BoldText"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/sell_gold_label"
-            tools:text="667" />
-
-        <TextView
-            android:id="@+id/item_description_label"
-            style="@style/LabelText"
-            android:text="@string/description"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/item_detail_image" />
-
-        <TextView
-            android:id="@+id/plain_text_label"
-            style="@style/LabelText"
-            android:text="@string/plain_text"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/item_description_tv" />
-
-        <TextView
-            android:id="@+id/item_detail_name"
-            style="@style/BoldText"
-            app:layout_constraintEnd_toStartOf="@+id/base_gold_label"
-            app:layout_constraintStart_toEndOf="@+id/item_detail_image"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="Guardian Angel ;)" />
-
-        <TextView
-            android:id="@+id/plain_text_tv"
-            style="@style/BoldText"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/plain_text_label"
-            app:layout_constraintTop_toTopOf="@+id/plain_text_label"
-            tools:text="cool" />
-
-        <TextView
-            android:id="@+id/item_description_tv"
-            style="@style/BoldText"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/item_description_label"
-            app:layout_constraintTop_toTopOf="@+id/item_description_label"
-            tools:text="pretty cool gragpog24opg2kog 2k40t-2qi4-ti259402i5902 3i592 tt 2903t290" />
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/item_from_recycler"
-            style="@style/RecyclerViewStyle"
-            app:layout_constraintEnd_toStartOf="@+id/guideline5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/item_from_label" />
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/item_into_recycler"
-            style="@style/RecyclerViewStyle"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/guideline5"
-            app:layout_constraintTop_toBottomOf="@+id/item_into_label" />
-
-        <android.support.constraint.Guideline
-            android:id="@+id/guideline5"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/item_content_layout"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:descendantFocusability="blocksDescendants"
             android:orientation="vertical"
-            app:layout_constraintGuide_percent="0.5" />
+            android:visibility="invisible">
 
-        <TextView
-            android:id="@+id/item_from_label"
-            style="@style/LabelText"
-            android:text="@string/recipe"
-            app:layout_constraintEnd_toEndOf="@+id/item_from_recycler"
-            app:layout_constraintStart_toStartOf="@+id/item_from_recycler"
-            app:layout_constraintTop_toBottomOf="@+id/plain_text_tv" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/item_into_label"
-            style="@style/LabelText"
-            android:text="@string/builds_into"
-            app:layout_constraintEnd_toEndOf="@+id/item_into_recycler"
-            app:layout_constraintStart_toStartOf="@+id/guideline5"
-            app:layout_constraintTop_toBottomOf="@+id/plain_text_tv" />
+                <ImageView
+                    android:id="@+id/item_detail_image"
+                    style="@style/Image"
+                    android:contentDescription="@string/image"
+                    tools:background="@color/colorAccent"
+                    tools:layout_height="100dp"
+                    tools:layout_width="100dp" />
 
-    </android.support.constraint.ConstraintLayout>
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1">
+
+                    <TextView
+                        android:id="@+id/item_detail_name"
+                        style="@style/TitleText"
+                        tools:text="Guardian Angel ;)" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/total_gold_label"
+                        style="@style/LabelText"
+                        android:text="@string/total_cost" />
+
+                    <TextView
+                        android:id="@+id/base_gold_label"
+                        style="@style/LabelText"
+                        android:text="@string/recipe_cost" />
+
+                    <TextView
+                        android:id="@+id/sell_gold_label"
+                        style="@style/LabelText"
+                        android:text="@string/gold_for_sale" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/total_gold_tv"
+                        style="@style/BoldText"
+                        tools:text="1000" />
+
+                    <TextView
+                        android:id="@+id/base_gold_tv"
+                        style="@style/BoldText"
+                        tools:text="400" />
+
+                    <TextView
+                        android:id="@+id/sell_gold_tv"
+                        style="@style/BoldText"
+                        tools:text="667" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/item_description_label"
+                    style="@style/LabelText"
+                    android:text="@string/description" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/item_description_tv"
+                        style="@style/BoldText"
+                        tools:text="pretty cool gragpog24opg2kog 2k40t-2qi4-ti259402i5902 3i592 tt 2903t290" />
+
+                    <TextView
+                        android:id="@+id/plain_text_tv"
+                        style="@style/BoldText"
+                        tools:text="cool, doing some awesome useful thing." />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/item_from_label"
+                        style="@style/LabelText"
+                        android:text="@string/recipe" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/item_into_label"
+                        style="@style/LabelText"
+                        android:text="@string/builds_into" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
+
+                    <android.support.v7.widget.RecyclerView
+                        android:id="@+id/item_from_recycler"
+                        style="@style/RecyclerViewStyle"
+                        android:layout_height="wrap_content" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
+
+                    <android.support.v7.widget.RecyclerView
+                        android:id="@+id/item_into_recycler"
+                        style="@style/RecyclerViewStyle"
+                        android:layout_height="wrap_content" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </RelativeLayout>
 
 </android.support.v4.widget.NestedScrollView>

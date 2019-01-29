@@ -1,103 +1,64 @@
 package com.example.android.leaguestats.adapters;
 
 import android.content.Context;
-import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
-import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.android.leaguestats.R;
-import com.example.android.leaguestats.utilities.PicassoUtils;
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.RequestCreator;
-import com.squareup.picasso.Target;
-
-import java.util.List;
+import com.example.android.leaguestats.data.glide.GlideApp;
+import com.example.android.leaguestats.data.glide.GlideUtils;
+import com.example.android.leaguestats.models.Champion;
 
 public class SplashArtAdapter extends RecyclerView.Adapter<SplashArtAdapter.SplashArtViewHolder> {
 
     private final Context mContext;
-    private final List<String> mSplashArt;
-    private final List<String> mSplashArtName;
+    private Champion mChampion;
 
-    public SplashArtAdapter(Context context, List<String> splashArt, List<String> splashArtName) {
+    public SplashArtAdapter(Context context, Champion champion) {
         mContext = context;
-        mSplashArt = splashArt;
-        mSplashArtName = splashArtName;
+        mChampion = champion;
     }
 
+    @NonNull
     @Override
-    public SplashArtViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public SplashArtViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(mContext).inflate(R.layout.splash_art_item, parent, false);
-
         return new SplashArtViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(final SplashArtViewHolder holder, int position) {
-
-        PicassoUtils.setSplashArt(holder.mTarget, mContext, mSplashArt.get(position));
-
-        // Set Splash Art Name on Text;
-        holder.mSplashArtNameTv.setText(mSplashArtName.get(position));
+    public void onBindViewHolder(@NonNull SplashArtViewHolder holder, int position) {
+        holder.splashArtNameTv.setText(mChampion.getSplashArtName().get(position));
+        GlideApp.with(mContext)
+                .load(GlideUtils.getSplashArtUrl(mChampion.getKey(), mChampion.getSplashArtId().get(position)))
+                .splashArt()
+                .into(holder.splashArtImage);
     }
 
-    public void add(String splashArt, String splashArtName) {
-        mSplashArt.add(splashArt);
-        mSplashArtName.add(splashArtName);
+    public void setChampion(Champion champion) {
+        mChampion = champion;
         notifyDataSetChanged();
-    }
-
-    public void clear() {
-        mSplashArt.clear();
-        mSplashArtName.clear();
-        notifyDataSetChanged();
-    }
-
-    public void setData(List<String> image, List<String> name) {
-        clear();
-        for (int i = 0; i < image.size(); i++) {
-            add(image.get(i), name.get(i));
-        }
     }
 
     @Override
     public int getItemCount() {
-        return mSplashArt.size();
+        return mChampion == null ? 0 : mChampion.getSplashArtId().size();
     }
 
     class SplashArtViewHolder extends RecyclerView.ViewHolder {
-        TextView mSplashArtNameTv;
-        Target mTarget;
 
-        public SplashArtViewHolder(final View itemView) {
+        ImageView splashArtImage;
+        TextView splashArtNameTv;
+
+        SplashArtViewHolder(View itemView) {
             super(itemView);
-            mSplashArtNameTv = itemView.findViewById(R.id.splash_art_name);
-
-            mTarget = new Target() {
-                @Override
-                public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                    Drawable imageDrawable = new BitmapDrawable(Resources.getSystem(), bitmap);
-                    mSplashArtNameTv.setCompoundDrawablesWithIntrinsicBounds(null, imageDrawable, null, null);
-                }
-
-                @Override
-                public void onBitmapFailed(Exception e, Drawable errorDrawable) {
-                    mSplashArtNameTv.setCompoundDrawablesWithIntrinsicBounds(null, errorDrawable, null, null);
-                }
-
-                @Override
-                public void onPrepareLoad(Drawable placeHolderDrawable) {
-                    mSplashArtNameTv.setCompoundDrawablesWithIntrinsicBounds(null, placeHolderDrawable, null, null);
-                }
-            };
+            splashArtImage = itemView.findViewById(R.id.splash_art_image);
+            splashArtNameTv = itemView.findViewById(R.id.splash_art_tv);
         }
     }
 }

@@ -2,34 +2,40 @@ package com.example.android.leaguestats.adapters;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.android.leaguestats.R;
-import com.example.android.leaguestats.data.database.entity.SummonerSpellEntry;
-import com.example.android.leaguestats.utilities.PicassoUtils;
+import com.example.android.leaguestats.data.glide.GlideApp;
+import com.example.android.leaguestats.data.glide.GlideUtils;
+import com.example.android.leaguestats.interfaces.IdClickListener;
+import com.example.android.leaguestats.models.SummonerSpell;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class SummonerSpellAdapter extends RecyclerView.Adapter<SummonerSpellAdapter.SummonerSpellViewHolder> {
+public class SummonerSpellAdapter extends RecyclerView.Adapter<SummonerSpellAdapter.SummonerSpellViewHolder> implements Filterable {
 
-    public interface SummonerSpellListener {
-        void onSummonerSpellClick(SummonerSpellEntry summonerSpellEntry);
-    }
-
-    private Context mContext;
-    private List<SummonerSpellEntry> mList;
-    private SummonerSpellListener mListener;
     private final String PATCH_VERSION;
+    private IdClickListener mListener;
+    private Context mContext;
+    private List<SummonerSpell> mSummonerSpellList;
 
-    public SummonerSpellAdapter(Context context, List<SummonerSpellEntry> list,
-                                SummonerSpellListener listener, String patchVersion) {
+    private List<SummonerSpell> mSummonerSpellListFiltered;
+    private ValueFilter<SummonerSpell> mFilter;
+
+    public SummonerSpellAdapter(Context context, IdClickListener listener, String patchVersion) {
         mContext = context;
-        mList = list;
+        mSummonerSpellList = new ArrayList<>();
+        mSummonerSpellListFiltered = mSummonerSpellList;
         mListener = listener;
         PATCH_VERSION = patchVersion;
     }
@@ -37,60 +43,108 @@ public class SummonerSpellAdapter extends RecyclerView.Adapter<SummonerSpellAdap
     @NonNull
     @Override
     public SummonerSpellViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(mContext).inflate(R.layout.summoner_spell_item, parent, false);
+        View view = LayoutInflater.from(mContext).inflate(R.layout.summoner_spell_card_item, parent, false);
         return new SummonerSpellViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull SummonerSpellViewHolder holder, int position) {
-        holder.mNameTv.setText(mList.get(position).getName());
-        holder.mCooldownTv.setText(String.valueOf(mList.get(position).getCooldown()));
-
-        String image = mList.get(position).getImage();
-
-        PicassoUtils.setSpellImage(holder.mImage, image, PATCH_VERSION,
-                R.dimen.summoner_spell_width, R.dimen.summoner_spell_height);
+        SummonerSpell summonerSpell = mSummonerSpellListFiltered.get(position);
+        holder.nameTv.setText(summonerSpell.getName());
+        holder.descriptionTv.setText(summonerSpell.getDescription());
+        GlideApp.with(mContext)
+                .load(GlideUtils.getSpellUrl(PATCH_VERSION, summonerSpell.getSummonerSpellImageId()))
+                .roundedImage()
+                .into(holder.image);
     }
 
-    public void add(SummonerSpellEntry summonerSpellEntry) {
-        mList.add(summonerSpellEntry);
-        notifyDataSetChanged();
-    }
+    public void setData(final List<SummonerSpell> newList) {
+        if (mSummonerSpellList.isEmpty()) {
+            mSummonerSpellList = newList;
+            mSummonerSpellListFiltered = mSummonerSpellList;
+            notifyDataSetChanged();
+        } else {
+            DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffUtil.Callback() {
+                @Override
+                public int getOldListSize() {
+                    return mSummonerSpellList.size();
+                }
 
-    public void clear() {
-        mList.clear();
-        notifyDataSetChanged();
-    }
+                @Override
+                public int getNewListSize() {
+                    return newList.size();
+                }
 
-    public void setData(List<SummonerSpellEntry> list) {
-        clear();
-        mList.addAll(list);
-        notifyDataSetChanged();
+                @Override
+                public boolean areItemsTheSame(int oldPosition, int newPosition) {
+                    return mSummonerSpellList.get(oldPosition).getId() == newList.get(newPosition).getId();
+                }
+
+                @Override
+                public boolean areContentsTheSame(int oldPosition, int newPosition) {
+                    return mSummonerSpellList.get(oldPosition).getName().equals(newList.get(newPosition).getName());
+                }
+
+                @Nullable
+                @Override
+                public Object getChangePayload(int oldItemPosition, int newItemPosition) {
+                    // You can return particular field for changed item.
+                    return super.getChangePayload(oldItemPosition, newItemPosition);
+                }
+            });
+            mSummonerSpellList = newList;
+            mSummonerSpellListFiltered = mSummonerSpellList;
+            diffResult.dispatchUpdatesTo(this);
+        }
     }
 
     @Override
     public int getItemCount() {
-        return mList.size();
+        return mSummonerSpellListFiltered.size();
+    }
+
+    @Override
+    public Filter getFilter() {
+        if (mFilter == null) {
+            mFilter = new ValueFilter<SummonerSpell>(mSummonerSpellList) {
+                @NonNull
+                @Override
+                protected List<SummonerSpell> filterResult(String query) {
+                    List<SummonerSpell> filteredList = new ArrayList<>();
+                    for (SummonerSpell summonerSpell : mSummonerSpellList) {
+                        if (summonerSpell.getName().toLowerCase().startsWith(query.toLowerCase())) {
+                            filteredList.add(summonerSpell);
+                        }
+                    }
+                    return filteredList;
+                }
+
+                @Override
+                protected void publishResults(@Nullable List<SummonerSpell> filteredList) {
+                    mSummonerSpellListFiltered = filteredList;
+                    notifyDataSetChanged();
+                }
+            };
+        }
+        return mFilter;
     }
 
     class SummonerSpellViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        TextView mNameTv;
-        TextView mCooldownTv;
-        ImageView mImage;
+        ImageView image;
+        TextView nameTv;
+        TextView descriptionTv;
 
-        public SummonerSpellViewHolder(View itemView) {
+        SummonerSpellViewHolder(View itemView) {
             super(itemView);
-
             itemView.setOnClickListener(this);
-
-            mNameTv = itemView.findViewById(R.id.summoner_spell_name_item);
-            mCooldownTv = itemView.findViewById(R.id.summoner_spell_cooldown_item);
-            mImage = itemView.findViewById(R.id.summoner_spell_image_item);
+            image = itemView.findViewById(R.id.image);
+            nameTv = itemView.findViewById(R.id.name_tv);
+            descriptionTv = itemView.findViewById(R.id.description_tv);
         }
 
         @Override
-        public void onClick(View v) {
-            mListener.onSummonerSpellClick(mList.get(getAdapterPosition()));
+        public void onClick(View view) {
+            mListener.onClick(mSummonerSpellList.get(getAdapterPosition()).getId());
         }
     }
 }

@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +19,8 @@ import android.widget.TextView;
 import com.example.android.leaguestats.R;
 import com.example.android.leaguestats.adapters.MatchAdapter;
 import com.example.android.leaguestats.models.Match;
+import com.example.android.leaguestats.models.Resource;
+import com.example.android.leaguestats.models.Status;
 import com.example.android.leaguestats.utilities.DataUtils;
 import com.example.android.leaguestats.utilities.InjectorUtils;
 import com.example.android.leaguestats.utilities.LeaguePreferences;
@@ -25,6 +28,8 @@ import com.example.android.leaguestats.viewmodels.SummonerModel;
 import com.example.android.leaguestats.viewmodels.SummonerModelFactory;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class SummonerHistoryFragment extends Fragment {
@@ -33,6 +38,7 @@ public class SummonerHistoryFragment extends Fragment {
 
     public interface HistoryListener {
         void onHistorySummonerListener(String entryUrlString, String summonerName);
+
         void onHighestRank(String highestAchievedSeasonTier);
     }
 
@@ -41,10 +47,10 @@ public class SummonerHistoryFragment extends Fragment {
     private MatchAdapter mAdapter;
     private TextView mEmptyViewTv;
     private ProgressBar mRecyclerIndicator;
-    private String mPatchVersion;
     private SummonerModel mSummonerModel;
     private final int DEFAULT_POSITION = -1;
     private int mLastExpandablePosition = DEFAULT_POSITION;
+    private String mPatchVersion;
 
     public SummonerHistoryFragment() {
     }
@@ -53,11 +59,9 @@ public class SummonerHistoryFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_summoner_history, container, false);
-
         mExpandableListView = rootView.findViewById(R.id.summoner_expandable_list);
         mEmptyViewTv = rootView.findViewById(R.id.summoner_empty_view_tv);
         mRecyclerIndicator = rootView.findViewById(R.id.summoner_recycler_indicator);
-
         return rootView;
     }
 
@@ -66,14 +70,13 @@ public class SummonerHistoryFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         mPatchVersion = LeaguePreferences.getPatchVersion(getContext());
-
         mAdapter = new MatchAdapter(getContext(), new ArrayList<Match>(), mPatchVersion);
         mExpandableListView.setAdapter(mAdapter);
-        mExpandableListView.setDividerHeight(8);
 
         mExpandableListView.setOnGroupExpandListener(new ExpandableListView.OnGroupExpandListener() {
             @Override
             public void onGroupExpand(int groupPosition) {
+                Log.d(LOG_TAG, "onGroupExpand");
                 if (mLastExpandablePosition != DEFAULT_POSITION &&
                         groupPosition != mLastExpandablePosition) {
                     mExpandableListView.collapseGroup(groupPosition);
@@ -85,16 +88,15 @@ public class SummonerHistoryFragment extends Fragment {
         mExpandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-                if (v.getId() == R.id.match_summoner_name_child_tv) {
-                    Match match = mAdapter.getGroup(groupPosition);
-                    String summonerName = match.getSummonerName().get(childPosition);
-                    String entryUrlString = DataUtils.getEntryUrl(match.getPlatformId());
-                    mCallback.onHistorySummonerListener(entryUrlString, summonerName);
-                    // TODO return true ? doesnt work rn
-                }
+                Match match = mAdapter.getGroup(groupPosition);
+                String summonerName = match.getParticipantIdentities().get(childPosition).getPlayer().getSummonerName();
+                String entryUrlString = DataUtils.getEntryUrl(match.getPlatformId());
+                mCallback.onHistorySummonerListener(entryUrlString, summonerName);
                 return false;
             }
         });
+
+        ViewCompat.setNestedScrollingEnabled(mExpandableListView, true);
 
         setupViewModel();
     }
@@ -103,33 +105,68 @@ public class SummonerHistoryFragment extends Fragment {
         SummonerModelFactory factory =
                 InjectorUtils.provideSummonerModelFactory(getActivity().getApplicationContext());
         mSummonerModel = ViewModelProviders.of(getActivity(), factory).get(SummonerModel.class);
-        mSummonerModel.getMatches().observe(getActivity(), new Observer<List<Match>>() {
+        mSummonerModel.getMatches().observe(this, new Observer<Resource<List<Resource<Match>>>>() {
             @Override
-            public void onChanged(@Nullable List<Match> matches) {
-                Log.d(LOG_TAG, "Retrieving matches from ViewModel");
-                updateUi(matches);
+            public void onChanged(@Nullable Resource<List<Resource<Match>>> matchListResource) {
+                Log.d(LOG_TAG, "Getting matches");
+                updateUi(matchListResource);
             }
         });
     }
 
-    private void updateUi(@Nullable List<Match> matches) {
-        mRecyclerIndicator.setVisibility(View.INVISIBLE);
-        if (matches != null && !matches.isEmpty()) {
-            mExpandableListView.setVisibility(View.VISIBLE);
-            mAdapter.setData(matches);
-            String highestAchievedSeasonTier = matches.get(0).getHighestAchievedSeasonTier();
-            mCallback.onHighestRank(highestAchievedSeasonTier);
-        } else {
-            mEmptyViewTv.setText(getString(R.string.no_matches_found));
-            mEmptyViewTv.setVisibility(View.VISIBLE);
+    private void updateUi(@Nullable Resource<List<Resource<Match>>> matchListResource) {
+        if (matchListResource == null) {
+            Log.d(LOG_TAG, "MatchListResource null");
+            return;
         }
-    }
+        switch (matchListResource.status) {
+            case LOADING:
+                mRecyclerIndicator.setVisibility(View.VISIBLE);
+                mExpandableListView.setVisibility(View.INVISIBLE);
+                mEmptyViewTv.setVisibility(View.INVISIBLE);
+                mEmptyViewTv.setText("");
+                mAdapter.clear();
+                break;
+            case SUCCESS:
+                mRecyclerIndicator.setVisibility(View.INVISIBLE);
+                mExpandableListView.setVisibility(View.VISIBLE);
+                mEmptyViewTv.setVisibility(View.INVISIBLE);
 
-    // Called from SummonerActivity.
-    public void showHistoryIndicator() {
-        mRecyclerIndicator.setVisibility(View.VISIBLE);
-        mEmptyViewTv.setVisibility(View.INVISIBLE);
-        mExpandableListView.setVisibility(View.INVISIBLE);
+                String highestAchievedSeasonTier = "";
+                List<Resource<Match>> matchResourceList = matchListResource.data;
+                if (matchResourceList != null && !matchResourceList.isEmpty()) {
+                    List<Match> matchList = new ArrayList<>();
+                    for (int i = 0; i < matchResourceList.size(); i++) {
+                        if (matchResourceList.get(i).status == Status.SUCCESS) {
+                            matchList.add(matchResourceList.get(i).data);
+                        }
+                    }
+                    if (!matchList.isEmpty()) {
+                        Collections.sort(matchList, new Comparator<Match>() {
+                            @Override
+                            public int compare(Match o1, Match o2) {
+                                return (int) (o2.getGameCreation() - o1.getGameCreation());
+                            }
+                        });
+                        mAdapter.setData(matchList);
+                        for (int i = 0; i < matchList.get(0).getParticipantIdentities().size(); i++) {
+                            if (matchList.get(0).getCurrentSummonerId() == matchList.get(0).getParticipantIdentities().get(i).getPlayer().getSummonerId()) {
+                                highestAchievedSeasonTier = matchList.get(0).getParticipants().get(i).getHighestAchievedSeasonTier();
+                                break;
+                            }
+                        }
+                    }
+                }
+                mCallback.onHighestRank(highestAchievedSeasonTier);
+                break;
+            case ERROR:
+                mRecyclerIndicator.setVisibility(View.INVISIBLE);
+                mExpandableListView.setVisibility(View.INVISIBLE);
+                mAdapter.clear();
+                mEmptyViewTv.setVisibility(View.VISIBLE);
+                mEmptyViewTv.setText(getString(R.string.no_matches_found));
+                break;
+        }
     }
 
     @Override

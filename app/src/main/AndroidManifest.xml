@@ -6,15 +6,16 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
+        android:name=".LeagueApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        android:usesCleartextTraffic="true">
         <activity
-            android:name=".ui.MainActivity"
-            android:launchMode="singleTop">
+            android:name=".ui.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -22,8 +23,8 @@
             </intent-filter>
 
             <meta-data
-                android:name="android.app.default_searchable"
-                android:value=".SummonerActivity" />
+                android:name="android.app.searchable"
+                android:resource="@xml/summoner_searchable" />
         </activity>
         <activity
             android:name=".ui.SummonerActivity"
@@ -32,14 +33,15 @@
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
+
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/summoner_searchable" />
         </activity>
         <activity
             android:name=".ui.ChampionActivity"
-            android:launchMode="singleTop"
-            android:parentActivityName=".ui.MainActivity">
+            android:parentActivityName=".ui.MainActivity"
+            android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
@@ -47,13 +49,41 @@
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
         </activity>
-        <activity android:name=".ui.SettingsActivity" />
+        <activity
+            android:name=".ui.ItemActivity"
+            android:parentActivityName=".ui.MainActivity"
+            android:launchMode="singleTop">
+
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+
+        </activity>
+        <activity
+            android:name=".ui.SummonerSpellActivity"
+            android:parentActivityName=".ui.MainActivity"
+            android:launchMode="singleTop" >
+
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+
+        </activity>
+        <activity
+            android:name=".ui.SettingsActivity"
+            android:parentActivityName=".ui.MainActivity" />
 
         <service
-            android:name=".data.network.LeagueSyncIntentService"
+            android:name=".data.sync.LeagueSyncIntentService"
             android:exported="false" />
         <service
-            android:name=".data.network.LeagueFirebaseJobService"
+            android:name=".data.sync.LeagueFirebaseJobService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE" />

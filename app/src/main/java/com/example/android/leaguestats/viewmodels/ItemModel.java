@@ -10,8 +10,9 @@ import android.arch.lifecycle.ViewModel;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.example.android.leaguestats.data.LeagueDataRepository;
 import com.example.android.leaguestats.data.database.entity.ItemEntry;
-import com.example.android.leaguestats.data.LeagueRepository;
+import com.example.android.leaguestats.models.Item;
 
 import java.util.List;
 
@@ -19,21 +20,18 @@ public class ItemModel extends ViewModel {
 
     private static final String LOG_TAG = ItemModel.class.getSimpleName();
 
-    private LiveData<List<ItemEntry>> mItems;
-
+    private LiveData<List<Item>> mItems;
     private LiveData<ItemEntry> mItem;
+    private LiveData<List<Item>> mItemFrom;
+    private LiveData<List<Item>> mItemInto;
 
-    private LiveData<List<ItemEntry>> mItemFrom;
-    private LiveData<List<ItemEntry>> mItemInto;
-
-    private final MutableLiveData<ItemEntry> mItemQuery = new MutableLiveData<>();
     private final MutableLiveData<Long> mIdQuery = new MutableLiveData<>();
     private final MutableLiveData<String> mNameQuery = new MutableLiveData<>();
     private final MutableLiveData<String[]> mFromQuery = new MutableLiveData<>();
     private final MutableLiveData<String[]> mIntoQuery = new MutableLiveData<>();
 
-    public ItemModel(final LeagueRepository repository) {
-        Log.d(LOG_TAG, "Retrieving items from database");
+    public ItemModel(final LeagueDataRepository repository) {
+        Log.d(LOG_TAG, "Retrieving Items from database");
         mItems = repository.getItems();
 
         final MediatorLiveData mediatorLiveData = new MediatorLiveData();
@@ -49,53 +47,34 @@ public class ItemModel extends ViewModel {
                 mediatorLiveData.setValue(o);
             }
         });
-        mediatorLiveData.addSource(mItemQuery, new Observer() {
-            @Override
-            public void onChanged(@Nullable Object o) {
-                mediatorLiveData.setValue(o);
-            }
-        });
 
         mItem = Transformations.switchMap(mediatorLiveData, new Function() {
             @Override
             public Object apply(Object input) {
-                Log.d(LOG_TAG, "Getting new item");
+                Log.d(LOG_TAG, "Getting new Item");
+                LiveData<ItemEntry> itemEntry = null;
                 if (input instanceof Long || input instanceof Integer) {
                     long itemId = (long) input;
-
-                    LiveData<ItemEntry> itemEntry = repository.getItem(itemId);
-
-                    updateItem(itemEntry);
-
-                    return itemEntry;
-
+                    itemEntry = repository.getItem(itemId);
                 } else if (input instanceof String) {
                     String itemName = (String) input;
-
-                    LiveData<ItemEntry> itemEntry = repository.getItem(itemName);
-
-                    updateItem(itemEntry);
-
-                    return repository.getItem(itemName);
-                } else if (input instanceof ItemEntry){
-                    return input;
-                } else {
-                    return null;
+                    itemEntry = repository.getItem(itemName);
                 }
+                updateItem(itemEntry);
+                return itemEntry;
             }
         });
 
-        mItemFrom = Transformations.switchMap(mFromQuery, new Function<String[], LiveData<List<ItemEntry>>>() {
+        mItemFrom = Transformations.switchMap(mFromQuery, new Function<String[], LiveData<List<Item>>>() {
             @Override
-            public LiveData<List<ItemEntry>> apply(String[] input) {
-                return repository.getItems(input);
+            public LiveData<List<Item>> apply(String[] input) {
+                return input == null ? null : repository.getItems(input);
             }
         });
-
-        mItemInto = Transformations.switchMap(mIntoQuery, new Function<String[], LiveData<List<ItemEntry>>>() {
+        mItemInto = Transformations.switchMap(mIntoQuery, new Function<String[], LiveData<List<Item>>>() {
             @Override
-            public LiveData<List<ItemEntry>> apply(String[] input) {
-                return repository.getItems(input);
+            public LiveData<List<Item>> apply(String[] input) {
+                return input == null ? null : repository.getItems(input);
             }
         });
     }
@@ -111,12 +90,8 @@ public class ItemModel extends ViewModel {
         });
     }
 
-    public LiveData<List<ItemEntry>> getItems() {
+    public LiveData<List<Item>> getItems() {
         return mItems;
-    }
-
-    public void initItem(ItemEntry itemEntry) {
-        mItemQuery.setValue(itemEntry);
     }
 
     public void initItem(String name) {
@@ -132,20 +107,28 @@ public class ItemModel extends ViewModel {
     }
 
     private void setItemFrom(ItemEntry itemEntry) {
-        List<String> fromId = itemEntry.getFrom();
-        mFromQuery.setValue(fromId.toArray(new String[fromId.size()]));
+        if (itemEntry == null) {
+            mFromQuery.setValue(null);
+        } else {
+            List<String> fromId = itemEntry.getFrom();
+            mFromQuery.setValue(fromId == null ? null : fromId.toArray(new String[fromId.size()]));
+        }
     }
 
-    public LiveData<List<ItemEntry>> getItemFrom() {
+    public LiveData<List<Item>> getItemFrom() {
         return mItemFrom;
     }
 
     private void setItemInto(ItemEntry itemEntry) {
-        List<String> intoId = itemEntry.getInto();
-        mIntoQuery.setValue(intoId.toArray(new String[intoId.size()]));
+        if (itemEntry == null) {
+            mIntoQuery.setValue(null);
+        } else {
+            List<String> intoId = itemEntry.getInto();
+            mIntoQuery.setValue(intoId == null ? null : intoId.toArray(new String[intoId.size()]));
+        }
     }
 
-    public LiveData<List<ItemEntry>> getItemInto() {
+    public LiveData<List<Item>> getItemInto() {
         return mItemInto;
     }
 }

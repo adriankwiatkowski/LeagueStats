@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/splash_art_name"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:textAllCaps="true"
-    android:textStyle="bold"
-    android:textColor="@color/lightWhiteColor"
-    tools:drawableTop="@drawable/ic_launcher_foreground"
-    tools:text="Default"/>
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".ui.ChampionActivity">
+
+    <ImageView
+        android:id="@+id/splash_art_image"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/splash_art_height" />
+
+    <TextView
+        android:id="@+id/splash_art_tv"
+        style="@style/LabelText"
+        tools:text="DEFAULT" />
+
+</LinearLayout>

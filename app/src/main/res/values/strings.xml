@@ -1,6 +1,7 @@
 <resources>
 
     <string name="app_name" translatable="false">League Stats</string>
+    <string name="riot_clause" translatable="false">LeagueStats isn’t endorsed by Riot Games and doesn’t reflect the views or opinions of Riot Games or anyone officially involved in producing or managing League of Legends. League of Legends and Riot Games are trademarks or registered trademarks of Riot Games, Inc. League of Legends © Riot Games, Inc.</string>
 
     <string name="region_eune">EUNE</string>
     <string name="region_euw">EUW</string>
@@ -22,8 +23,8 @@
 
     <string name="splash_art_description">Splash Art for Champion.</string>
 
-    <string name="playing_as">Playing As</string>
-    <string name="playing_vs">Playing Vs</string>
+    <string name="playing_as">Playing As %1$s</string>
+    <string name="playing_vs">Playing Vs %1$s</string>
 
     <string name="summoner_name">Summoner name…</string>
 
@@ -31,9 +32,9 @@
     <string name="unknown_name">Unknown name</string>
     <string name="unknown_description">Unknown description</string>
     <string name="unknown_resource">Unknown resource</string>
-    <string name="level">Level</string>
+    <string name="level">Level %1$d</string>
     <string name="overview">Overview</string>
-    <string name="info">Info</string>
+    <string name="info">info</string>
     <string name="summoner">Summoner</string>
     <string name="difficulty">Difficulty</string>
     <string name="attack">Attack</string>
@@ -50,7 +51,7 @@
     <string name="summoner_spells">summoner spells</string>
     <string name="cost">cost</string>
     <string name="cooldown">cooldown</string>
-    <string name="image_for_spell">Image for spell.</string>
+    <string name="spell_description">Image spell</string>
 
     <string name="mastery_points">Mastery Points</string>
     <string name="match_history">Match History</string>
@@ -77,8 +78,9 @@
     <string name="lose">lose</string>
 
     <string name="enter_summoner_name">Please enter summoner name…</string>
-    <string name="search_summoner">search summoner</string>
-    <string name="action_search">search…</string>
+    <string name="search_summoner">Search summoner</string>
+    <string name="search_summoner_underline"><u>search summoner…</u></string>
+    <string name="action_search">Search…</string>
     <string name="action_region">region</string>
     <string name="action_settings">Settings</string>
 
@@ -91,4 +93,21 @@
     <string name="pref_language_en" translatable="false">en_US</string>
     <string name="pref_language_pl" translatable="false">pl_PL</string>
 
+    <string name="image">Image</string>
+
+    <string name="kda">%1$d/%2$d/%3$d</string>
+    <string name="minions_args">%1$d minions</string>
+    <string name="gold_args">%1$d gold</string>
+    <string name="match_timestamp">%1$s / %2$s</string>
+
+    <string name="bio">biography</string>
+    <string name="stats">stats</string>
+    <string name="spells">spells</string>
+    <string name="search_champion">Search champion</string>
+    <string name="skins">skins</string>
+
+    <string name="initializing_data">Initializing data…</string>
+    <string name="summoner_spell_not_found">Summoner spell not found.</string>
+    <string name="champion_not_found">Champion not found.</string>
+    <string name="item_not_found">Item not found.</string>
 </resources>

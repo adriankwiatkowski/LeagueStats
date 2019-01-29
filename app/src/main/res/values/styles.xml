@@ -1,129 +1,250 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+    <style name="AppTheme" parent="BaseAppTheme" />
+
+    <style name="BaseAppTheme" parent="Theme.AppCompat.NoActionBar">
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="actionBarStyle">@style/PagerBarStyle</item>
+        <item name="android:windowAnimationStyle">@style/CustomActivityAnimation</item>
     </style>
 
-    <style name="PagerBarStyle" parent="Widget.AppCompat.Light.ActionBar.Solid.Inverse" >
-        <item name="elevation">0dp</item>
+    <style name="CustomActivityAnimation" parent="@android:style/Animation.Activity">
+        <item name="android:activityOpenEnterAnimation">@anim/slide_in_right</item>
+        <item name="android:activityOpenExitAnimation">@anim/slide_out_left</item>
+        <item name="android:activityCloseEnterAnimation">@anim/slide_in_left</item>
+        <item name="android:activityCloseExitAnimation">@anim/slide_out_right</item>
     </style>
 
-    <style name="PagerTab" parent="Widget.Design.TabLayout" >
+    <style name="AppBarStyle" parent="ThemeOverlay.AppCompat.ActionBar">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="tabIndicatorColor">@color/darkWhiteColor</item>
-        <item name="tabSelectedTextColor">@color/lightWhiteColor</item>
-        <item name="tabTextAppearance">@style/PagerTabTextAppearance</item>
     </style>
 
-    <style name="PagerTabTextAppearance" parent="TextAppearance.Design.Tab" >
-        <item name="android:textColor">@color/darkWhiteColor</item>
+    <style name="CollapsingToolbarStyle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
     </style>
 
-    <style name="LabelText" >
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat" />
+
+    <style name="PagerTab" parent="Widget.Design.TabLayout">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="SearchView">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:iconifiedByDefault">false</item>
+        <item name="android:focusable">false</item>
+    </style>
+
+    <style name="AlphaTopView">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:layout_marginTop">@dimen/activity_horizontal_margin</item>
+        <item name="android:alpha">0.5</item>
+        <item name="android:background">@color/colorAccent</item>
+    </style>
+
+    <style name="AlphaBottomView">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:layout_marginBottom">@dimen/activity_horizontal_margin</item>
+        <item name="android:alpha">0.5</item>
+        <item name="android:background">@color/colorAccent</item>
+    </style>
+
+    <style name="TitleText">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:textStyle">italic</item>
+        <item name="android:layout_gravity">center</item>
         <item name="android:textAllCaps">true</item>
-        <item name="android:layout_marginTop">8dp</item>
-        <item name="android:layout_marginBottom">8dp</item>
-        <item name="android:layout_marginLeft">8dp</item>
-        <item name="android:layout_marginStart">8dp</item>
-        <item name="android:layout_marginRight">8dp</item>
-        <item name="android:layout_marginEnd">8dp</item>
-        <item name="android:textSize">12sp</item>
-        <item name="android:textColor">@color/darkWhiteColor</item>
+        <item name="android:textSize">@dimen/title_text_size</item>
+        <item name="android:textStyle">bold|italic</item>
     </style>
 
-    <style name="BoldText" >
-        <item name="android:layout_width">0dp</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginLeft">8dp</item>
-        <item name="android:layout_marginStart">8dp</item>
-        <item name="android:layout_marginRight">8dp</item>
-        <item name="android:layout_marginEnd">8dp</item>
-        <item name="android:textSize">12sp</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:textColor">@color/lightWhiteColor</item>
-    </style>
-
-    <style name="FragmentTitleText" parent="LabelText">
+    <style name="MainCard" parent="Widget.MaterialComponents.CardView">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/main_card_height</item>
         <item name="android:gravity">center</item>
-        <item name="android:textAllCaps">true</item>
+        <item name="cardUseCompatPadding">true</item>
+        <item name="android:foreground">@drawable/touch_selector</item>
+        <item name="cardCornerRadius">@dimen/card_corner_radius</item>
     </style>
 
-    <style name="MatchGroupText" parent="BoldText" >
-        <item name="android:layout_marginLeft">8dp</item>
-        <item name="android:layout_marginStart">8dp</item>
-        <item name="android:layout_marginRight">8dp</item>
-        <item name="android:layout_marginEnd">8dp</item>
-        <item name="android:layout_marginTop">8dp</item>
-        <item name="android:layout_marginBottom">8dp</item>
-        <item name="android:textSize">12sp</item>
+    <style name="MainSummonerCard" parent="MainCard">
+        <item name="android:layout_height">@dimen/main_summoner_card_height</item>
     </style>
 
-    <style name="EmptyText" >
+    <style name="MainCardImage">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_centerInParent">true</item>
+        <item name="android:scaleType">fitXY</item>
+    </style>
+
+    <style name="MainCardText" parent="TextAppearance.AppCompat.Title.Inverse">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:textSize">@dimen/empty_text_size</item>
+        <item name="android:layout_centerHorizontal">true</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textStyle">bold|italic</item>
+    </style>
+
+    <style name="RootCardView" parent="Widget.MaterialComponents.CardView">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="contentPadding">@dimen/padding_small</item>
+        <item name="android:layout_margin">@dimen/margin_small</item>
+        <item name="cardCornerRadius">@dimen/card_corner_radius</item>
+        <item name="android:foreground">@drawable/touch_selector</item>
+    </style>
+
+    <style name="CardPrimaryText" parent="PrimaryText">
+        <item name="android:paddingLeft">@dimen/padding_small</item>
+        <item name="android:paddingStart">@dimen/padding_small</item>
+        <item name="android:paddingEnd">@dimen/padding_default</item>
+        <item name="android:paddingRight">@dimen/padding_default</item>
+    </style>
+
+    <style name="CardSecondaryText" parent="SecondaryText">
+        <item name="android:paddingLeft">@dimen/padding_small</item>
+        <item name="android:paddingStart">@dimen/padding_small</item>
+        <item name="android:paddingEnd">@dimen/padding_default</item>
+        <item name="android:paddingRight">@dimen/padding_default</item>
+    </style>
+
+    <style name="PrimaryText" parent="TextAppearance.AppCompat.Body1">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">center_vertical</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">@color/textColorPrimary</item>
+    </style>
+
+    <style name="SecondaryText" parent="TextAppearance.AppCompat.Body2">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:textColor">@color/textColorSecondary</item>
+    </style>
+
+    <style name="LabelText" parent="SecondaryText">
+        <item name="android:paddingTop">@dimen/padding_default</item>
+        <item name="android:paddingStart">@dimen/padding_default</item>
+        <item name="android:paddingLeft">@dimen/padding_default</item>
+        <item name="android:paddingRight">@dimen/padding_default</item>
+        <item name="android:paddingEnd">@dimen/padding_default</item>
+    </style>
+
+    <style name="BoldText" parent="PrimaryText">
+        <item name="android:paddingTop">@dimen/padding_default</item>
+        <item name="android:paddingStart">@dimen/padding_default</item>
+        <item name="android:paddingLeft">@dimen/padding_default</item>
+        <item name="android:paddingEnd">@dimen/padding_default</item>
+        <item name="android:paddingRight">@dimen/padding_default</item>
+    </style>
+
+    <style name="SummonerEditText" parent="PrimaryText">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:inputType">text</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="EmptyText" parent="TextAppearance.AppCompat.Title">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
         <item name="android:visibility">invisible</item>
+        <item name="android:textSize">@dimen/empty_text_size</item>
+    </style>
+
+    <style name="IndeterminateProgressBar" parent="@style/Widget.AppCompat.ProgressBar">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_centerInParent">true</item>
+        <item name="android:indeterminate">true</item>
     </style>
 
     <style name="StatsProgressBar" parent="@style/Widget.AppCompat.ProgressBar.Horizontal">
-        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginRight">8dp</item>
-        <item name="android:layout_marginEnd">8dp</item>
-        <item name="android:layout_marginLeft">8dp</item>
-        <item name="android:layout_marginStart">8dp</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:layout_marginStart">@dimen/margin_default</item>
+        <item name="android:layout_marginLeft">@dimen/margin_default</item>
+        <item name="android:layout_marginRight">@dimen/margin_default</item>
+        <item name="android:layout_marginEnd">@dimen/margin_default</item>
         <item name="android:indeterminate">false</item>
         <item name="android:max">10</item>
     </style>
 
-    <style name="ImageThumbnail" >
+    <style name="ProfileImage">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/profile_height</item>
+        <item name="android:layout_marginTop">?attr/actionBarSize</item>
+    </style>
+
+    <style name="Image">
         <item name="android:layout_width">@dimen/thumbnail_width</item>
         <item name="android:layout_height">@dimen/thumbnail_height</item>
-        <item name="android:layout_marginLeft">8dp</item>
-        <item name="android:layout_marginStart">8dp</item>
-        <item name="android:layout_marginTop">8dp</item>
-        <item name="android:layout_marginBottom">8dp</item>
+        <item name="android:layout_marginLeft">@dimen/margin_default</item>
+        <item name="android:layout_marginStart">@dimen/margin_default</item>
+        <item name="android:layout_marginTop">@dimen/margin_default</item>
+        <item name="android:layout_marginBottom">@dimen/margin_default</item>
     </style>
 
-    <style name="SmallImageThumbnail" >
+    <style name="SmallImageThumbnail">
         <item name="android:layout_width">@dimen/item_thumbnail_width</item>
         <item name="android:layout_height">@dimen/item_thumbnail_height</item>
-        <item name="android:layout_marginLeft">8dp</item>
-        <item name="android:layout_marginStart">8dp</item>
-        <item name="android:layout_marginTop">8dp</item>
-        <item name="android:layout_marginBottom">8dp</item>
+        <item name="android:layout_marginLeft">@dimen/margin_default</item>
+        <item name="android:layout_marginStart">@dimen/margin_default</item>
+        <item name="android:layout_marginTop">@dimen/margin_default</item>
+        <item name="android:layout_marginBottom">@dimen/margin_default</item>
     </style>
 
-    <style name="TipsSplashArt" >
+    <style name="MatchGroupImage">
+        <item name="android:layout_width">@dimen/match_image_group_width</item>
+        <item name="android:layout_height">@dimen/match_image_group_height</item>
+        <item name="android:layout_marginLeft">@dimen/margin_default</item>
+        <item name="android:layout_marginStart">@dimen/margin_default</item>
+        <item name="android:layout_marginTop">@dimen/margin_default</item>
+        <item name="android:layout_marginBottom">@dimen/margin_default</item>
+    </style>
+
+    <style name="MatchGroupSummonerSpell">
+        <item name="android:layout_width">@dimen/match_summoner_spell_group_width</item>
+        <item name="android:layout_height">@dimen/match_summoner_spell_group_height</item>
+        <item name="android:layout_marginLeft">@dimen/margin_default</item>
+        <item name="android:layout_marginStart">@dimen/margin_default</item>
+        <item name="android:layout_marginTop">@dimen/margin_small</item>
+    </style>
+
+    <style name="MatchChildImage">
+        <item name="android:layout_width">@dimen/match_image_child_width</item>
+        <item name="android:layout_height">@dimen/match_image_child_height</item>
+        <item name="android:layout_marginLeft">@dimen/margin_default</item>
+        <item name="android:layout_marginStart">@dimen/margin_default</item>
+        <item name="android:layout_marginTop">@dimen/margin_default</item>
+        <item name="android:layout_marginBottom">@dimen/margin_default</item>
+    </style>
+
+    <style name="MatchChildSummonerSpell">
+        <item name="android:layout_width">@dimen/match_summoner_spell_child_width</item>
+        <item name="android:layout_height">@dimen/match_summoner_spell_child_height</item>
+        <item name="android:layout_marginLeft">@dimen/margin_default</item>
+        <item name="android:layout_marginStart">@dimen/margin_default</item>
+        <item name="android:layout_marginTop">@dimen/margin_small</item>
+    </style>
+
+    <style name="RecyclerViewStyle">
         <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_height">@dimen/recyclerview_height</item>
+        <item name="android:layout_marginLeft">@dimen/margin_default</item>
+        <item name="android:layout_marginStart">@dimen/margin_default</item>
+        <item name="android:layout_marginRight">@dimen/margin_default</item>
+        <item name="android:layout_marginEnd">@dimen/margin_default</item>
+        <item name="android:layout_marginBottom">@dimen/margin_default</item>
+        <item name="android:layout_marginTop">@dimen/margin_default</item>
     </style>
-
-    <!-- TODO check layout_height -->
-    <style name="RecyclerViewStyle" >
-        <item name="android:layout_width">0dp</item>
-        <item name="android:layout_height">500dp</item>
-        <item name="android:layout_marginLeft">8dp</item>
-        <item name="android:layout_marginStart">8dp</item>
-        <item name="android:layout_marginRight">8dp</item>
-        <item name="android:layout_marginEnd">8dp</item>
-        <item name="android:layout_marginBottom">8dp</item>
-        <item name="android:layout_marginTop">8dp</item>
-    </style>
-
-    <style name="ButtonImageMain" >
-        <item name="android:layout_width">@dimen/button_image_main_width</item>
-        <item name="android:layout_height">@dimen/button_image_main_height</item>
-    </style>
-
 </resources>

@@ -3,7 +3,6 @@ package com.example.android.leaguestats.data.database.entity;
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
-import android.support.annotation.NonNull;
 
 import java.util.List;
 
@@ -11,100 +10,114 @@ import java.util.List;
 public class ChampionEntry {
 
     @PrimaryKey
+    @ColumnInfo(name = "champion_id")
     private int id;
+    @ColumnInfo(name = "champion_name")
     private String name;
     @ColumnInfo(name = "champion_key")
     private String key;
+    @ColumnInfo(name = "champion_title")
     private String title;
+    @ColumnInfo(name = "champion_lore")
     private String lore;
 
-    private String image;
-    @ColumnInfo(name = "splash_art")
-    private List<String> splashArt;
-    @ColumnInfo(name = "splash_art_name")
+    @ColumnInfo(name = "champion_tags")
+    private List<String> tags;
+
+    @ColumnInfo(name = "champion_image_id")
+    private String imageId;
+
+    @ColumnInfo(name = "champion_splash_art_id")
+    private List<Integer> splashArtId;
+    @ColumnInfo(name = "champion_splash_art_name")
     private List<String> splashArtName;
 
+    @ColumnInfo(name = "champion_difficulty")
     private int difficulty;
+    @ColumnInfo(name = "champion_attack")
     private int attack;
+    @ColumnInfo(name = "champion_defense")
     private int defense;
+    @ColumnInfo(name = "champion_magic")
     private int magic;
 
-    @ColumnInfo(name = "vs_tips")
+    @ColumnInfo(name = "champion_vs_tips")
     private List<String> vsTips;
-    @ColumnInfo(name = "as_tips")
+    @ColumnInfo(name = "champion_as_tips")
     private List<String> asTips;
 
-    @ColumnInfo(name = "attack_damage")
+    @ColumnInfo(name = "champion_attack_damage")
     private double attackDamage;
-    @ColumnInfo(name = "attack_damage_per_level")
+    @ColumnInfo(name = "champion_attack_damage_per_level")
     private double attackDamagePerLevel;
-    @ColumnInfo(name = "attack_range")
+    @ColumnInfo(name = "champion_attack_range")
     private double attackRange;
+    @ColumnInfo(name = "champion_armor")
     private double armor;
-    @ColumnInfo(name = "armor_per_level")
+    @ColumnInfo(name = "champion_armor_per_level")
     private double armorPerLevel;
+    @ColumnInfo(name = "champion_health")
     private double health;
-    @ColumnInfo(name = "health_per_level")
+    @ColumnInfo(name = "champion_health_per_level")
     private double healthPerLevel;
-    @ColumnInfo(name = "health_regen")
+    @ColumnInfo(name = "champion_health_regen")
     private double healthRegen;
-    @ColumnInfo(name = "health_regen_per_level")
+    @ColumnInfo(name = "champion_health_regen_per_level")
     private double healthRegenPerLevel;
+    @ColumnInfo(name = "champion_mana")
     private double mana;
-    @ColumnInfo(name = "mana_per_level")
+    @ColumnInfo(name = "champion_mana_per_level")
     private double manaPerLevel;
-    @ColumnInfo(name = "mana_regen")
+    @ColumnInfo(name = "champion_mana_regen")
     private double manaRegen;
-    @ColumnInfo(name = "mana_regen_per_level")
+    @ColumnInfo(name = "champion_mana_regen_per_level")
     private double manaRegenPerLevel;
-    @ColumnInfo(name = "attack_speed_offset")
+    @ColumnInfo(name = "champion_attack_speed_offset")
     private double attackSpeedOffset;
-    @ColumnInfo(name = "attack_speed_per_level")
+    @ColumnInfo(name = "champion_attack_speed_per_level")
     private double attackSpeedPerLevel;
-    @ColumnInfo(name = "move_speed")
+    @ColumnInfo(name = "champion_move_speed")
     private double moveSpeed;
+    @ColumnInfo(name = "chmapion_crit")
     private double crit;
-    @ColumnInfo(name = "crit_per_level")
+    @ColumnInfo(name = "champion_crit_per_level")
     private double critPerLevel;
-    @ColumnInfo(name = "magic_resist")
+    @ColumnInfo(name = "champion_magic_resist")
     private double magicResist;
-    @ColumnInfo(name = "magic_resist_per_level")
+    @ColumnInfo(name = "champion_magic_resist_per_level")
     private double magicResistPerLevel;
 
-    @ColumnInfo(name = "spell_name")
-    private List<String> spellName;
-    @ColumnInfo(name = "spell_description")
-    private List<String> spellDescription;
-    @ColumnInfo(name = "spell_image")
-    private List<String> spellImage;
-    @ColumnInfo(name = "spell_resource")
-    private List<String> spellResource;
-    @ColumnInfo(name = "spell_cooldown_array")
-    private List<Double> spellCooldown;
-    @ColumnInfo(name = "spell_cost_array")
-    private List<Double> spellCost;
-    @ColumnInfo(name = "spell_max_rank")
-    private List<Integer> spellMaxRank;
+    @ColumnInfo(name = "champion_partype")
+    private String partype;
 
-    public ChampionEntry(int id, String name, String key, String title, String lore, String image,
-                         List<String> splashArt, List<String> splashArtName, int difficulty, int attack,
+    @ColumnInfo(name = "champion_passive_name")
+    private String passiveName;
+    @ColumnInfo(name = "champion_passive_description")
+    private String passiveDescription;
+    @ColumnInfo(name = "champion_passive_id")
+    private String passiveId;
+
+    private List<Spell> spells;
+
+    public ChampionEntry(int id, String name, String key, String title, String lore, List<String> tags, String imageId,
+                         List<Integer> splashArtId, List<String> splashArtName, int difficulty, int attack,
                          int defense, int magic, List<String> vsTips, List<String> asTips, double attackDamage,
                          double attackDamagePerLevel, double attackRange, double armor,
                          double armorPerLevel, double health, double healthPerLevel, double healthRegen,
                          double healthRegenPerLevel, double mana, double manaPerLevel, double manaRegen,
                          double manaRegenPerLevel, double attackSpeedOffset, double attackSpeedPerLevel,
                          double moveSpeed, double crit, double critPerLevel, double magicResist,
-                         double magicResistPerLevel, List<String> spellName, List<String> spellDescription,
-                         List<String> spellImage, List<String> spellResource, List<Double> spellCooldown,
-                         List<Double> spellCost, List<Integer> spellMaxRank) {
+                         double magicResistPerLevel, String partype, String passiveName,
+                         String passiveDescription, String passiveId, List<Spell> spells) {
 
         this.id = id;
         this.name = name;
         this.key = key;
         this.title = title;
         this.lore = lore;
-        this.image = image;
-        this.splashArt = splashArt;
+        this.tags = tags;
+        this.imageId = imageId;
+        this.splashArtId = splashArtId;
         this.splashArtName = splashArtName;
         this.difficulty = difficulty;
         this.attack = attack;
@@ -134,13 +147,11 @@ public class ChampionEntry {
         this.magicResist = magicResist;
         this.magicResistPerLevel = magicResistPerLevel;
 
-        this.spellName = spellName;
-        this.spellDescription = spellDescription;
-        this.spellImage = spellImage;
-        this.spellResource = spellResource;
-        this.spellCooldown = spellCooldown;
-        this.spellCost = spellCost;
-        this.spellMaxRank = spellMaxRank;
+        this.partype = partype;
+        this.passiveName = passiveName;
+        this.passiveDescription = passiveDescription;
+        this.passiveId = passiveId;
+        this.spells = spells;
     }
 
     public String getName() {
@@ -171,20 +182,12 @@ public class ChampionEntry {
         this.lore = lore;
     }
 
-    public String getImage() {
-        return image;
+    public List<Integer> getSplashArtId() {
+        return splashArtId;
     }
 
-    public void setImage(String image) {
-        this.image = image;
-    }
-
-    public List<String> getSplashArt() {
-        return splashArt;
-    }
-
-    public void setSplashArt(List<String> splashArt) {
-        this.splashArt = splashArt;
+    public void setSplashArtId(List<Integer> splashArt) {
+        this.splashArtId = splashArt;
     }
 
     public List<String> getSplashArtName() {
@@ -411,59 +414,59 @@ public class ChampionEntry {
         this.magicResist = magicResist;
     }
 
-    public List<String> getSpellName() {
-        return spellName;
+    public String getImageId() {
+        return imageId;
     }
 
-    public void setSpellName(List<String> name) {
-        this.spellName = name;
+    public void setImageId(String imageId) {
+        this.imageId = imageId;
     }
 
-    public List<String> getSpellDescription() {
-        return spellDescription;
+    public String getPassiveName() {
+        return passiveName;
     }
 
-    public void setSpellDescription(List<String> description) {
-        this.spellDescription = description;
+    public void setPassiveName(String passiveName) {
+        this.passiveName = passiveName;
     }
 
-    public List<String> getSpellImage() {
-        return spellImage;
+    public String getPassiveId() {
+        return passiveId;
     }
 
-    public void setSpellImage(List<String> image) {
-        this.spellImage = image;
+    public void setPassiveId(String passiveId) {
+        this.passiveId = passiveId;
     }
 
-    public List<Double> getSpellCooldown() {
-        return spellCooldown;
+    public List<String> getTags() {
+        return tags;
     }
 
-    public void setSpellCooldown(List<Double> cooldown) {
-        this.spellCooldown = cooldown;
+    public void setTags(List<String> tags) {
+        this.tags = tags;
     }
 
-    public List<Double> getSpellCost() {
-        return spellCost;
+    public String getPassiveDescription() {
+        return passiveDescription;
     }
 
-    public void setSpellCost(List<Double> cost) {
-        this.spellCost = cost;
+    public void setPassiveDescription(String passiveDescription) {
+        this.passiveDescription = passiveDescription;
     }
 
-    public List<String> getSpellResource() {
-        return spellResource;
+    public String getPartype() {
+        return partype;
     }
 
-    public void setSpellResource(List<String> resource) {
-        this.spellResource = resource;
+    public void setPartype(String partype) {
+        this.partype = partype;
     }
 
-    public List<Integer> getSpellMaxRank() {
-        return spellMaxRank;
+    public List<Spell> getSpells() {
+        return spells;
     }
 
-    public void setSpellMaxRank(List<Integer> spellMaxRank) {
-        this.spellMaxRank = spellMaxRank;
+    public void setSpells(List<Spell> spells) {
+        this.spells = spells;
     }
 }

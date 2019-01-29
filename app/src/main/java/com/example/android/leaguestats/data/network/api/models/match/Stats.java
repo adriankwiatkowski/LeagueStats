@@ -1,5 +1,6 @@
 package com.example.android.leaguestats.data.network.api.models.match;
 
+import com.example.android.leaguestats.models.Item;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -13,25 +14,46 @@ public class Stats {
     private boolean win;
     @SerializedName("item0")
     @Expose
-    private int item0;
+    private int item0Id;
     @SerializedName("item1")
     @Expose
-    private int item1;
+    private int item1Id;
     @SerializedName("item2")
     @Expose
-    private int item2;
+    private int item2Id;
     @SerializedName("item3")
     @Expose
-    private int item3;
+    private int item3Id;
     @SerializedName("item4")
     @Expose
-    private int item4;
+    private int item4Id;
     @SerializedName("item5")
     @Expose
-    private int item5;
+    private int item5Id;
     @SerializedName("item6")
     @Expose
-    private int item6;
+    private int item6Id;
+    @SerializedName("item_item0")
+    @Expose
+    private Item item0;
+    @SerializedName("item_item1")
+    @Expose
+    private Item item1;
+    @SerializedName("item_item2")
+    @Expose
+    private Item item2;
+    @SerializedName("item_item3")
+    @Expose
+    private Item item3;
+    @SerializedName("item_item4")
+    @Expose
+    private Item item4;
+    @SerializedName("item_item5")
+    @Expose
+    private Item item5;
+    @SerializedName("item_item6")
+    @Expose
+    private Item item6;
     @SerializedName("kills")
     @Expose
     private int kills;
@@ -318,11 +340,11 @@ public class Stats {
 
     /**
      *
-     * @param item2
+     * @param item2Id
      * @param unrealKills
-     * @param item1
+     * @param item1Id
      * @param totalDamageTaken
-     * @param item0
+     * @param item0Id
      * @param pentaKills
      * @param sightWardsBoughtInGame
      * @param perk1
@@ -410,27 +432,27 @@ public class Stats {
      * @param turretKills
      * @param largestMultiKill
      * @param win
-     * @param item4
-     * @param item3
+     * @param item4Id
+     * @param item3Id
      * @param objectivePlayerScore
      * @param damageSelfMitigated
-     * @param item6
+     * @param item6Id
      * @param firstTowerAssist
-     * @param item5
+     * @param item5Id
      * @param combatPlayerScore
      * @param totalMinionsKilled
      */
-    public Stats(long participantId, boolean win, int item0, int item1, int item2, int item3, int item4, int item5, int item6, int kills, int deaths, int assists, int largestKillingSpree, int largestMultiKill, int killingSprees, int longestTimeSpentLiving, int doubleKills, int tripleKills, int quadraKills, int pentaKills, int unrealKills, long totalDamageDealt, long magicDamageDealt, long physicalDamageDealt, long trueDamageDealt, int largestCriticalStrike, long totalDamageDealtToChampions, long magicDamageDealtToChampions, long physicalDamageDealtToChampions, long trueDamageDealtToChampions, long totalHeal, int totalUnitsHealed, long damageSelfMitigated, long damageDealtToObjectives, long damageDealtToTurrets, long visionScore, long timeCCingOthers, int totalDamageTaken, long magicalDamageTaken, long physicalDamageTaken, long trueDamageTaken, int goldEarned, int goldSpent, int turretKills, int inhibitorKills, int totalMinionsKilled, int neutralMinionsKilled, int neutralMinionsKilledTeamJungle, int neutralMinionsKilledEnemyJungle, int totalTimeCrowdControlDealt, int champLevel, int visionWardsBoughtInGame, int sightWardsBoughtInGame, int wardsPlaced, int wardsKilled, boolean firstBloodKill, boolean firstBloodAssist, boolean firstTowerKill, boolean firstTowerAssist, boolean firstInhibitorKill, boolean firstInhibitorAssist, int combatPlayerScore, int objectivePlayerScore, int totalPlayerScore, int totalScoreRank, int playerScore0, int playerScore1, int playerScore2, int playerScore3, int playerScore4, int playerScore5, int playerScore6, int playerScore7, int playerScore8, int playerScore9, int perk0, int perk0Var1, int perk0Var2, int perk0Var3, int perk1, int perk1Var1, int perk1Var2, int perk1Var3, int perk2, int perk2Var1, int perk2Var2, int perk2Var3, int perk3, int perk3Var1, int perk3Var2, int perk3Var3, int perk4, int perk4Var1, int perk4Var2, int perk4Var3, int perk5, int perk5Var1, int perk5Var2, int perk5Var3, int perkPrimaryStyle, int perkSubStyle) {
+    public Stats(long participantId, boolean win, int item0Id, int item1Id, int item2Id, int item3Id, int item4Id, int item5Id, int item6Id, int kills, int deaths, int assists, int largestKillingSpree, int largestMultiKill, int killingSprees, int longestTimeSpentLiving, int doubleKills, int tripleKills, int quadraKills, int pentaKills, int unrealKills, long totalDamageDealt, long magicDamageDealt, long physicalDamageDealt, long trueDamageDealt, int largestCriticalStrike, long totalDamageDealtToChampions, long magicDamageDealtToChampions, long physicalDamageDealtToChampions, long trueDamageDealtToChampions, long totalHeal, int totalUnitsHealed, long damageSelfMitigated, long damageDealtToObjectives, long damageDealtToTurrets, long visionScore, long timeCCingOthers, int totalDamageTaken, long magicalDamageTaken, long physicalDamageTaken, long trueDamageTaken, int goldEarned, int goldSpent, int turretKills, int inhibitorKills, int totalMinionsKilled, int neutralMinionsKilled, int neutralMinionsKilledTeamJungle, int neutralMinionsKilledEnemyJungle, int totalTimeCrowdControlDealt, int champLevel, int visionWardsBoughtInGame, int sightWardsBoughtInGame, int wardsPlaced, int wardsKilled, boolean firstBloodKill, boolean firstBloodAssist, boolean firstTowerKill, boolean firstTowerAssist, boolean firstInhibitorKill, boolean firstInhibitorAssist, int combatPlayerScore, int objectivePlayerScore, int totalPlayerScore, int totalScoreRank, int playerScore0, int playerScore1, int playerScore2, int playerScore3, int playerScore4, int playerScore5, int playerScore6, int playerScore7, int playerScore8, int playerScore9, int perk0, int perk0Var1, int perk0Var2, int perk0Var3, int perk1, int perk1Var1, int perk1Var2, int perk1Var3, int perk2, int perk2Var1, int perk2Var2, int perk2Var3, int perk3, int perk3Var1, int perk3Var2, int perk3Var3, int perk4, int perk4Var1, int perk4Var2, int perk4Var3, int perk5, int perk5Var1, int perk5Var2, int perk5Var3, int perkPrimaryStyle, int perkSubStyle) {
         super();
         this.participantId = participantId;
         this.win = win;
-        this.item0 = item0;
-        this.item1 = item1;
-        this.item2 = item2;
-        this.item3 = item3;
-        this.item4 = item4;
-        this.item5 = item5;
-        this.item6 = item6;
+        this.item0Id = item0Id;
+        this.item1Id = item1Id;
+        this.item2Id = item2Id;
+        this.item3Id = item3Id;
+        this.item4Id = item4Id;
+        this.item5Id = item5Id;
+        this.item6Id = item6Id;
         this.kills = kills;
         this.deaths = deaths;
         this.assists = assists;
@@ -541,60 +563,60 @@ public class Stats {
         this.win = win;
     }
 
-    public int getItem0() {
-        return item0;
+    public int getItem0Id() {
+        return item0Id;
     }
 
-    public void setItem0(int item0) {
-        this.item0 = item0;
+    public void setItem0Id(int item0Id) {
+        this.item0Id = item0Id;
     }
 
-    public int getItem1() {
-        return item1;
+    public int getItem1Id() {
+        return item1Id;
     }
 
-    public void setItem1(int item1) {
-        this.item1 = item1;
+    public void setItem1Id(int item1Id) {
+        this.item1Id = item1Id;
     }
 
-    public int getItem2() {
-        return item2;
+    public int getItem2Id() {
+        return item2Id;
     }
 
-    public void setItem2(int item2) {
-        this.item2 = item2;
+    public void setItem2Id(int item2Id) {
+        this.item2Id = item2Id;
     }
 
-    public int getItem3() {
-        return item3;
+    public int getItem3Id() {
+        return item3Id;
     }
 
-    public void setItem3(int item3) {
-        this.item3 = item3;
+    public void setItem3Id(int item3Id) {
+        this.item3Id = item3Id;
     }
 
-    public int getItem4() {
-        return item4;
+    public int getItem4Id() {
+        return item4Id;
     }
 
-    public void setItem4(int item4) {
-        this.item4 = item4;
+    public void setItem4Id(int item4Id) {
+        this.item4Id = item4Id;
     }
 
-    public int getItem5() {
-        return item5;
+    public int getItem5Id() {
+        return item5Id;
     }
 
-    public void setItem5(int item5) {
-        this.item5 = item5;
+    public void setItem5Id(int item5Id) {
+        this.item5Id = item5Id;
     }
 
-    public int getItem6() {
-        return item6;
+    public int getItem6Id() {
+        return item6Id;
     }
 
-    public void setItem6(int item6) {
-        this.item6 = item6;
+    public void setItem6Id(int item6Id) {
+        this.item6Id = item6Id;
     }
 
     public int getKills() {
@@ -1333,4 +1355,59 @@ public class Stats {
         this.perkSubStyle = perkSubStyle;
     }
 
+    public Item getItem0() {
+        return item0;
+    }
+
+    public void setItem0(Item item0) {
+        this.item0 = item0;
+    }
+
+    public Item getItem1() {
+        return item1;
+    }
+
+    public void setItem1(Item item1) {
+        this.item1 = item1;
+    }
+
+    public Item getItem2() {
+        return item2;
+    }
+
+    public void setItem2(Item item2) {
+        this.item2 = item2;
+    }
+
+    public Item getItem3() {
+        return item3;
+    }
+
+    public void setItem3(Item item3) {
+        this.item3 = item3;
+    }
+
+    public Item getItem4() {
+        return item4;
+    }
+
+    public void setItem4(Item item4) {
+        this.item4 = item4;
+    }
+
+    public Item getItem5() {
+        return item5;
+    }
+
+    public void setItem5(Item item5) {
+        this.item5 = item5;
+    }
+
+    public Item getItem6() {
+        return item6;
+    }
+
+    public void setItem6(Item item6) {
+        this.item6 = item6;
+    }
 }

@@ -3,13 +3,13 @@ package com.example.android.leaguestats.ui;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,16 +19,16 @@ import android.widget.ProgressBar;
 
 import com.example.android.leaguestats.R;
 import com.example.android.leaguestats.adapters.ChampionAdapter;
-import com.example.android.leaguestats.data.database.entity.ChampionEntry;
+import com.example.android.leaguestats.interfaces.IdClickListener;
+import com.example.android.leaguestats.models.Champion;
 import com.example.android.leaguestats.utilities.InjectorUtils;
 import com.example.android.leaguestats.utilities.LeaguePreferences;
 import com.example.android.leaguestats.viewmodels.ChampionModel;
 import com.example.android.leaguestats.viewmodels.ChampionModelFactory;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class ChampionListFragment extends Fragment implements ChampionAdapter.ChampionListener {
+public class ChampionListFragment extends Fragment implements IdClickListener {
 
     public interface OnChampionSelected {
         void onChampionSelected(int id);
@@ -40,17 +40,16 @@ public class ChampionListFragment extends Fragment implements ChampionAdapter.Ch
     private ChampionAdapter mAdapter;
     private ChampionModel mViewModel;
     private ProgressBar mIndicator;
+    private String mPatchVersion;
 
     public ChampionListFragment() {}
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_list, container, false);
-
+        View rootView = inflater.inflate(R.layout.fragment_champion_list, container, false);
         mRecyclerView = rootView.findViewById(R.id.recycler_view);
         mIndicator = rootView.findViewById(R.id.indicator);
-
         return rootView;
     }
 
@@ -58,49 +57,54 @@ public class ChampionListFragment extends Fragment implements ChampionAdapter.Ch
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        int gridLayoutColumnCount;
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            gridLayoutColumnCount = 3;
-        } else {
-            gridLayoutColumnCount = 2;
-        }
+        mPatchVersion = LeaguePreferences.getPatchVersion(getContext());
 
-        mRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), gridLayoutColumnCount));
+        if (getContext().getResources().getBoolean(R.bool.twoPane)) {
+            mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        } else {
+            mRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), getNumberOfColumns()));
+        }
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-
-        String patchVersion = LeaguePreferences.getPatchVersion(getContext());
-        mAdapter = new ChampionAdapter(getContext(), new ArrayList<ChampionEntry>(), this, patchVersion);
+        mAdapter = new ChampionAdapter(getContext(), this, mPatchVersion);
         mRecyclerView.setAdapter(mAdapter);
 
         setupViewModel();
     }
 
+    public int getNumberOfColumns() {
+        View view = View.inflate(getContext(), R.layout.champion_card_item, null);
+        view.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+        int width = view.getMeasuredWidth();
+        int count = getResources().getDisplayMetrics().widthPixels / width;
+        int remaining = getResources().getDisplayMetrics().widthPixels - width * count;
+        if (remaining > width - 15)
+            count++;
+        return count - 1;
+    }
+
     private void setupViewModel() {
         ChampionModelFactory factory = InjectorUtils.provideChampionModelFactory(getActivity().getApplicationContext());
-        mViewModel =
-                ViewModelProviders.of(getActivity(), factory).get(ChampionModel.class);
-        mViewModel.getChampions().observe(getActivity(), new Observer<List<ChampionEntry>>() {
+        mViewModel = ViewModelProviders.of(getActivity(), factory).get(ChampionModel.class);
+        mViewModel.getChampions().observe(this, new Observer<List<Champion>>() {
             @Override
-            public void onChanged(@Nullable List<ChampionEntry> listChampionEntries) {
+            public void onChanged(@Nullable List<Champion> championList) {
                 Log.d(LOG_TAG, "Receiving database update from LiveData");
-                mAdapter.setData(listChampionEntries);
-                mIndicator.setVisibility(View.INVISIBLE);
+                if (championList != null && !championList.isEmpty()) {
+                    mAdapter.setData(championList);
+                    mIndicator.setVisibility(View.INVISIBLE);
+                }
             }
         });
     }
 
+    public void filterResults(String query) {
+        mAdapter.getFilter().filter(query);
+    }
+
     @Override
-    public void onChampionClick(ChampionEntry championEntry) {
-        Fragment parentFragment = getParentFragment();
-        boolean twoPane = parentFragment.getView().findViewById(R.id.master_fragment_detail_container) != null;
-        if (twoPane) {
-            MasterFragment masterFragment = (MasterFragment) getParentFragment();
-            masterFragment.addChampionFragment();
-        } else {
-            mViewModel.initChampion(championEntry);
-            mCallback.onChampionSelected(championEntry.getId());
-        }
+    public void onClick(int id) {
+        mCallback.onChampionSelected(id);
     }
 
     @Override

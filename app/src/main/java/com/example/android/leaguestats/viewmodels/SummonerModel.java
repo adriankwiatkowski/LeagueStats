@@ -8,10 +8,12 @@ import android.arch.lifecycle.ViewModel;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.example.android.leaguestats.data.LeagueSummonerRepository;
 import com.example.android.leaguestats.models.Mastery;
 import com.example.android.leaguestats.models.Match;
+import com.example.android.leaguestats.models.Resource;
 import com.example.android.leaguestats.models.Summoner;
-import com.example.android.leaguestats.data.LeagueRepository;
+import com.example.android.leaguestats.utilities.AbsentLiveData;
 
 import java.util.List;
 
@@ -19,42 +21,70 @@ public class SummonerModel extends ViewModel {
 
     private final String LOG_TAG = SummonerModel.class.getSimpleName();
 
+    private LiveData<Resource<Summoner>> mSummoner;
+    private LiveData<Resource<List<Mastery>>> mMasteries;
+    private LiveData<Resource<List<Resource<Match>>>> mMatches;
+
     private final MutableLiveData<SummonerQuery> mSummonerQuery = new MutableLiveData<>();
-    private LiveData<Summoner> mSummoner;
 
-    private LiveData<List<Mastery>> mMasteries;
-
-    private LiveData<List<Match>> mMatches;
-
-    public SummonerModel(final LeagueRepository repository) {
+    public SummonerModel(final LeagueSummonerRepository repository) {
         Log.d(LOG_TAG, "Getting SummonerModel");
-
-        mSummoner = Transformations.switchMap(mSummonerQuery, new Function<SummonerQuery, LiveData<Summoner>>() {
+        mSummoner = Transformations.switchMap(mSummonerQuery, new Function<SummonerQuery, LiveData<Resource<Summoner>>>() {
             @Override
-            public LiveData<Summoner> apply(SummonerQuery summonerQuery) {
+            public LiveData<Resource<Summoner>> apply(SummonerQuery summonerQuery) {
                 Log.d(LOG_TAG, "Getting new summoner");
-                return repository.getSummoner(summonerQuery.getEntryUrlString(), summonerQuery.getSummonerName());
+                LiveData<Resource<Summoner>> summonerLiveData = repository.getSummoner(summonerQuery.getEntryUrlString(), summonerQuery.getSummonerName());
+                if (summonerLiveData != null) {
+                    return summonerLiveData;
+                } else if (mSummoner != null) {
+                    // Return current Summoner. Dont override with null.
+                    return mSummoner;
+                }
+                return null;
             }
         });
-
-        mMasteries = Transformations.switchMap(mSummoner, new Function<Summoner, LiveData<List<Mastery>>>() {
+        mMasteries = Transformations.switchMap(mSummoner, new Function<Resource<Summoner>, LiveData<Resource<List<Mastery>>>>() {
             @Override
-            public LiveData<List<Mastery>> apply(Summoner input) {
-                Log.d(LOG_TAG, "Getting new masteries");
-                return repository.getMasteries(input.getEntryUrl(), input.getSummonerId());
+            public LiveData<Resource<List<Mastery>>> apply(Resource<Summoner> input) {
+                if (input != null) {
+                    switch (input.status) {
+                        case LOADING:
+                            Log.d(LOG_TAG, "Waiting for Summoner to get masteries");
+                            return AbsentLiveData.create(Resource.loading((List<Mastery>) null));
+                        case SUCCESS:
+                            Log.d(LOG_TAG, "Getting new masteries");
+                            return repository.getMasteries(input.data.getEntryUrl(), input.data.getSummonerId());
+                        case ERROR:
+                            Log.d(LOG_TAG, "Error getting masteries. Summoner Error");
+                            return AbsentLiveData.create(Resource.error(input.message, (List<Mastery>) null));
+                    }
+                }
+                return null;
             }
         });
-
-        mMatches = Transformations.switchMap(mSummoner, new Function<Summoner, LiveData<List<Match>>>() {
+        mMatches = Transformations.switchMap(mSummoner, new Function<Resource<Summoner>, LiveData<Resource<List<Resource<Match>>>>>() {
             @Override
-            public LiveData<List<Match>> apply(Summoner input) {
-                Log.d(LOG_TAG, "Getting matches");
-                return repository.getMatches(input.getEntryUrl(), input.getAccountId(), input.getSummonerId());
+            public LiveData<Resource<List<Resource<Match>>>> apply(Resource<Summoner> input) {
+                if (input != null) {
+                    switch (input.status) {
+                        case LOADING:
+                            Log.d(LOG_TAG, "Waiting for Summoner to get matches");
+                            return AbsentLiveData.create(Resource.loading((List<Resource<Match>>) null));
+                        case SUCCESS:
+                            Log.d(LOG_TAG, "Getting new matches");
+                            return repository.getMatches(input.data.getEntryUrl(), input.data.getAccountId(), input.data.getSummonerId());
+                        case ERROR:
+                            Log.d(LOG_TAG, "Error getting matches. Summoner Error");
+                            return AbsentLiveData.create(Resource.error(input.message, (List<Resource<Match>>) null));
+                    }
+                }
+                return null;
             }
         });
     }
 
     public void searchSummoner(String entryUrlString, String summonerName) {
+        summonerName = removeWhitespaces(summonerName);
         SummonerQuery newSummonerQuery = new SummonerQuery(entryUrlString, summonerName);
         if (mSummonerQuery.getValue() != null) {
             SummonerQuery summonerQuery = mSummonerQuery.getValue();
@@ -65,15 +95,15 @@ public class SummonerModel extends ViewModel {
         mSummonerQuery.setValue(newSummonerQuery);
     }
 
-    public LiveData<Summoner> getSummoner() {
+    public LiveData<Resource<Summoner>> getSummoner() {
         return mSummoner;
     }
 
-    public LiveData<List<Mastery>> getMasteries() {
+    public LiveData<Resource<List<Mastery>>> getMasteries() {
         return mMasteries;
     }
 
-    public LiveData<List<Match>> getMatches() {
+    public LiveData<Resource<List<Resource<Match>>>> getMatches() {
         return mMatches;
     }
 
@@ -105,13 +135,7 @@ public class SummonerModel extends ViewModel {
         return builder.toString().toLowerCase();
     }
 
-    @Override
-    protected void onCleared() {
-        super.onCleared();
-        // TODO cancel AsyncTask?
-    }
-
-    class SummonerQuery {
+    static class SummonerQuery {
 
         String entryUrlString;
         String summonerName;

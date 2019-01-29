@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string-array name="pref_language_options">
+    <string-array name="pref_language_labels">
         <item>@string/pref_language_label_pl</item>
         <item>@string/pref_language_label_en</item>
     </string-array>

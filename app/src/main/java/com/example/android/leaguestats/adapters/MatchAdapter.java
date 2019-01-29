@@ -3,6 +3,7 @@ package com.example.android.leaguestats.adapters;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,15 +13,18 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.android.leaguestats.R;
-import com.example.android.leaguestats.data.database.entity.ItemEntry;
+import com.example.android.leaguestats.data.glide.GlideApp;
+import com.example.android.leaguestats.data.glide.GlideUtils;
+import com.example.android.leaguestats.data.network.api.models.match.Stats;
+import com.example.android.leaguestats.models.Champion;
+import com.example.android.leaguestats.models.Item;
 import com.example.android.leaguestats.models.Match;
-import com.example.android.leaguestats.utilities.PicassoUtils;
+import com.example.android.leaguestats.models.SummonerSpell;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 public class MatchAdapter extends BaseExpandableListAdapter {
@@ -57,8 +61,8 @@ public class MatchAdapter extends BaseExpandableListAdapter {
         ImageView summonerSpell2Image = convertView.findViewById(R.id.match_summoner_spell_2_group_image);
 
         int currentSummonerPosition = -1;
-        for (int i = 0; i < match.getSummonerId().size(); i++) {
-            long summonerId = match.getSummonerId().get(i);
+        for (int i = 0; i < match.getParticipantIdentities().size(); i++) {
+            long summonerId = match.getParticipantIdentities().get(i).getPlayer().getSummonerId();
             if (match.getCurrentSummonerId() == summonerId) {
                 currentSummonerPosition = i;
                 break;
@@ -70,7 +74,7 @@ public class MatchAdapter extends BaseExpandableListAdapter {
             return null;
         }
 
-        boolean isWin = match.isWin().get(currentSummonerPosition);
+        boolean isWin = match.getParticipants().get(currentSummonerPosition).getStats().isWin();
         if (isWin) {
             matchResultTv.setText(R.string.victory);
             matchResultTv.setTextColor(mContext.getResources().getColor(R.color.victoryColor));
@@ -79,32 +83,43 @@ public class MatchAdapter extends BaseExpandableListAdapter {
             matchResultTv.setTextColor(mContext.getResources().getColor(R.color.loseColor));
         }
 
-        int kills = match.getKills().get(currentSummonerPosition);
-        int deaths = match.getDeaths().get(currentSummonerPosition);
-        int assists = match.getAssists().get(currentSummonerPosition);
-        int totalMinionsKilled = match.getTotalMinionsKilled().get(currentSummonerPosition);
-        int goldEarned = match.getGoldEarned().get(currentSummonerPosition);
+        int kills = match.getParticipants().get(currentSummonerPosition).getStats().getKills();
+        int deaths = match.getParticipants().get(currentSummonerPosition).getStats().getDeaths();
+        int assists = match.getParticipants().get(currentSummonerPosition).getStats().getAssists();
+        int totalMinionsKilled = match.getParticipants().get(currentSummonerPosition).getStats().getTotalMinionsKilled();
+        int goldEarned = match.getParticipants().get(currentSummonerPosition).getStats().getGoldEarned();
 
-        summonerStatsTv.setText(String.format(Locale.getDefault(), "%d/%d/%d", kills, deaths, assists));
-        minionsKilledTv.setText(String.format(Locale.getDefault(), "minions %d", totalMinionsKilled));
-        goldEarnedTv.setText(String.format(Locale.getDefault(), "gold %d", goldEarned));
+        summonerStatsTv.setText(mContext.getString(R.string.kda, kills, deaths, assists));
+        minionsKilledTv.setText(mContext.getString(R.string.minions_args, totalMinionsKilled));
+        goldEarnedTv.setText(mContext.getString(R.string.gold_args, goldEarned));
 
         String gameCreation = getGameCreation(match);
         String gameDuration = getGameDuration(match);
 
-        matchTimestampTv.setText(gameDuration + '\t' + gameCreation);
+        matchTimestampTv.setText(mContext.getString(R.string.match_timestamp, gameDuration, gameCreation));
 
-        String championImagePath = match.getChampionEntries().get(currentSummonerPosition).getImage();
-        PicassoUtils.setChampionThumbnail(championImage, championImagePath, PATCH_VERSION,
-                R.dimen.champion_match_group_width, R.dimen.champion_match_group_height);
 
-        String summonerSpell1Path = match.getSpellEntries1().get(currentSummonerPosition).getImage();
-        PicassoUtils.setSpellImage(summonerSpell1Image, summonerSpell1Path, PATCH_VERSION,
-                R.dimen.summoner_spell_match_group_width, R.dimen.summoner_spell_match_group_height);
-
-        String summonerSpell2Path = match.getSpellEntries2().get(currentSummonerPosition).getImage();
-        PicassoUtils.setSpellImage(summonerSpell2Image, summonerSpell2Path, PATCH_VERSION,
-                R.dimen.summoner_spell_match_group_width, R.dimen.summoner_spell_match_group_height);
+        Champion champion = match.getParticipants().get(currentSummonerPosition).getChampion();
+        if (champion != null) {
+            GlideApp.with(mContext)
+                    .load(GlideUtils.getChampionUrl(PATCH_VERSION, champion.getChampionImageId()))
+                    .roundedImage()
+                    .into(championImage);
+        }
+        SummonerSpell summonerSpell1 = match.getParticipants().get(currentSummonerPosition).getSummonerSpell1();
+        if (summonerSpell1 != null) {
+            GlideApp.with(mContext)
+                    .load(GlideUtils.getSpellUrl(PATCH_VERSION, summonerSpell1.getSummonerSpellImageId()))
+                    .roundedImage()
+                    .into(summonerSpell1Image);
+        }
+        SummonerSpell summonerSpell2 = match.getParticipants().get(currentSummonerPosition).getSummonerSpell2();
+        if (summonerSpell2 != null) {
+            GlideApp.with(mContext)
+                    .load(GlideUtils.getSpellUrl(PATCH_VERSION, summonerSpell2.getSummonerSpellImageId()))
+                    .roundedImage()
+                    .into(summonerSpell2Image);
+        }
 
         ImageView item1Image = convertView.findViewById(R.id.match_item_1_group_image);
         ImageView item2Image = convertView.findViewById(R.id.match_item_2_group_image);
@@ -117,7 +132,7 @@ public class MatchAdapter extends BaseExpandableListAdapter {
         ImageView[] imageViews = new ImageView[]{item1Image, item2Image, item3Image,
                 item4Image, item5Image, item6Image, item7Image};
 
-        setItemData(imageViews, match, currentSummonerPosition, R.dimen.match_item_width, R.dimen.match_item_height);
+        setItemData(imageViews, match, currentSummonerPosition);
 
         return convertView;
     }
@@ -138,26 +153,42 @@ public class MatchAdapter extends BaseExpandableListAdapter {
         ImageView summonerSpell1Image = convertView.findViewById(R.id.match_summoner_spell_1_child_image);
         ImageView summonerSpell2Image = convertView.findViewById(R.id.match_summoner_spell_2_child_image);
 
-        boolean isWin = match.isWin().get(childPosition);
+        boolean isWin = match.getParticipants().get(childPosition).getStats().isWin();
         if (isWin) {
-            convertView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.victoryColor));
+            if (convertView instanceof CardView) {
+                ((CardView) convertView).setCardBackgroundColor(ContextCompat.getColor(mContext, R.color.victoryColor));
+            } else
+                convertView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.victoryColor));
         } else {
-            convertView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.loseColor));
+            if (convertView instanceof CardView) {
+                ((CardView) convertView).setCardBackgroundColor(ContextCompat.getColor(mContext, R.color.loseColor));
+            } else
+                convertView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.loseColor));
         }
 
-        summonerNameTv.setText(match.getSummonerName().get(childPosition));
+        summonerNameTv.setText(match.getParticipantIdentities().get(childPosition).getPlayer().getSummonerName());
 
-        String championImagePath = match.getChampionEntries().get(childPosition).getImage();
-        PicassoUtils.setChampionThumbnail(championImage, championImagePath, PATCH_VERSION,
-                R.dimen.champion_match_child_width, R.dimen.champion_match_child_height);
-
-        String summonerSpell1Path = match.getSpellEntries1().get(childPosition).getImage();
-        PicassoUtils.setSpellImage(summonerSpell1Image, summonerSpell1Path, PATCH_VERSION,
-                R.dimen.summoner_spell_match_child_width, R.dimen.summoner_spell_match_child_height);
-
-        String summonerSpell2Path = match.getSpellEntries2().get(childPosition).getImage();
-        PicassoUtils.setSpellImage(summonerSpell2Image, summonerSpell2Path, PATCH_VERSION,
-                R.dimen.summoner_spell_match_child_width, R.dimen.summoner_spell_match_child_height);
+        Champion champion = match.getParticipants().get(childPosition).getChampion();
+        if (champion != null) {
+            GlideApp.with(mContext)
+                    .load(GlideUtils.getChampionUrl(PATCH_VERSION, champion.getChampionImageId()))
+                    .roundedImage()
+                    .into(championImage);
+        }
+        SummonerSpell summonerSpell1 = match.getParticipants().get(childPosition).getSummonerSpell1();
+        if (summonerSpell1 != null) {
+            GlideApp.with(mContext)
+                    .load(GlideUtils.getSpellUrl(PATCH_VERSION, summonerSpell1.getSummonerSpellImageId()))
+                    .roundedImage()
+                    .into(summonerSpell1Image);
+        }
+        SummonerSpell summonerSpell2 = match.getParticipants().get(childPosition).getSummonerSpell2();
+        if (summonerSpell2 != null) {
+            GlideApp.with(mContext)
+                    .load(GlideUtils.getSpellUrl(PATCH_VERSION, summonerSpell2.getSummonerSpellImageId()))
+                    .roundedImage()
+                    .into(summonerSpell2Image);
+        }
 
         ImageView item1Image = convertView.findViewById(R.id.match_item_1_child_image);
         ImageView item2Image = convertView.findViewById(R.id.match_item_2_child_image);
@@ -170,25 +201,30 @@ public class MatchAdapter extends BaseExpandableListAdapter {
         ImageView[] imageViews = new ImageView[]{item1Image, item2Image, item3Image,
                 item4Image, item5Image, item6Image, item7Image};
 
-        setItemData(imageViews, match, childPosition, R.dimen.match_item_child_width, R.dimen.match_item_child_height);
+        setItemData(imageViews, match, childPosition);
 
         return convertView;
     }
 
-    private void setItemData(ImageView[] imageViews, Match match, int childPosition,
-                             int widthResId, int heightResId) {
-
-        List<ItemEntry> itemEntries = match.getItemEntries();
-
-        String[] itemPaths = new String[7];
-        for (int i = 0; i < itemPaths.length; i++) {
-            int itemPosition = childPosition * 7 + i;
-            itemPaths[i] = itemEntries.get(itemPosition).getImage();
-        }
-
+    private void setItemData(ImageView[] imageViews, Match match, int childPosition) {
+        List<Item> itemList = new ArrayList<>();
+        Stats stats = match.getParticipants().get(childPosition).getStats();
+        itemList.add(stats.getItem0());
+        itemList.add(stats.getItem1());
+        itemList.add(stats.getItem2());
+        itemList.add(stats.getItem3());
+        itemList.add(stats.getItem4());
+        itemList.add(stats.getItem5());
+        itemList.add(stats.getItem6());
         for (int i = 0; i < imageViews.length; i++) {
-            PicassoUtils.setItemImage(imageViews[i], itemPaths[i],
-                    PATCH_VERSION, widthResId, heightResId);
+            String url = "";
+            if (itemList.get(i) != null) {
+                url = GlideUtils.getItemUrl(PATCH_VERSION, itemList.get(i).getItemImageId());
+            }
+            GlideApp.with(mContext)
+                    .load(url)
+                    .roundedImage()
+                    .into(imageViews[i]);
         }
     }
 
@@ -220,7 +256,7 @@ public class MatchAdapter extends BaseExpandableListAdapter {
         notifyDataSetChanged();
     }
 
-    private void clear() {
+    public void clear() {
         mMatches.clear();
         notifyDataSetChanged();
     }
@@ -248,6 +284,11 @@ public class MatchAdapter extends BaseExpandableListAdapter {
     }
 
     @Override
+    public boolean areAllItemsEnabled() {
+        return true;
+    }
+
+    @Override
     public boolean hasStableIds() {
         return false;
     }
@@ -269,6 +310,6 @@ public class MatchAdapter extends BaseExpandableListAdapter {
 
     @Override
     public int getChildrenCount(int groupPosition) {
-        return mMatches.get(groupPosition).getSummonerId().size();
+        return mMatches.get(groupPosition).getParticipantIdentities().size();
     }
 }

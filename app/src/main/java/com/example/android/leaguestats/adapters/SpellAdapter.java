@@ -1,12 +1,12 @@
 package com.example.android.leaguestats.adapters;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.support.annotation.NonNull;
-import android.support.constraint.ConstraintLayout;
-import android.support.v7.graphics.Palette;
+import android.support.annotation.Nullable;
+import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,22 +14,22 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.android.leaguestats.R;
-import com.example.android.leaguestats.models.Spell;
-import com.example.android.leaguestats.utilities.PicassoUtils;
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
+import com.example.android.leaguestats.data.database.entity.Spell;
+import com.example.android.leaguestats.data.glide.GlideApp;
+import com.example.android.leaguestats.data.glide.GlideUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SpellAdapter extends RecyclerView.Adapter<SpellAdapter.SpellViewHolder> {
 
     private final Context mContext;
-    private final List<Spell> mSpell;
+    private List<Spell> mSpellList;
     private final String PATCH_VERSION;
 
-    public SpellAdapter(Context context, List<Spell> spells, String patchVersion) {
-        this.mContext = context;
-        this.mSpell = spells;
+    public SpellAdapter(Context context, String patchVersion) {
+        mContext = context;
+        mSpellList = new ArrayList<>();
         PATCH_VERSION = patchVersion;
     }
 
@@ -42,49 +42,77 @@ public class SpellAdapter extends RecyclerView.Adapter<SpellAdapter.SpellViewHol
 
     @Override
     public void onBindViewHolder(@NonNull SpellViewHolder holder, int position) {
-        holder.mSpellNameTv.setText(mSpell.get(position).getName());
-        holder.mSpellDescriptionTv.setText(mSpell.get(position).getDescription());
-        holder.mSpellCostTv.setText(mSpell.get(position).getCost());
-        holder.mSpellCooldownTv.setText(mSpell.get(position).getCooldown());
-
-        String spellPath = mSpell.get(position).getImage();
-        PicassoUtils.setSpellImage(holder.mSpellImage, spellPath, PATCH_VERSION,
-                R.dimen.spell_width, R.dimen.spell_height);
+        Spell spell = mSpellList.get(position);
+        holder.mSpellNameTv.setText(spell.getName());
+        String tooltip = spell.getTooltip();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            holder.mSpellTooltipTv.setText(Html.fromHtml(tooltip, Html.FROM_HTML_MODE_LEGACY));
+        } else {
+            holder.mSpellTooltipTv.setText(Html.fromHtml(tooltip));
+        }
+        holder.mSpellCostTv.setText(spell.getCostBurn());
+        holder.mSpellCooldownTv.setText(spell.getCooldown());
+        GlideApp.with(mContext)
+                .load(GlideUtils.getSpellUrl(PATCH_VERSION, spell.getImageId()))
+                .roundedImage()
+                .into(holder.mSpellImage);
     }
 
-    public void add(Spell spell) {
-        mSpell.add(spell);
-        notifyDataSetChanged();
-    }
+    public void setData(final List<Spell> newList) {
+        if (mSpellList.isEmpty()) {
+            mSpellList = newList;
+            notifyDataSetChanged();
+        } else {
+            DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffUtil.Callback() {
+                @Override
+                public int getOldListSize() {
+                    return mSpellList.size();
+                }
 
-    public void clear() {
-        mSpell.clear();
-        notifyDataSetChanged();
-    }
+                @Override
+                public int getNewListSize() {
+                    return newList.size();
+                }
 
-    public void setData(List<Spell> spells) {
-        clear();
-        mSpell.addAll(spells);
+                @Override
+                public boolean areItemsTheSame(int oldPosition, int newPosition) {
+                    return mSpellList.get(oldPosition).getImageId().equals(newList.get(newPosition).getImageId());
+                }
+
+                @Override
+                public boolean areContentsTheSame(int oldPosition, int newPosition) {
+                    return mSpellList.get(oldPosition).getName().equals(newList.get(newPosition).getName());
+                }
+
+                @Nullable
+                @Override
+                public Object getChangePayload(int oldItemPosition, int newItemPosition) {
+                    // You can return particular field for changed item.
+                    return super.getChangePayload(oldItemPosition, newItemPosition);
+                }
+            });
+            mSpellList = newList;
+            diffResult.dispatchUpdatesTo(this);
+        }
     }
 
     @Override
     public int getItemCount() {
-        return mSpell.size();
+        return mSpellList.size();
     }
 
-    public class SpellViewHolder extends RecyclerView.ViewHolder {
-        ConstraintLayout mLayout;
+    class SpellViewHolder extends RecyclerView.ViewHolder {
+
         TextView mSpellNameTv;
-        TextView mSpellDescriptionTv;
+        TextView mSpellTooltipTv;
         TextView mSpellCooldownTv;
         TextView mSpellCostTv;
         ImageView mSpellImage;
 
-        public SpellViewHolder(View itemView) {
+        SpellViewHolder(View itemView) {
             super(itemView);
-            mLayout = itemView.findViewById(R.id.spell_item_layout);
             mSpellNameTv = itemView.findViewById(R.id.spell_name_tv);
-            mSpellDescriptionTv = itemView.findViewById(R.id.spell_description_tv);
+            mSpellTooltipTv = itemView.findViewById(R.id.spell_tooltip_tv);
             mSpellCooldownTv = itemView.findViewById(R.id.spell_cooldown_tv);
             mSpellCostTv = itemView.findViewById(R.id.spell_cost_tv);
             mSpellImage = itemView.findViewById(R.id.spell_image);

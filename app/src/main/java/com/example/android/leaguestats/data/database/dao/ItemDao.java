@@ -2,42 +2,37 @@ package com.example.android.leaguestats.data.database.dao;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Dao;
-import android.arch.persistence.room.Insert;
-import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
-import android.arch.persistence.room.Update;
 
 import com.example.android.leaguestats.data.database.entity.ItemEntry;
+import com.example.android.leaguestats.models.Item;
 
 import java.util.List;
 
 @Dao
-public interface ItemDao {
+public abstract class ItemDao implements BaseDao<ItemEntry> {
 
-    @Query("SELECT * FROM item WHERE purchasable = 'true' AND total_gold > 0 ORDER BY total_gold")
-    LiveData<List<ItemEntry>> getItems();
+    @Query("SELECT item_id, item_key, item_name, item_description, item_plain_text, item_image_id, item_total_gold FROM item WHERE item_purchasable = 'true' AND item_total_gold > 0 ORDER BY item_total_gold")
+    public abstract LiveData<List<Item>> getItems();
 
-    @Query("SELECT * FROM item WHERE id IN (:id)")
-    LiveData<ItemEntry> getItem(long id);
+    @Query("SELECT item_id, item_key, item_name, item_description, item_plain_text, item_image_id, item_total_gold FROM item WHERE item_id IN (:id) ORDER BY item_total_gold")
+    public abstract LiveData<List<Item>> getItems(List<Integer> id);
 
-    @Query("SELECT * FROM item WHERE name LIKE + :name")
-    LiveData<ItemEntry> getItem(String name);
+    @Query("SELECT * FROM item WHERE item_id IN (:id)")
+    public abstract LiveData<ItemEntry> getItem(long id);
 
-    @Query("SELECT * FROM item WHERE id IN (:id) ORDER BY total_gold")
-    LiveData<List<ItemEntry>> getItems(String[] id);
+    @Query("SELECT * FROM item WHERE item_name LIKE :name")
+    public abstract LiveData<ItemEntry> getItem(String name);
 
-    @Query("SELECT * FROM item WHERE id IN (:id) ORDER BY total_gold")
-    LiveData<List<ItemEntry>> getItems(int[] id);
+    @Query("SELECT item_id, item_key, item_name, item_description, item_plain_text, item_image_id, item_total_gold FROM item WHERE item_id IN (:id) ORDER BY item_total_gold")
+    public abstract LiveData<List<Item>> getItems(String[] id);
 
-    @Query("SELECT COUNT(id) FROM item")
-    int countAllItems();
+    @Query("SELECT COUNT(item_id) FROM item")
+    public abstract LiveData<Integer> countAllLiveItems();
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void bulkInsert(ItemEntry... itemEntries);
-
-    @Update(onConflict = OnConflictStrategy.REPLACE)
-    void updateItem(ItemEntry itemEntry);
+    @Query("SELECT COUNT(item_id) FROM item")
+    public abstract int countAllItems();
 
     @Query("DELETE FROM item")
-    void deleteItems();
+    public abstract void deleteItems();
 }

@@ -1,49 +1,58 @@
 package com.example.android.leaguestats.models;
 
-import com.example.android.leaguestats.data.database.entity.ChampionEntry;
-import com.example.android.leaguestats.data.network.api.models.MasteryResponse;
+import android.support.annotation.Nullable;
 
-import java.util.List;
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 
 public class Mastery {
 
+    @SerializedName("playerId")
+    @Expose
+    private int mPlayerId;
+    @SerializedName("championId")
+    @Expose
     private int mChampionId;
+    @SerializedName("championLevel")
+    @Expose
     private int mChampionLevel;
+    @SerializedName("championPoints")
+    @Expose
     private int mChampionPoints;
+    @SerializedName("lastPlayTime")
+    @Expose
     private long mLastPlayTime;
+    @SerializedName("championPointsSinceLastLevel")
+    @Expose
+    private int mChampionPointsSinceLastLevel;
+    @SerializedName("championPointsUntilNextLevel")
+    @Expose
+    private int mChampionPointsUntilNextLevel;
+    @SerializedName("chestGranted")
+    @Expose
     private boolean mIsChestGranted;
+    @SerializedName("tokensEarned")
+    @Expose
+    private int mTokensEarned;
+    @Nullable
     private String mChampionName;
-    private String mChampionImage;
+    @Nullable
+    private String mChampionImageId;
 
-    public Mastery(MasteryResponse masteries, List<ChampionEntry> championEntries) {
+    public Mastery(int playerId, int championId, int championLevel, int championPoints,
+                   long lastPlayTime, int championPointsSinceLastLevel,
+                   int championPointsUntilNextLevel, boolean chestGranted,
+                   int tokensEarned) {
 
-        String championName = "";
-        String championThumbnail = "";
-        int championId = 0;
-        int championLevel = 0;
-        int championPoints = 0;
-        long lastPlayTime = 0;
-        boolean isChestGranted = false;
-
-        // Find champion for given id.
-        for (int j = 0; j < championEntries.size(); j++) {
-            if (masteries.getChampionId() == (championEntries.get(j).getId())) {
-                championName = championEntries.get(j).getName();
-                championThumbnail = championEntries.get(j).getImage();
-                championId = masteries.getChampionId();
-                championLevel = masteries.getChampionLevel();
-                championPoints = masteries.getChampionPoints();
-                lastPlayTime = masteries.getLastPlayTime();
-                isChestGranted = masteries.isChestGranted();
-            }
-        }
-        mChampionName = championName;
-        mChampionImage = championThumbnail;
+        mPlayerId = playerId;
         mChampionId = championId;
         mChampionLevel = championLevel;
         mChampionPoints = championPoints;
         mLastPlayTime = lastPlayTime;
-        mIsChestGranted = isChestGranted;
+        mChampionPointsSinceLastLevel = championPointsSinceLastLevel;
+        mChampionPointsUntilNextLevel = championPointsUntilNextLevel;
+        mIsChestGranted = chestGranted;
+        mTokensEarned = tokensEarned;
     }
 
     public int getChampionId() {
@@ -94,11 +103,43 @@ public class Mastery {
         this.mChampionName = championName;
     }
 
-    public String getChampionImage() {
-        return mChampionImage;
+    public String getChampionImageId() {
+        return mChampionImageId;
     }
 
-    public void setChampionImage(String championImage) {
-        this.mChampionImage = championImage;
+    public void setChampionImageId(String championImageId) {
+        this.mChampionImageId = championImageId;
+    }
+
+    public int getPlayerId() {
+        return mPlayerId;
+    }
+
+    public void setPlayerId(int playerId) {
+        this.mPlayerId = playerId;
+    }
+
+    public int getChampionPointsSinceLastLevel() {
+        return mChampionPointsSinceLastLevel;
+    }
+
+    public void setChampionPointsSinceLastLevel(int championPointsSinceLastLevel) {
+        this.mChampionPointsSinceLastLevel = championPointsSinceLastLevel;
+    }
+
+    public int getTokensEarned() {
+        return mTokensEarned;
+    }
+
+    public void setTokensEarned(int tokensEarned) {
+        this.mTokensEarned = tokensEarned;
+    }
+
+    public int getChampionPointsUntilNextLevel() {
+        return mChampionPointsUntilNextLevel;
+    }
+
+    public void setChampionPointsUntilNextLevel(int championPointsUntilNextLevel) {
+        this.mChampionPointsUntilNextLevel = championPointsUntilNextLevel;
     }
 }

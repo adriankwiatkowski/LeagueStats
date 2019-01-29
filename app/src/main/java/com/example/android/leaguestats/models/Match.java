@@ -1,301 +1,186 @@
 package com.example.android.leaguestats.models;
 
-import com.example.android.leaguestats.data.database.entity.ChampionEntry;
-import com.example.android.leaguestats.data.database.entity.ItemEntry;
-import com.example.android.leaguestats.data.database.entity.SummonerSpellEntry;
-import com.example.android.leaguestats.data.network.api.models.match.MatchResponse;
 import com.example.android.leaguestats.data.network.api.models.match.Participant;
 import com.example.android.leaguestats.data.network.api.models.match.ParticipantIdentity;
+import com.example.android.leaguestats.data.network.api.models.match.Team;
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class Match {
 
-    private List<Integer> mParticipantId;
-    private List<Long> mAccountId;
-    private List<Long> mSummonerId;
-    private List<String> mSummonerName;
-    private List<Integer> mTeamId;
-    private List<Boolean> mWin;
-    private List<Integer> mKills;
-    private List<Integer> mDeaths;
-    private List<Integer> mAssists;
-    private List<Long> mTotalDamageToChampions;
-    private List<Integer> mTotalMinionsKilled;
-    private List<Integer> mGoldEarned;
+    @SerializedName("gameId")
+    @Expose
+    private long gameId;
+    @SerializedName("platformId")
+    @Expose
+    private String platformId;
+    @SerializedName("gameCreation")
+    @Expose
+    private long gameCreation;
+    @SerializedName("gameDuration")
+    @Expose
+    private long gameDuration;
+    @SerializedName("queueId")
+    @Expose
+    private int queueId;
+    @SerializedName("mapId")
+    @Expose
+    private int mapId;
+    @SerializedName("seasonId")
+    @Expose
+    private int seasonId;
+    @SerializedName("gameVersion")
+    @Expose
+    private String gameVersion;
+    @SerializedName("gameMode")
+    @Expose
+    private String gameMode;
+    @SerializedName("gameType")
+    @Expose
+    private String gameType;
+    @SerializedName("teams")
+    @Expose
+    private List<Team> teams;
+    @SerializedName("participants")
+    @Expose
+    private List<Participant> participants;
+    @SerializedName("participantIdentities")
+    @Expose
+    private List<ParticipantIdentity> participantIdentities;
 
-    private List<ChampionEntry> mChampionEntries;
-    private List<SummonerSpellEntry> mSpellEntries1;
-    private List<SummonerSpellEntry> mSpellEntries2;
-    private List<ItemEntry> mItemEntries;
+    // Setters:
+    private long currentSummonerId;
 
-    private long mGameDuration;
-    private long mGameCreation;
-    private long mCurrentSummonerId;
-    private String mPlatformId;
-    private String mHighestAchievedSeasonTier;
-
-    public Match(List<Integer> mParticipantId, List<Long> mAccountId, List<Long> mSummonerId,
-                 List<String> mSummonerName, List<Integer> mTeamId, long mGameDuration,
-                 long mGameCreation, List<ChampionEntry> mChampionEntries,
-                 List<SummonerSpellEntry> mSpellEntries1, List<SummonerSpellEntry> mSpellEntries2,
-                 List<Boolean> win, List<ItemEntry> itemList, List<Integer> killList,
-                 List<Integer> deathList, List<Integer> assistList,
-                 List<Long> totalDamageToChampions, long currentSummonerId) {
-        this.mParticipantId = mParticipantId;
-        this.mAccountId = mAccountId;
-        this.mSummonerId = mSummonerId;
-        this.mSummonerName = mSummonerName;
-        this.mTeamId = mTeamId;
-        this.mGameDuration = mGameDuration;
-        this.mGameCreation = mGameCreation;
-        this.mChampionEntries = mChampionEntries;
-        this.mSpellEntries1 = mSpellEntries1;
-        this.mSpellEntries2 = mSpellEntries2;
-        this.mWin = win;
-        this.mItemEntries = itemList;
-        this.mKills = killList;
-        this.mDeaths = deathList;
-        this.mAssists = assistList;
-        this.mTotalDamageToChampions = totalDamageToChampions;
-        this.mCurrentSummonerId = currentSummonerId;
+    public Match(long gameId, String platformId, long gameCreation, long gameDuration,
+                         int queueId, int mapId, int seasonId, String gameVersion, String gameMode,
+                         String gameType, List<Team> teams, List<Participant> participants,
+                         List<ParticipantIdentity> participantIdentities) {
+        this.gameId = gameId;
+        this.platformId = platformId;
+        this.gameCreation = gameCreation;
+        this.gameDuration = gameDuration;
+        this.queueId = queueId;
+        this.mapId = mapId;
+        this.seasonId = seasonId;
+        this.gameVersion = gameVersion;
+        this.gameMode = gameMode;
+        this.gameType = gameType;
+        this.teams = teams;
+        this.participants = participants;
+        this.participantIdentities = participantIdentities;
     }
 
-    public Match(MatchResponse matchResponse,
-                 List<ChampionEntry> championEntries,
-                 List<SummonerSpellEntry> summonerSpell1Entries,
-                 List<SummonerSpellEntry> summonerSpell2Entries,
-                 List<ItemEntry> itemEntries,
-                 long currentSummonerId) {
-
-        List<Integer> participantId = new ArrayList<>();
-        List<Integer> teamId = new ArrayList<>();
-        List<Boolean> isWin = new ArrayList<>();
-        List<Integer> kills = new ArrayList<>();
-        List<Integer> deaths = new ArrayList<>();
-        List<Integer> assists = new ArrayList<>();
-        List<Long> totalDamageToChampions = new ArrayList<>();
-        List<Integer> totalMinionsKilled = new ArrayList<>();
-        List<Integer> totalGoldEarned = new ArrayList<>();
-
-        List<Participant> participantList = matchResponse.getParticipants();
-        for (Participant participant : participantList) {
-            participantId.add(participant.getParticipantId());
-            teamId.add(participant.getTeamId());
-            isWin.add(participant.getStats().isWin());
-            kills.add(participant.getStats().getKills());
-            deaths.add(participant.getStats().getDeaths());
-            assists.add(participant.getStats().getAssists());
-            totalDamageToChampions.add(participant.getStats().getTotalDamageDealtToChampions());
-            totalMinionsKilled.add(participant.getStats().getTotalMinionsKilled());
-            totalGoldEarned.add(participant.getStats().getGoldEarned());
-        }
-
-        List<Long> accountId = new ArrayList<>();
-        List<Long> summonerId = new ArrayList<>();
-        List<String> summonerName = new ArrayList<>();
-
-        List<ParticipantIdentity> participantIdentities = matchResponse.getParticipantIdentities();
-        for (ParticipantIdentity participantIdentity : participantIdentities) {
-            accountId.add(participantIdentity.getPlayer().getAccountId());
-            summonerId.add(participantIdentity.getPlayer().getSummonerId());
-            summonerName.add(participantIdentity.getPlayer().getSummonerName());
-        }
-
-        mParticipantId = participantId;
-        mTeamId = teamId;
-        mAccountId = accountId;
-        mSummonerId = summonerId;
-        mSummonerName = summonerName;
-        mWin = isWin;
-        mKills = kills;
-        mDeaths = deaths;
-        mAssists = assists;
-        mTotalDamageToChampions = totalDamageToChampions;
-        mTotalMinionsKilled = totalMinionsKilled;
-        mGoldEarned = totalGoldEarned;
-        mChampionEntries = championEntries;
-        mSpellEntries1 = summonerSpell1Entries;
-        mSpellEntries2 = summonerSpell2Entries;
-        mItemEntries = itemEntries;
-        mGameDuration = matchResponse.getGameDuration();
-        mGameCreation = matchResponse.getGameCreation();
-        mCurrentSummonerId = currentSummonerId;
-        mPlatformId = matchResponse.getPlatformId();
-
-        for (int i = 0; i < matchResponse.getParticipantIdentities().size(); i++) {
-            if (currentSummonerId == matchResponse.getParticipantIdentities().get(i).getPlayer().getSummonerId()) {
-                mHighestAchievedSeasonTier = matchResponse.getParticipants().get(i).getHighestAchievedSeasonTier();
-            }
-        }
+    public long getGameId() {
+        return gameId;
     }
 
-    public List<Integer> getParticipantId() {
-        return mParticipantId;
-    }
-
-    public void setParticipantId(List<Integer> participantId) {
-        this.mParticipantId = participantId;
-    }
-
-    public List<String> getSummonerName() {
-        return mSummonerName;
-    }
-
-    public void setSummonerName(List<String> summonerName) {
-        this.mSummonerName = summonerName;
-    }
-
-    public List<Integer> getTeamId() {
-        return mTeamId;
-    }
-
-    public void setTeamId(List<Integer> teamId) {
-        this.mTeamId = teamId;
-    }
-
-    public long getGameDuration() {
-        return mGameDuration;
-    }
-
-    public void setGameDuration(long gameDuration) {
-        this.mGameDuration = gameDuration;
-    }
-
-    public long getGameCreation() {
-        return mGameCreation;
-    }
-
-    public void setGameCreation(long gameCreation) {
-        this.mGameCreation = gameCreation;
-    }
-
-    public List<Long> getAccountId() {
-        return mAccountId;
-    }
-
-    public void setAccountId(List<Long> accountId) {
-        this.mAccountId = accountId;
-    }
-
-    public List<Long> getSummonerId() {
-        return mSummonerId;
-    }
-
-    public void setSummonerId(List<Long> summonerId) {
-        this.mSummonerId = summonerId;
-    }
-
-    public List<SummonerSpellEntry> getSpellEntries2() {
-        return mSpellEntries2;
-    }
-
-    public void setSpellEntries2(List<SummonerSpellEntry> spellEntries2) {
-        this.mSpellEntries2 = spellEntries2;
-    }
-
-    public List<SummonerSpellEntry> getSpellEntries1() {
-        return mSpellEntries1;
-    }
-
-    public void setSpellEntries1(List<SummonerSpellEntry> spellEntries1) {
-        this.mSpellEntries1 = spellEntries1;
-    }
-
-    public List<ChampionEntry> getChampionEntries() {
-        return mChampionEntries;
-    }
-
-    public void setChampionEntries(List<ChampionEntry> championEntries) {
-        this.mChampionEntries = championEntries;
-    }
-
-    public List<Boolean> isWin() {
-        return mWin;
-    }
-
-    public void setWin(List<Boolean> win) {
-        this.mWin = win;
-    }
-
-    public List<Long> getTotalDamageToChampions() {
-        return mTotalDamageToChampions;
-    }
-
-    public void setTotalDamageToChampions(List<Long> totalDamageToChampions) {
-        this.mTotalDamageToChampions = totalDamageToChampions;
-    }
-
-    public List<Integer> getAssists() {
-        return mAssists;
-    }
-
-    public void setAssists(List<Integer> assists) {
-        this.mAssists = assists;
-    }
-
-    public List<Integer> getDeaths() {
-        return mDeaths;
-    }
-
-    public void setDeaths(List<Integer> deaths) {
-        this.mDeaths = deaths;
-    }
-
-    public List<Integer> getKills() {
-        return mKills;
-    }
-
-    public void setKills(List<Integer> kills) {
-        this.mKills = kills;
-    }
-
-    public List<ItemEntry> getItemEntries() {
-        return mItemEntries;
-    }
-
-    public void setItemEntries(List<ItemEntry> mItemEntries) {
-        this.mItemEntries = mItemEntries;
-    }
-
-    public long getCurrentSummonerId() {
-        return mCurrentSummonerId;
-    }
-
-    public void setCurrentSummonerId(long mCurrentSummonerId) {
-        this.mCurrentSummonerId = mCurrentSummonerId;
+    public void setGameId(long gameId) {
+        this.gameId = gameId;
     }
 
     public String getPlatformId() {
-        return mPlatformId;
+        return platformId;
     }
 
     public void setPlatformId(String platformId) {
-        this.mPlatformId = platformId;
+        this.platformId = platformId;
     }
 
-    public String getHighestAchievedSeasonTier() {
-        return mHighestAchievedSeasonTier;
+    public long getGameCreation() {
+        return gameCreation;
     }
 
-    public void setHighestAchievedSeasonTier(String highestAchievedSeasonTier) {
-        this.mHighestAchievedSeasonTier = highestAchievedSeasonTier;
+    public void setGameCreation(long gameCreation) {
+        this.gameCreation = gameCreation;
     }
 
-    public List<Integer> getTotalMinionsKilled() {
-        return mTotalMinionsKilled;
+    public long getGameDuration() {
+        return gameDuration;
     }
 
-    public void setTotalMinionsKilled(List<Integer> totalMinionsKilled) {
-        this.mTotalMinionsKilled = totalMinionsKilled;
+    public void setGameDuration(long gameDuration) {
+        this.gameDuration = gameDuration;
     }
 
-    public List<Integer> getGoldEarned() {
-        return mGoldEarned;
+    public int getQueueId() {
+        return queueId;
     }
 
-    public void setGoldEarned(List<Integer> totalGoldEarned) {
-        this.mGoldEarned = totalGoldEarned;
+    public void setQueueId(int queueId) {
+        this.queueId = queueId;
+    }
+
+    public int getMapId() {
+        return mapId;
+    }
+
+    public void setMapId(int mapId) {
+        this.mapId = mapId;
+    }
+
+    public int getSeasonId() {
+        return seasonId;
+    }
+
+    public void setSeasonId(int seasonId) {
+        this.seasonId = seasonId;
+    }
+
+    public String getGameVersion() {
+        return gameVersion;
+    }
+
+    public void setGameVersion(String gameVersion) {
+        this.gameVersion = gameVersion;
+    }
+
+    public String getGameMode() {
+        return gameMode;
+    }
+
+    public void setGameMode(String gameMode) {
+        this.gameMode = gameMode;
+    }
+
+    public String getGameType() {
+        return gameType;
+    }
+
+    public void setGameType(String gameType) {
+        this.gameType = gameType;
+    }
+
+    public List<Team> getTeams() {
+        return teams;
+    }
+
+    public void setTeams(List<Team> teams) {
+        this.teams = teams;
+    }
+
+    public List<Participant> getParticipants() {
+        return participants;
+    }
+
+    public void setParticipants(List<Participant> participants) {
+        this.participants = participants;
+    }
+
+    public List<ParticipantIdentity> getParticipantIdentities() {
+        return participantIdentities;
+    }
+
+    public void setParticipantIdentities(List<ParticipantIdentity> participantIdentities) {
+        this.participantIdentities = participantIdentities;
+    }
+
+    public long getCurrentSummonerId() {
+        return currentSummonerId;
+    }
+
+    public void setCurrentSummonerId(long currentSummonerId) {
+        this.currentSummonerId = currentSummonerId;
     }
 }

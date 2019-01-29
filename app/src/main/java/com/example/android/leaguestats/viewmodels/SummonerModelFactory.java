@@ -4,13 +4,13 @@ import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProvider;
 import android.support.annotation.NonNull;
 
-import com.example.android.leaguestats.data.LeagueRepository;
+import com.example.android.leaguestats.data.LeagueSummonerRepository;
 
 public class SummonerModelFactory extends ViewModelProvider.NewInstanceFactory {
 
-    private final LeagueRepository mRepository;
+    private final LeagueSummonerRepository mRepository;
 
-    public SummonerModelFactory(LeagueRepository repository) {
+    public SummonerModelFactory(LeagueSummonerRepository repository) {
         mRepository = repository;
     }
 

@@ -21,12 +21,12 @@ import com.example.android.leaguestats.R;
 import com.example.android.leaguestats.adapters.MasteryAdapter;
 import com.example.android.leaguestats.interfaces.IdClickListener;
 import com.example.android.leaguestats.models.Mastery;
+import com.example.android.leaguestats.models.Resource;
 import com.example.android.leaguestats.utilities.InjectorUtils;
 import com.example.android.leaguestats.utilities.LeaguePreferences;
 import com.example.android.leaguestats.viewmodels.SummonerModel;
 import com.example.android.leaguestats.viewmodels.SummonerModelFactory;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class SummonerMasteryFragment extends Fragment implements IdClickListener {
@@ -41,9 +41,9 @@ public class SummonerMasteryFragment extends Fragment implements IdClickListener
     private RecyclerView mRecyclerView;
     private MasteryAdapter mAdapter;
     private SummonerModel mSummonerModel;
-    private String mPatchVersion;
     private TextView mEmptyViewTv;
     private ProgressBar mRecyclerIndicator;
+    private String mPatchVersion;
 
     public SummonerMasteryFragment() {}
 
@@ -51,11 +51,9 @@ public class SummonerMasteryFragment extends Fragment implements IdClickListener
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_summoner_mastery, container, false);
-
         mRecyclerView = rootView.findViewById(R.id.summoner_recycler_view);
         mEmptyViewTv = rootView.findViewById(R.id.summoner_empty_view_tv);
         mRecyclerIndicator = rootView.findViewById(R.id.summoner_recycler_indicator);
-
         return rootView;
     }
 
@@ -64,9 +62,9 @@ public class SummonerMasteryFragment extends Fragment implements IdClickListener
         super.onActivityCreated(savedInstanceState);
 
         mPatchVersion = LeaguePreferences.getPatchVersion(getContext());
-
-        mAdapter = new MasteryAdapter(getContext(), new ArrayList<Mastery>(), SummonerMasteryFragment.this, mPatchVersion);
+        mAdapter = new MasteryAdapter(getContext(), this, mPatchVersion);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
@@ -77,34 +75,45 @@ public class SummonerMasteryFragment extends Fragment implements IdClickListener
         SummonerModelFactory factory =
                 InjectorUtils.provideSummonerModelFactory(getActivity().getApplicationContext());
         mSummonerModel = ViewModelProviders.of(getActivity(), factory).get(SummonerModel.class);
-        mSummonerModel.getMasteries().observe(getActivity(), new Observer<List<Mastery>>() {
+        mSummonerModel.getMasteries().observe(this, new Observer<Resource<List<Mastery>>>() {
             @Override
-            public void onChanged(@Nullable List<Mastery> masteries) {
+            public void onChanged(@Nullable Resource<List<Mastery>> masteryListResource) {
                 Log.d(LOG_TAG, "Getting masteries");
-                updateUi(masteries);
+                updateUi(masteryListResource);
             }
         });
     }
 
-    private void updateUi(@Nullable List<Mastery> masteries) {
-        if (masteries != null && !masteries.isEmpty()) {
-            mAdapter.swapData(masteries);
-        } else {
-            mEmptyViewTv.setText(getString(R.string.no_masteries_found));
-            mEmptyViewTv.setVisibility(View.VISIBLE);
+    private void updateUi(@Nullable Resource<List<Mastery>> masteryListResource) {
+        if (masteryListResource == null) {
+            Log.d(LOG_TAG, "MasteryListResource null");
+            return;
         }
-        mRecyclerIndicator.setVisibility(View.INVISIBLE);
+        switch (masteryListResource.status) {
+            case LOADING:
+                mRecyclerIndicator.setVisibility(View.VISIBLE);
+                mRecyclerView.setVisibility(View.INVISIBLE);
+                mEmptyViewTv.setVisibility(View.INVISIBLE);
+                mEmptyViewTv.setText("");
+                break;
+            case SUCCESS:
+                mRecyclerIndicator.setVisibility(View.INVISIBLE);
+                mRecyclerView.setVisibility(View.VISIBLE);
+                mEmptyViewTv.setVisibility(View.INVISIBLE);
+                mAdapter.setData(masteryListResource.data);
+                break;
+            case ERROR:
+                mRecyclerIndicator.setVisibility(View.INVISIBLE);
+                mRecyclerView.setVisibility(View.INVISIBLE);
+                mEmptyViewTv.setVisibility(View.VISIBLE);
+                mEmptyViewTv.setText(getString(R.string.no_masteries_found));
+                break;
+        }
     }
 
     @Override
-    public void onClickListener(int id) {
+    public void onClick(int id) {
         mCallback.onMasteryChampionListener(id);
-    }
-
-    // Called from SummonerActivity.
-    public void showMasteryIndicator() {
-        mRecyclerIndicator.setVisibility(View.VISIBLE);
-        mEmptyViewTv.setVisibility(View.INVISIBLE);
     }
 
     @Override

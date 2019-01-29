@@ -10,7 +10,7 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -22,7 +22,6 @@ import com.example.android.leaguestats.R;
 import com.example.android.leaguestats.utilities.DataUtils;
 
 public class SummonerSearchFragment extends Fragment {
-
 
     public interface OnSummonerListener {
         void onSummonerSearch(String entryUrlString, String summonerName);
@@ -51,6 +50,10 @@ public class SummonerSearchFragment extends Fragment {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
+                    InputMethodManager imm = (InputMethodManager)v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    if (imm != null) {
+                        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                    }
                     searchSummoner();
                     return true;
                 }

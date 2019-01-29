@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nested_scroll_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="@dimen/activity_vertical_margin">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/empty_view_tv"
+            style="@style/EmptyText"
+            android:layout_centerInParent="true"
+            android:text="@string/champion_not_found" />
+
+        <LinearLayout
+            android:id="@+id/champion_content_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="invisible">
+
+            <TextView
+                style="@style/TitleText"
+                android:text="@string/skins" />
+
+            <View style="@style/AlphaBottomView" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/splash_art_recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <View style="@style/AlphaTopView" />
+
+            <TextView
+                style="@style/TitleText"
+                android:text="@string/bio" />
+
+            <View style="@style/AlphaBottomView" />
+
+            <TextView
+                android:id="@+id/champion_bio_tv"
+                style="@style/BoldText"
+                tools:text="Riven was the... " />
+
+            <View style="@style/AlphaTopView" />
+
+            <TextView
+                style="@style/TitleText"
+                android:text="@string/info" />
+
+            <View style="@style/AlphaBottomView" />
+
+            <include
+                layout="@layout/champion_overview_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <View style="@style/AlphaTopView" />
+
+            <TextView
+                style="@style/TitleText"
+                android:text="@string/stats" />
+
+            <View style="@style/AlphaBottomView" />
+
+            <include
+                layout="@layout/champion_stats_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <View style="@style/AlphaTopView" />
+
+            <TextView
+                style="@style/TitleText"
+                android:text="@string/spells" />
+
+            <View style="@style/AlphaBottomView" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/spell_recycler_view"
+                style="@style/RecyclerViewStyle"
+                android:layout_height="wrap_content" />
+
+            <View style="@style/AlphaTopView" />
+
+            <TextView
+                style="@style/TitleText"
+                android:text="@string/tips" />
+
+            <View style="@style/AlphaBottomView" />
+
+            <include
+                layout="@layout/champion_tips_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</android.support.v4.widget.NestedScrollView>

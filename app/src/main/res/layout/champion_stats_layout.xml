@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    tools:showIn="@layout/fragment_champion_detail">
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/health_label_tv"
+            style="@style/LabelText"
+            android:text="@string/health_label" />
+
+        <TextView
+            android:id="@+id/health_tv"
+            style="@style/BoldText"
+            tools:text="520" />
+
+        <TextView
+            android:id="@+id/health_regen_label_tv"
+            style="@style/LabelText"
+            android:text="@string/health_regen_label" />
+
+        <TextView
+            android:id="@+id/health_regen_tv"
+            style="@style/BoldText"
+            tools:text="6.25" />
+
+        <TextView
+            android:id="@+id/mana_label_tv"
+            style="@style/LabelText"
+            android:text="@string/mana_label" />
+
+        <TextView
+            android:id="@+id/mana_tv"
+            style="@style/BoldText"
+            tools:text="427" />
+
+        <TextView
+            android:id="@+id/mana_regen_label_tv"
+            style="@style/LabelText"
+            android:text="@string/mana_regen_label" />
+
+        <TextView
+            android:id="@+id/mana_regen_tv"
+            style="@style/BoldText"
+            tools:text="0" />
+
+        <TextView
+            android:id="@+id/range_label_tv"
+            style="@style/LabelText"
+            android:text="@string/range_label" />
+
+        <TextView
+            android:id="@+id/range_tv"
+            style="@style/BoldText"
+            tools:text="625" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/attack_damage_label_tv"
+            style="@style/LabelText"
+            android:text="@string/attack_damage_label" />
+
+        <TextView
+            android:id="@+id/attack_damage_tv"
+            style="@style/BoldText"
+            tools:text="70" />
+
+        <TextView
+            android:id="@+id/attack_speed_label_tv"
+            style="@style/LabelText"
+            android:text="@string/attack_speed_label" />
+
+        <TextView
+            android:id="@+id/attack_speed_tv"
+            style="@style/BoldText"
+            tools:text="0.651" />
+
+        <TextView
+            android:id="@+id/magic_resist_label_tv"
+            style="@style/LabelText"
+            android:text="@string/magic_resist_label" />
+
+        <TextView
+            android:id="@+id/magic_resist_tv"
+            style="@style/BoldText"
+            tools:text="32" />
+
+        <TextView
+            android:id="@+id/armor_label_tv"
+            style="@style/LabelText"
+            android:text="@string/armor_label" />
+
+        <TextView
+            android:id="@+id/armor_tv"
+            style="@style/BoldText"
+            tools:text="30" />
+
+        <TextView
+            android:id="@+id/move_speed_label"
+            style="@style/LabelText"
+            android:text="@string/move_speed_label" />
+
+        <TextView
+            android:id="@+id/move_speed_tv"
+            style="@style/BoldText"
+            tools:text="350" />
+
+    </LinearLayout>
+
+</LinearLayout>

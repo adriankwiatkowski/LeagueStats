@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    tools:showIn="@layout/fragment_champion_detail">
+
+    <TextView
+        android:id="@+id/playing_as_label_tv"
+        style="@style/LabelText"
+        tools:text="Playing As Riven" />
+
+    <TextView
+        android:id="@+id/playing_as_tv"
+        style="@style/BoldText"
+        tools:text="Try not to screw up combo>?" />
+
+    <TextView
+        android:id="@+id/playing_against_label_tv"
+        style="@style/LabelText"
+        tools:text="Playing Against Riven" />
+
+    <TextView
+        android:id="@+id/playing_against_tv"
+        style="@style/BoldText"
+        tools:text="ff15 ¯\_(ツ)_/¯" />
+
+</LinearLayout>

@@ -10,67 +10,76 @@ import java.util.List;
 public class ItemEntry {
 
     @PrimaryKey
+    @ColumnInfo(name = "item_id")
     private int id;
+    @ColumnInfo(name = "item_key")
+    private String key;
+    @ColumnInfo(name = "item_name")
     private String name;
 
-    @ColumnInfo(name = "plain_text")
+    @ColumnInfo(name = "item_plain_text")
     private String plainText;
+    @ColumnInfo(name = "item_description")
     private String description;
+    @ColumnInfo(name = "item_depth")
     private int depth;
 
-    private String image;
+    @ColumnInfo(name = "item_image_id")
+    private String itemId;
 
     @ColumnInfo(name = "item_into")
     private List<String> into;
     @ColumnInfo(name = "item_from")
     private List<String> from;
 
-    @ColumnInfo(name = "base_gold")
+    @ColumnInfo(name = "item_base_gold")
     private int baseGold;
-    @ColumnInfo(name = "total_gold")
+    @ColumnInfo(name = "item_total_gold")
     private int totalGold;
-    @ColumnInfo(name = "sell_gold")
+    @ColumnInfo(name = "item_sell_gold")
     private int sellGold;
+    @ColumnInfo(name = "item_purchasable")
     private String purchasable;
 
-    @ColumnInfo(name = "flat_armor_mod")
+    @ColumnInfo(name = "item_flat_armor_mod")
     private double flatArmorMod;
-    @ColumnInfo(name = "flat_spell_block_mod")
+    @ColumnInfo(name = "item_flat_spell_block_mod")
     private double flatSpellBlockMod;
-    @ColumnInfo(name = "flat_hp_pool_mod")
+    @ColumnInfo(name = "item_flat_hp_pool_mod")
     private double flatHPPoolMod;
-    @ColumnInfo(name = "flat_mp_pool_mod")
+    @ColumnInfo(name = "item_flat_mp_pool_mod")
     private double flatMPPoolMod;
-    @ColumnInfo(name = "flat_hp_regen_mod")
+    @ColumnInfo(name = "item_flat_hp_regen_mod")
     private double flatHPRegenMod;
-    @ColumnInfo(name = "flat_crit_chance_mod")
+    @ColumnInfo(name = "item_flat_crit_chance_mod")
     private double flatCritChanceMod;
-    @ColumnInfo(name = "flat_magic_damage_mod")
+    @ColumnInfo(name = "item_flat_magic_damage_mod")
     private double flatMagicDamageMod;
-    @ColumnInfo(name = "flat_physical_damage_mod")
+    @ColumnInfo(name = "item_flat_physical_damage_mod")
     private double flatPhysicalDamageMod;
-    @ColumnInfo(name = "flat_movement_speed_mod")
+    @ColumnInfo(name = "item_flat_movement_speed_mod")
     private double flatMovementSpeedMod;
-    @ColumnInfo(name = "percent_movement_speed_mod")
+    @ColumnInfo(name = "item_percent_movement_speed_mod")
     private double percentMovementSpeedMod;
-    @ColumnInfo(name = "percent_attack_speed_mod")
+    @ColumnInfo(name = "item_percent_attack_speed_mod")
     private double percentAttackSpeedMod;
-    @ColumnInfo(name = "percent_life_steal_mod")
+    @ColumnInfo(name = "item_percent_life_steal_mod")
     private double percentLifeStealMod;
 
-    public ItemEntry(int id, String name, String plainText, String description, int depth,
-                     String image, List<String> into, List<String> from, int baseGold, int totalGold,
-                     int sellGold, String purchasable, double flatArmorMod, double flatSpellBlockMod,
+    public ItemEntry(int id, String key, String name, String plainText, String description, int depth, String itemId,
+                     List<String> into, List<String> from, int baseGold, int totalGold, int sellGold,
+                     String purchasable, double flatArmorMod, double flatSpellBlockMod,
                      double flatHPPoolMod, double flatMPPoolMod, double flatHPRegenMod,
                      double flatCritChanceMod, double flatMagicDamageMod, double flatPhysicalDamageMod,
                      double flatMovementSpeedMod, double percentMovementSpeedMod,
                      double percentAttackSpeedMod, double percentLifeStealMod) {
         this.id = id;
+        this.key = key;
         this.name = name;
         this.plainText = plainText;
         this.description = description;
         this.depth = depth;
-        this.image = image;
+        this.itemId = itemId;
         this.into = into;
         this.from = from;
         this.baseGold = baseGold;
@@ -129,14 +138,6 @@ public class ItemEntry {
 
     public void setDepth(int depth) {
         this.depth = depth;
-    }
-
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
     }
 
     public List<String> getInto() {
@@ -281,5 +282,21 @@ public class ItemEntry {
 
     public void setPercentLifeStealMod(double percentLifeStealMod) {
         this.percentLifeStealMod = percentLifeStealMod;
+    }
+
+    public String getItemId() {
+        return itemId;
+    }
+
+    public void setItemId(String itemId) {
+        this.itemId = itemId;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 }
