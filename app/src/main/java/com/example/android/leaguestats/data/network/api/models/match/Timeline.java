@@ -45,16 +45,16 @@ public class Timeline {
 
     /**
      *
-     * @param xpDiffPerMinDeltas
-     * @param damageTakenDiffPerMinDeltas
-     * @param xpPerMinDeltas
-     * @param goldPerMinDeltas
-     * @param role
-     * @param creepsPerMinDeltas
      * @param participantId
      * @param csDiffPerMinDeltas
      * @param damageTakenPerMinDeltas
+     * @param role
+     * @param damageTakenDiffPerMinDeltas
+     * @param xpPerMinDeltas
+     * @param xpDiffPerMinDeltas
      * @param lane
+     * @param creepsPerMinDeltas
+     * @param goldPerMinDeltas
      */
     public Timeline(int participantId, CreepsPerMinDeltas creepsPerMinDeltas, XpPerMinDeltas xpPerMinDeltas, GoldPerMinDeltas goldPerMinDeltas, CsDiffPerMinDeltas csDiffPerMinDeltas, XpDiffPerMinDeltas xpDiffPerMinDeltas, DamageTakenPerMinDeltas damageTakenPerMinDeltas, DamageTakenDiffPerMinDeltas damageTakenDiffPerMinDeltas, String role, String lane) {
         super();

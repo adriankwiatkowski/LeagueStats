@@ -65,22 +65,22 @@ public class Team {
 
     /**
      *
-     * @param bans
-     * @param firstBlood
-     * @param firstTower
-     * @param firstInhibitor
-     * @param firstDragon
-     * @param vilemawKills
-     * @param win
-     * @param baronKills
-     * @param teamId
-     * @param inhibitorKills
-     * @param dominionVictoryScore
-     * @param riftHeraldKills
-     * @param firstRiftHerald
      * @param towerKills
+     * @param riftHeraldKills
+     * @param firstBlood
+     * @param inhibitorKills
+     * @param bans
      * @param firstBaron
+     * @param firstDragon
+     * @param dominionVictoryScore
      * @param dragonKills
+     * @param baronKills
+     * @param firstInhibitor
+     * @param firstTower
+     * @param vilemawKills
+     * @param firstRiftHerald
+     * @param teamId
+     * @param win
      */
     public Team(int teamId, String win, boolean firstBlood, boolean firstTower, boolean firstInhibitor, boolean firstBaron, boolean firstDragon, boolean firstRiftHerald, int towerKills, int inhibitorKills, int baronKills, int dragonKills, int vilemawKills, int riftHeraldKills, int dominionVictoryScore, List<Ban> bans) {
         super();

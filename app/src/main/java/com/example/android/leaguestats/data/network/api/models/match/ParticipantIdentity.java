@@ -21,8 +21,8 @@ public class ParticipantIdentity {
 
     /**
      *
-     * @param player
      * @param participantId
+     * @param player
      */
     public ParticipantIdentity(int participantId, Player player) {
         super();

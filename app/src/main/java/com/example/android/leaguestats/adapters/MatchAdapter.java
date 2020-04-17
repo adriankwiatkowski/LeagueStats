@@ -62,8 +62,8 @@ public class MatchAdapter extends BaseExpandableListAdapter {
 
         int currentSummonerPosition = -1;
         for (int i = 0; i < match.getParticipantIdentities().size(); i++) {
-            long summonerId = match.getParticipantIdentities().get(i).getPlayer().getSummonerId();
-            if (match.getCurrentSummonerId() == summonerId) {
+            String summonerId = match.getParticipantIdentities().get(i).getPlayer().getSummonerId();
+            if (match.getCurrentSummonerId().equals(summonerId)) {
                 currentSummonerPosition = i;
                 break;
             }

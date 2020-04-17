@@ -45,18 +45,18 @@ public class RetrofitInstance {
     }
 
     public static String getSummonerUrl(String entryUrlString, String summonerName) {
-        return entryUrlString + "/lol/" + "summoner/v3/summoners/by-name/" + summonerName + "?api_key=" + PERSONAL_API_KEY;
+        return entryUrlString + "/lol/" + "summoner/v4/summoners/by-name/" + summonerName + "?api_key=" + PERSONAL_API_KEY;
     }
 
-    public static String getMasteryUrl(String entryUrlString, long summonerId) {
-        return entryUrlString + "/lol/" + "champion-mastery/v3/champion-masteries/by-summoner/" + String.valueOf(summonerId) + "?api_key=" + PERSONAL_API_KEY;
+    public static String getMasteryUrl(String entryUrlString, String summonerId) {
+        return entryUrlString + "/lol/" + "champion-mastery/v4/champion-masteries/by-summoner/" + String.valueOf(summonerId) + "?api_key=" + PERSONAL_API_KEY;
     }
 
-    public static String getMatchListUrl(String entryUrlString, long accountId) {
-        return entryUrlString + "/lol/" + "match/v3/matchlists/by-account/" + String.valueOf(accountId) + "?api_key=" + PERSONAL_API_KEY;
+    public static String getMatchListUrl(String entryUrlString, String accountId) {
+        return entryUrlString + "/lol/" + "match/v4/matchlists/by-account/" + String.valueOf(accountId) + "?api_key=" + PERSONAL_API_KEY;
     }
 
     public static String getMatchUrl(String entryUrlString, long gameId) {
-        return entryUrlString + "/lol/" + "match/v3/matches/" + String.valueOf(gameId) + "?api_key=" + PERSONAL_API_KEY;
+        return entryUrlString + "/lol/" + "match/v4/matches/" + String.valueOf(gameId) + "?api_key=" + PERSONAL_API_KEY;
     }
 }

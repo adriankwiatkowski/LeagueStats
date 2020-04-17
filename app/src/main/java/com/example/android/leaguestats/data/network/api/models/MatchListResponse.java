@@ -9,31 +9,20 @@ public class MatchListResponse {
 
     @SerializedName("matches")
     @Expose
-    private List<MatchList> matches;
+    private List<MatchList> matches = null;
     @SerializedName("startIndex")
     @Expose
-    private Integer startIndex;
+    private int startIndex;
     @SerializedName("endIndex")
     @Expose
-    private Integer endIndex;
+    private int endIndex;
     @SerializedName("totalGames")
     @Expose
-    private Integer totalGames;
+    private int totalGames;
 
-    /**
-     * No args constructor for use in serialization
-     *
-     */
     public MatchListResponse() {
     }
 
-    /**
-     *
-     * @param matches
-     * @param totalGames
-     * @param startIndex
-     * @param endIndex
-     */
     public MatchListResponse(List<MatchList> matches, Integer startIndex, Integer endIndex, Integer totalGames) {
         super();
         this.matches = matches;

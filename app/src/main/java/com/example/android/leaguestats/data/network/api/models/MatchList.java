@@ -1,34 +1,54 @@
 package com.example.android.leaguestats.data.network.api.models;
 
+import java.util.List;
+
+import com.example.android.leaguestats.data.network.api.models.match.Participant;
+import com.example.android.leaguestats.data.network.api.models.match.ParticipantIdentity;
+import com.example.android.leaguestats.data.network.api.models.match.Team;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 public class MatchList {
 
+    @SerializedName("gameId")
+    @Expose
+    private int gameId;
     @SerializedName("platformId")
     @Expose
     private String platformId;
-    @SerializedName("gameId")
+    @SerializedName("gameCreation")
     @Expose
-    private long gameId;
-    @SerializedName("champion")
+    private int gameCreation;
+    @SerializedName("gameDuration")
     @Expose
-    private int champion;
-    @SerializedName("queue")
+    private int gameDuration;
+    @SerializedName("queueId")
     @Expose
-    private int queue;
-    @SerializedName("season")
+    private int queueId;
+    @SerializedName("mapId")
     @Expose
-    private int season;
-    @SerializedName("timestamp")
+    private int mapId;
+    @SerializedName("seasonId")
     @Expose
-    private long timestamp;
-    @SerializedName("role")
+    private int seasonId;
+    @SerializedName("gameVersion")
     @Expose
-    private String role;
-    @SerializedName("lane")
+    private String gameVersion;
+    @SerializedName("gameMode")
     @Expose
-    private String lane;
+    private String gameMode;
+    @SerializedName("gameType")
+    @Expose
+    private String gameType;
+    @SerializedName("teams")
+    @Expose
+    private List<Team> teams = null;
+    @SerializedName("participants")
+    @Expose
+    private List<Participant> participants = null;
+    @SerializedName("participantIdentities")
+    @Expose
+    private List<ParticipantIdentity> participantIdentities = null;
 
     /**
      * No args constructor for use in serialization
@@ -39,25 +59,43 @@ public class MatchList {
 
     /**
      *
-     * @param timestamp
-     * @param champion
-     * @param queue
-     * @param season
      * @param gameId
-     * @param role
+     * @param participantIdentities
+     * @param queueId
+     * @param gameType
+     * @param gameDuration
+     * @param teams
      * @param platformId
-     * @param lane
+     * @param gameCreation
+     * @param seasonId
+     * @param gameVersion
+     * @param mapId
+     * @param gameMode
+     * @param participants
      */
-    public MatchList(String platformId, long gameId, int champion, int queue, int season, long timestamp, String role, String lane) {
+    public MatchList(int gameId, String platformId, int gameCreation, int gameDuration, int queueId, int mapId, int seasonId, String gameVersion, String gameMode, String gameType, List<Team> teams, List<Participant> participants, List<ParticipantIdentity> participantIdentities) {
         super();
-        this.platformId = platformId;
         this.gameId = gameId;
-        this.champion = champion;
-        this.queue = queue;
-        this.season = season;
-        this.timestamp = timestamp;
-        this.role = role;
-        this.lane = lane;
+        this.platformId = platformId;
+        this.gameCreation = gameCreation;
+        this.gameDuration = gameDuration;
+        this.queueId = queueId;
+        this.mapId = mapId;
+        this.seasonId = seasonId;
+        this.gameVersion = gameVersion;
+        this.gameMode = gameMode;
+        this.gameType = gameType;
+        this.teams = teams;
+        this.participants = participants;
+        this.participantIdentities = participantIdentities;
+    }
+
+    public int getGameId() {
+        return gameId;
+    }
+
+    public void setGameId(int gameId) {
+        this.gameId = gameId;
     }
 
     public String getPlatformId() {
@@ -68,59 +106,92 @@ public class MatchList {
         this.platformId = platformId;
     }
 
-    public long getGameId() {
-        return gameId;
+    public int getGameCreation() {
+        return gameCreation;
     }
 
-    public void setGameId(long gameId) {
-        this.gameId = gameId;
+    public void setGameCreation(int gameCreation) {
+        this.gameCreation = gameCreation;
     }
 
-    public int getChampion() {
-        return champion;
+    public int getGameDuration() {
+        return gameDuration;
     }
 
-    public void setChampion(int champion) {
-        this.champion = champion;
+    public void setGameDuration(int gameDuration) {
+        this.gameDuration = gameDuration;
     }
 
-    public int getQueue() {
-        return queue;
+    public int getQueueId() {
+        return queueId;
     }
 
-    public void setQueue(int queue) {
-        this.queue = queue;
+    public void setQueueId(int queueId) {
+        this.queueId = queueId;
     }
 
-    public int getSeason() {
-        return season;
+    public int getMapId() {
+        return mapId;
     }
 
-    public void setSeason(int season) {
-        this.season = season;
+    public void setMapId(int mapId) {
+        this.mapId = mapId;
     }
 
-    public long getTimestamp() {
-        return timestamp;
+    public int getSeasonId() {
+        return seasonId;
     }
 
-    public void setTimestamp(long timestamp) {
-        this.timestamp = timestamp;
+    public void setSeasonId(int seasonId) {
+        this.seasonId = seasonId;
     }
 
-    public String getRole() {
-        return role;
+    public String getGameVersion() {
+        return gameVersion;
     }
 
-    public void setRole(String role) {
-        this.role = role;
+    public void setGameVersion(String gameVersion) {
+        this.gameVersion = gameVersion;
     }
 
-    public String getLane() {
-        return lane;
+    public String getGameMode() {
+        return gameMode;
     }
 
-    public void setLane(String lane) {
-        this.lane = lane;
+    public void setGameMode(String gameMode) {
+        this.gameMode = gameMode;
     }
+
+    public String getGameType() {
+        return gameType;
+    }
+
+    public void setGameType(String gameType) {
+        this.gameType = gameType;
+    }
+
+    public List<Team> getTeams() {
+        return teams;
+    }
+
+    public void setTeams(List<Team> teams) {
+        this.teams = teams;
+    }
+
+    public List<Participant> getParticipants() {
+        return participants;
+    }
+
+    public void setParticipants(List<Participant> participants) {
+        this.participants = participants;
+    }
+
+    public List<ParticipantIdentity> getParticipantIdentities() {
+        return participantIdentities;
+    }
+
+    public void setParticipantIdentities(List<ParticipantIdentity> participantIdentities) {
+        this.participantIdentities = participantIdentities;
+    }
+
 }

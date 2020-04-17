@@ -7,9 +7,9 @@ import com.google.gson.annotations.SerializedName;
 
 public class Mastery {
 
-    @SerializedName("playerId")
+    @SerializedName("summonerId")
     @Expose
-    private int mPlayerId;
+    private String mSummonerId;
     @SerializedName("championId")
     @Expose
     private int mChampionId;
@@ -39,12 +39,12 @@ public class Mastery {
     @Nullable
     private String mChampionImageId;
 
-    public Mastery(int playerId, int championId, int championLevel, int championPoints,
+    public Mastery(String playerId, int championId, int championLevel, int championPoints,
                    long lastPlayTime, int championPointsSinceLastLevel,
                    int championPointsUntilNextLevel, boolean chestGranted,
                    int tokensEarned) {
 
-        mPlayerId = playerId;
+        mSummonerId = playerId;
         mChampionId = championId;
         mChampionLevel = championLevel;
         mChampionPoints = championPoints;
@@ -111,12 +111,12 @@ public class Mastery {
         this.mChampionImageId = championImageId;
     }
 
-    public int getPlayerId() {
-        return mPlayerId;
+    public String getPlayerId() {
+        return mSummonerId;
     }
 
-    public void setPlayerId(int playerId) {
-        this.mPlayerId = playerId;
+    public void setPlayerId(String playerId) {
+        this.mSummonerId = playerId;
     }
 
     public int getChampionPointsSinceLastLevel() {

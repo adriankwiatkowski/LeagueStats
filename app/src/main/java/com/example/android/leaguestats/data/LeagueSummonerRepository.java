@@ -67,7 +67,6 @@ public class LeagueSummonerRepository {
     }
 
     public LiveData<Resource<Summoner>> getSummoner(final String entryUrlString, final String summonerName) {
-        Log.d(LOG_TAG, "Getting summoner");
         return new SummonerBoundResource<Summoner, IconEntry>() {
 
             @Override
@@ -113,8 +112,8 @@ public class LeagueSummonerRepository {
         }.asLiveData();
     }
 
-    public LiveData<Resource<List<Mastery>>> getMasteries(final String entryUrlString, final long summonerId) {
-        Log.d(LOG_TAG, "Getting masteries");
+    public LiveData<Resource<List<Mastery>>> getMasteries(final String entryUrlString, final String summonerId) {
+        Log.d(LOG_TAG, "Getting masteries: " + mService.getMasteries(RetrofitInstance.getMasteryUrl(entryUrlString, summonerId)));
         return new SummonerBoundResource<List<Mastery>, List<Champion>>() {
 
             @Override
@@ -176,7 +175,7 @@ public class LeagueSummonerRepository {
         }.asLiveData();
     }
 
-    public LiveData<Resource<List<Resource<Match>>>> getMatches(final String entryUrlString, final long accountId, final long summonerId) {
+    public LiveData<Resource<List<Resource<Match>>>> getMatches(final String entryUrlString, final String accountId, final String summonerId) {
         Log.d(LOG_TAG, "Getting matches");
 
         final LiveData<Resource<List<Resource<Match>>>> matchResourceLiveData = new MatchBoundResource<Match, MatchListResponse>() {

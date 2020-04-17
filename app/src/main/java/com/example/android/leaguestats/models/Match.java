@@ -51,7 +51,7 @@ public class Match {
     private List<ParticipantIdentity> participantIdentities;
 
     // Setters:
-    private long currentSummonerId;
+    private String currentSummonerId;
 
     public Match(long gameId, String platformId, long gameCreation, long gameDuration,
                          int queueId, int mapId, int seasonId, String gameVersion, String gameMode,
@@ -176,11 +176,11 @@ public class Match {
         this.participantIdentities = participantIdentities;
     }
 
-    public long getCurrentSummonerId() {
+    public String getCurrentSummonerId() {
         return currentSummonerId;
     }
 
-    public void setCurrentSummonerId(long currentSummonerId) {
+    public void setCurrentSummonerId(String currentSummonerId) {
         this.currentSummonerId = currentSummonerId;
     }
 }

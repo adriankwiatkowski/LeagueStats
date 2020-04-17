@@ -10,19 +10,19 @@ public class Player {
     private String platformId;
     @SerializedName("accountId")
     @Expose
-    private long accountId;
+    private String accountId;
     @SerializedName("summonerName")
     @Expose
     private String summonerName;
     @SerializedName("summonerId")
     @Expose
-    private long summonerId;
+    private String summonerId;
     @SerializedName("currentPlatformId")
     @Expose
     private String currentPlatformId;
     @SerializedName("currentAccountId")
     @Expose
-    private long currentAccountId;
+    private String currentAccountId;
     @SerializedName("matchHistoryUri")
     @Expose
     private String matchHistoryUri;
@@ -39,16 +39,16 @@ public class Player {
 
     /**
      *
-     * @param accountId
      * @param profileIcon
+     * @param accountId
      * @param matchHistoryUri
+     * @param currentAccountId
      * @param currentPlatformId
      * @param summonerName
-     * @param currentAccountId
-     * @param platformId
      * @param summonerId
+     * @param platformId
      */
-    public Player(String platformId, long accountId, String summonerName, int summonerId, String currentPlatformId, long currentAccountId, String matchHistoryUri, int profileIcon) {
+    public Player(String platformId, String accountId, String summonerName, String summonerId, String currentPlatformId, String currentAccountId, String matchHistoryUri, int profileIcon) {
         super();
         this.platformId = platformId;
         this.accountId = accountId;
@@ -68,11 +68,11 @@ public class Player {
         this.platformId = platformId;
     }
 
-    public long getAccountId() {
+    public String getAccountId() {
         return accountId;
     }
 
-    public void setAccountId(long accountId) {
+    public void setAccountId(String accountId) {
         this.accountId = accountId;
     }
 
@@ -84,11 +84,11 @@ public class Player {
         this.summonerName = summonerName;
     }
 
-    public long getSummonerId() {
+    public String getSummonerId() {
         return summonerId;
     }
 
-    public void setSummonerId(long summonerId) {
+    public void setSummonerId(String summonerId) {
         this.summonerId = summonerId;
     }
 
@@ -100,11 +100,11 @@ public class Player {
         this.currentPlatformId = currentPlatformId;
     }
 
-    public long getCurrentAccountId() {
+    public String getCurrentAccountId() {
         return currentAccountId;
     }
 
-    public void setCurrentAccountId(long currentAccountId) {
+    public void setCurrentAccountId(String currentAccountId) {
         this.currentAccountId = currentAccountId;
     }
 

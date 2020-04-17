@@ -16,16 +16,16 @@ public class Summoner {
     private long mSummonerLevel;
 
     @SerializedName("id")
-    private long mSummonerId;
+    private String mSummonerId;
 
     @SerializedName("accountId")
-    private long mAccountId;
+    private String mAccountId;
 
     @SerializedName("revisionDate")
     private long mSummonerRevisionDate;
 
     public Summoner(String entryUrl, int profileIconId, String summonerName, long summonerLevel,
-                    long accountId, long summonerId, long summonerRevisionDate) {
+                    String accountId, String summonerId, long summonerRevisionDate) {
         this.mEntryUrl = entryUrl;
         this.mIconId = profileIconId;
         this.mSummonerName = summonerName;
@@ -67,19 +67,19 @@ public class Summoner {
         this.mSummonerRevisionDate = summonerRevisionDate;
     }
 
-    public long getSummonerId() {
+    public String getSummonerId() {
         return mSummonerId;
     }
 
-    public void setSummonerId(long summonerId) {
+    public void setSummonerId(String summonerId) {
         this.mSummonerId = summonerId;
     }
 
-    public long getAccountId() {
+    public String getAccountId() {
         return mAccountId;
     }
 
-    public void setAccountId(long accountId) {
+    public void setAccountId(String accountId) {
         this.mAccountId = accountId;
     }
 

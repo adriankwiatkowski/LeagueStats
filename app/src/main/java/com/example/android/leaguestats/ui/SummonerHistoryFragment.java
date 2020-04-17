@@ -137,10 +137,12 @@ public class SummonerHistoryFragment extends Fragment {
                 if (matchResourceList != null && !matchResourceList.isEmpty()) {
                     List<Match> matchList = new ArrayList<>();
                     for (int i = 0; i < matchResourceList.size(); i++) {
-                        if (matchResourceList.get(i).status == Status.SUCCESS) {
+                        if (matchResourceList.get(i).status == Status.SUCCESS
+                                && matchResourceList.get(i).data != null) {
                             matchList.add(matchResourceList.get(i).data);
                         }
                     }
+                    Log.d(LOG_TAG, "Match list size: " + matchList.size() + ".");
                     if (!matchList.isEmpty()) {
                         Collections.sort(matchList, new Comparator<Match>() {
                             @Override
@@ -150,7 +152,7 @@ public class SummonerHistoryFragment extends Fragment {
                         });
                         mAdapter.setData(matchList);
                         for (int i = 0; i < matchList.get(0).getParticipantIdentities().size(); i++) {
-                            if (matchList.get(0).getCurrentSummonerId() == matchList.get(0).getParticipantIdentities().get(i).getPlayer().getSummonerId()) {
+                            if (matchList.get(0).getCurrentSummonerId().equals(matchList.get(0).getParticipantIdentities().get(i).getPlayer().getSummonerId())) {
                                 highestAchievedSeasonTier = matchList.get(0).getParticipants().get(i).getHighestAchievedSeasonTier();
                                 break;
                             }
