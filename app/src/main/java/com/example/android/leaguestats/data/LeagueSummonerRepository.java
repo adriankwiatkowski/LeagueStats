@@ -34,6 +34,7 @@ import java.util.concurrent.TimeUnit;
 
 import retrofit2.Retrofit;
 
+// TODO: Remove it later.
 public class LeagueSummonerRepository {
 
     private static final String LOG_TAG = LeagueSummonerRepository.class.getSimpleName();

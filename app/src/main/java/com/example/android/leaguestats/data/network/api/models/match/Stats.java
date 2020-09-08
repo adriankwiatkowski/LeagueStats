@@ -4,6 +4,7 @@ import com.example.android.leaguestats.models.Item;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+// TODO: Remove it later.
 public class Stats {
 
     @SerializedName("participantId")

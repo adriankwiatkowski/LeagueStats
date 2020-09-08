@@ -2,6 +2,7 @@ package com.example.android.leaguestats.models;
 
 import com.google.gson.annotations.SerializedName;
 
+// TODO: Remove it later.
 public class Summoner {
 
     private String mEntryUrl;

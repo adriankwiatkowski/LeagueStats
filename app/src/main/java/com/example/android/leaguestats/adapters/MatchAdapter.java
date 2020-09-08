@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+// TODO: Remove it later.
 public class MatchAdapter extends BaseExpandableListAdapter {
 
     private static final String LOG_TAG = MatchAdapter.class.getSimpleName();

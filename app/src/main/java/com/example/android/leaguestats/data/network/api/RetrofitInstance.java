@@ -11,6 +11,7 @@ import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+// TODO: Remove it later.
 public class RetrofitInstance {
 
     private static final String BASE_DDRAGON_URL = "https://ddragon.leagueoflegends.com/";
