@@ -3,7 +3,6 @@ package com.example.android.leaguestats.data.network.api.models.match;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-// TODO: Remove it later.
 public class DamageTakenDiffPerMinDeltas {
 
     @SerializedName("10-20")

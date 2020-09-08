@@ -32,7 +32,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-// TODO: Remove it later.
 public class SummonerHistoryFragment extends Fragment {
 
     private HistoryListener mCallback;

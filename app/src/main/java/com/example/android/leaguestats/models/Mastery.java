@@ -5,7 +5,6 @@ import android.support.annotation.Nullable;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-// TODO: Remove it later.
 public class Mastery {
 
     @SerializedName("summonerId")

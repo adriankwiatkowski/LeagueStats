@@ -8,7 +8,6 @@ import com.example.android.leaguestats.data.network.api.models.match.Team;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-// TODO: Remove it later.
 public class MatchList {
 
     @SerializedName("gameId")

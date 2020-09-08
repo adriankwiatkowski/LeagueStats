@@ -7,7 +7,6 @@ import com.example.android.leaguestats.models.SummonerSpell;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-// TODO: Remove it later.
 public class Participant {
 
     @SerializedName("participantId")

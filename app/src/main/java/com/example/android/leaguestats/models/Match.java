@@ -8,7 +8,6 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-// TODO: Remove it later.
 public class Match {
 
     @SerializedName("gameId")
