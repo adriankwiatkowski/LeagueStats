@@ -90,7 +90,7 @@ public final class OpenDataJsonParser {
             String championLore = championObject.getString("lore");
 
             JSONArray tagsArray = championObject.getJSONArray("tags");
-            List<String> championTags = JsonUtils.getStringListFromJSONArray(tagsArray);
+            List<String> championTags = JsonUtils.getStringsFromArray(tagsArray);
 
             String partype = championObject.getString("partype");
 
@@ -114,15 +114,15 @@ public final class OpenDataJsonParser {
 
             // Get Champion allyTips.
             JSONArray allyTipsArray = championObject.getJSONArray("allytips");
-            List<String> asTips = JsonUtils.getStringListFromJSONArray(allyTipsArray);
+            List<String> asTips = JsonUtils.getStringsFromArray(allyTipsArray);
 
             // Get Champion enemyTips.
             JSONArray enemyTipsArray = championObject.getJSONArray("enemytips");
-            List<String> vsTips = JsonUtils.getStringListFromJSONArray(enemyTipsArray);
+            List<String> vsTips = JsonUtils.getStringsFromArray(enemyTipsArray);
 
             JSONArray skins = championObject.getJSONArray("skins");
-            List<Integer> splashArtIdList = JsonUtils.getListIntegerFromJSONObjectFromJSONArray(skins, "num");
-            List<String> splashArtName = JsonUtils.getListStringFromJSONObjectFromJSONArray(skins, "name");
+            List<Integer> splashArtIdList = JsonUtils.getIntegersFromObjectsInArray(skins, "num");
+            List<String> splashArtName = JsonUtils.getStringsFromObjectsInArray(skins, "name");
 
             // Get Champion info.
             JSONObject info = championObject.getJSONObject("info");
@@ -203,13 +203,13 @@ public final class OpenDataJsonParser {
             JSONArray fromArray = itemJson.optJSONArray("from");
             List<String> fromList = new ArrayList<>();
             if (fromArray != null) {
-                fromList = JsonUtils.getStringListFromJSONArray(fromArray);
+                fromList = JsonUtils.getStringsFromArray(fromArray);
             }
 
             JSONArray intoArray = itemJson.optJSONArray("into");
             List<String> intoList = new ArrayList<>();
             if (intoArray != null) {
-                intoList = JsonUtils.getStringListFromJSONArray(intoArray);
+                intoList = JsonUtils.getStringsFromArray(intoArray);
             }
 
             double flatArmor = 0;
@@ -282,6 +282,7 @@ public final class OpenDataJsonParser {
             int sellGold = 0;
             String purchasable = "";
             if (itemJson.has("gold")) {
+                // This JSON is gold, it's very valuable.
                 JSONObject goldJson = itemJson.getJSONObject("gold");
                 baseGold = goldJson.optInt("base");
                 totalGold = goldJson.optInt("total");
@@ -377,7 +378,7 @@ public final class OpenDataJsonParser {
             int range = rangeArray.getInt(0);
 
             JSONArray modesArray = summonerSpellJson.optJSONArray("modes");
-            List<String> modesList = JsonUtils.getStringListFromJSONArray(modesArray);
+            List<String> modesList = JsonUtils.getStringsFromArray(modesArray);
 
             SummonerSpellEntry summonerSpellEntry = new SummonerSpellEntry(id, key, name,
                     description, imageId, cost, cooldown, range, modesList);

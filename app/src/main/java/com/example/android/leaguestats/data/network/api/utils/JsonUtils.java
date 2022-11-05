@@ -9,7 +9,7 @@ import java.util.List;
 
 class JsonUtils {
 
-    static List<String> getStringListFromJSONArray(JSONArray jsonArray) throws JSONException {
+    static List<String> getStringsFromArray(JSONArray jsonArray) throws JSONException {
         List<String> stringList = new ArrayList<>();
         for (int i = 0; i < jsonArray.length(); i++) {
             stringList.add(i, jsonArray.getString(i));
@@ -17,7 +17,7 @@ class JsonUtils {
         return stringList;
     }
 
-    static List<String> getListStringFromJSONObjectFromJSONArray(JSONArray jsonArray, String key) throws JSONException {
+    static List<String> getStringsFromObjectsInArray(JSONArray jsonArray, String key) throws JSONException {
         List<String> stringList = new ArrayList<>();
         for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject object = jsonArray.getJSONObject(i);
@@ -26,7 +26,7 @@ class JsonUtils {
         return stringList;
     }
 
-    static List<Integer> getListIntegerFromJSONObjectFromJSONArray(JSONArray jsonArray, String key) throws JSONException  {
+    static List<Integer> getIntegersFromObjectsInArray(JSONArray jsonArray, String key) throws JSONException  {
         List<Integer> integerList = new ArrayList<>();
         for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject object = jsonArray.getJSONObject(i);
